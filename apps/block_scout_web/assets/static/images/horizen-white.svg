@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 150.77151 36.664408"
+   version="1.1"
+   id="svg1499"
+   sodipodi:docname="horizen-white.svg"
+   width="150.77151"
+   height="36.66441"
+   inkscape:version="1.2.2 (b0a84865, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview1964"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="2.1819526"
+     inkscape:cx="155.59458"
+     inkscape:cy="54.080002"
+     inkscape:window-width="1309"
+     inkscape:window-height="456"
+     inkscape:window-x="0"
+     inkscape:window-y="38"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg1499" />
+  <defs
+     id="defs1469">
+    <style
+       id="style1458">.cls-1{fill:#041742;}.cls-2{fill:#fff;}.cls-3{fill:url(#radial-gradient);}</style>
+    <radialGradient
+       id="radial-gradient"
+       cx="106.31"
+       cy="41.41"
+       r="38.259998"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0.1"
+         stop-color="#26db8d"
+         id="stop1460" />
+      <stop
+         offset="0.26"
+         stop-color="#23d29a"
+         id="stop1462" />
+      <stop
+         offset="0.56"
+         stop-color="#1abbbb"
+         id="stop1464" />
+      <stop
+         offset="0.89"
+         stop-color="#0e9de5"
+         id="stop1466" />
+    </radialGradient>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath1507">
+      <rect
+         style="fill:#0000ff;stroke-width:0.973852"
+         id="rect1509"
+         width="279.10782"
+         height="67.37085"
+         x="16.040678"
+         y="20.165424" />
+    </clipPath>
+    <radialGradient
+       xlink:href="#radial-gradient"
+       id="radialGradient1511"
+       gradientUnits="userSpaceOnUse"
+       cx="106.31"
+       cy="41.41"
+       r="38.259998" />
+    <radialGradient
+       xlink:href="#radial-gradient"
+       id="radialGradient1513"
+       gradientUnits="userSpaceOnUse"
+       cx="106.31"
+       cy="41.41"
+       r="38.259998" />
+  </defs>
+  <title
+     id="title1471">Asset 5</title>
+  <g
+     id="Layer_2"
+     data-name="Layer 2"
+     clip-path="url(#clipPath1507)"
+     transform="matrix(0.53781367,0,0,0.53781367,-8.1685913,-10.386936)">
+    <g
+       id="Layer_1-2"
+       data-name="Layer 1">
+      <rect
+         class="cls-1"
+         width="310.72"
+         height="108.16"
+         id="rect1473"
+         x="0"
+         y="0" />
+      <polygon
+         class="cls-2"
+         points="35.7,57.2 47.34,57.2 47.34,69.77 52.95,69.77 52.95,39.56 47.34,39.56 47.34,52.02 35.7,52.02 35.7,39.56 30.1,39.56 30.1,69.77 35.7,69.77 "
+         id="polygon1475" />
+      <path
+         class="cls-2"
+         d="m 139.79,56.83 a 10.47,10.47 0 0 0 2.5,-7.08 10.37,10.37 0 0 0 -2.49,-7.1 9.73,9.73 0 0 0 -7.67,-3.09 H 123 v 30.21 h 5.61 v -9.86 h 2.55 l 7.35,9.86 h 6.46 L 136.86,59 a 8.68,8.68 0 0 0 2.93,-2.17 z m -2.68,-7.08 a 5.1,5.1 0 0 1 -1.17,3.62 4.82,4.82 0 0 1 -3.81,1.4 h -3.56 v -10 h 3.56 a 4.84,4.84 0 0 1 3.87,1.33 5.19,5.19 0 0 1 1.11,3.65 z"
+         id="path1477" />
+      <rect
+         class="cls-2"
+         x="157.28"
+         y="39.560001"
+         width="5.6100001"
+         height="30.209999"
+         id="rect1479" />
+      <polygon
+         class="cls-2"
+         points="186.56,64.16 200.51,39.56 179.21,39.56 179.21,45.17 190.51,45.17 176.55,69.77 200.51,69.77 200.51,64.16 "
+         id="polygon1481" />
+      <polygon
+         class="cls-2"
+         points="230.09,51.43 219.45,51.43 219.45,44.7 232.38,44.7 232.38,39.56 213.84,39.56 213.84,69.77 232.38,69.77 232.38,64.59 219.45,64.59 219.45,56.6 230.09,56.6 "
+         id="polygon1483" />
+      <polygon
+         class="cls-2"
+         points="265.71,69.77 269.79,69.77 269.79,39.56 264.14,39.56 264.14,58.49 249.94,39.56 245.83,39.56 245.83,69.77 251.44,69.77 251.44,50.8 "
+         id="polygon1485" />
+      <path
+         class="cls-3"
+         d="m 106.31,41.43 v 0 l -3.72,5.76 A 16.54,16.54 0 0 1 80.36,69.43 l -5.76,3.73 a 22.74,22.74 0 0 0 31.71,-31.73 z"
+         id="path1487"
+         style="fill:url(#radialGradient1511)" />
+      <path
+         class="cls-3"
+         d="M 87.82,66.05 A 11.42,11.42 0 0 0 99.05,56.71 26.18,26.18 0 0 0 78.35,61 11.41,11.41 0 0 0 87.82,66.05 Z"
+         id="path1489"
+         style="fill:url(#radialGradient1513)" />
+      <path
+         class="cls-2"
+         d="m 93.45,54.05 a 27.54,27.54 0 0 1 5.79,0.62 v 0 a 11.42,11.42 0 1 0 -22.84,0 11,11 0 0 0 0.11,1.52 v 0 a 25.12,25.12 0 0 0 -4.29,4 16.54,16.54 0 0 1 23,-20.28 L 101,36.16 a 22.73,22.73 0 0 0 -31.5,32 27.38,27.38 0 0 1 3.89,-5.36 32.86,32.86 0 0 1 4,-3.52 27.16,27.16 0 0 1 16.06,-5.23 z"
+         id="path1491" />
+      <path
+         class="cls-2"
+         d="m 273.79,43.67 v -3.48 h -1.24 v -0.63 h 3.2 v 0.63 h -1.24 v 3.48 z"
+         id="path1493" />
+      <path
+         class="cls-2"
+         d="m 279.91,43.67 v -3.05 l -1.26,3.05 h -0.31 l -1.26,-3.05 v 3.05 h -0.72 v -4.11 h 1 l 1.11,2.7 1.12,-2.7 h 1 v 4.11 z"
+         id="path1495" />
+    </g>
+  </g>
+  <metadata
+     id="metadata1621">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Asset 5</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

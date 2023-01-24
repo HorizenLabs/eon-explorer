@@ -4,6 +4,42 @@ import Config
 |> Path.join()
 |> Code.eval_file()
 
+import Bitwise
+
+indexer_memory_limit_default = 1
+
+indexer_memory_limit =
+  "INDEXER_MEMORY_LIMIT"
+  |> System.get_env(to_string(indexer_memory_limit_default))
+  |> Integer.parse()
+  |> case do
+    {integer, ""} -> integer
+    _ -> indexer_memory_limit_default
+  end
+
+config :indexer,
+  memory_limit: indexer_memory_limit <<< 30
+
+indexer_empty_blocks_sanitizer_batch_size_default = 100
+
+indexer_empty_blocks_sanitizer_batch_size =
+  "INDEXER_EMPTY_BLOCKS_SANITIZER_BATCH_SIZE"
+  |> System.get_env(to_string(indexer_empty_blocks_sanitizer_batch_size_default))
+  |> Integer.parse()
+  |> case do
+    {integer, ""} -> integer
+    _ -> indexer_empty_blocks_sanitizer_batch_size_default
+  end
+
+config :indexer, Indexer.Fetcher.EmptyBlocksSanitizer, batch_size: indexer_empty_blocks_sanitizer_batch_size
+
+config :block_scout_web, :footer,
+  chat_link: System.get_env("FOOTER_CHAT_LINK", "https://discord.gg/blockscout"),
+  forum_link: System.get_env("FOOTER_FORUM_LINK", "https://forum.poa.network/c/blockscout"),
+  github_link: System.get_env("FOOTER_GITHUB_LINK", "https://github.com/blockscout/blockscout"),
+  enable_forum_link: System.get_env("FOOTER_ENABLE_FORUM_LINK", "false") == "true",
+  subnetwork: System.get_env("SUBNETWORK", "Horizen EON")
+
 ######################
 ### BlockScout Web ###
 ######################
