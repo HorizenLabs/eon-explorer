@@ -579,7 +579,7 @@ msgstr ""
 #: lib/block_scout_web/templates/block/_tile.html.eex:64
 #: lib/block_scout_web/templates/block/overview.html.eex:216
 #, elixir-autogen, elixir-format
-msgid "Burnt Fees"
+msgid "Reward Pool Fees"
 msgstr ""
 
 #: lib/block_scout_web/templates/address_token/overview.html.eex:65
@@ -3044,7 +3044,7 @@ msgstr ""
 
 #: lib/block_scout_web/templates/transaction/overview.html.eex:438
 #, elixir-autogen, elixir-format
-msgid "Transaction Burnt Fee"
+msgid "Reward Pool Fee"
 msgstr ""
 
 #: lib/block_scout_web/templates/transaction/overview.html.eex:50
@@ -3547,12 +3547,12 @@ msgstr ""
 
 #: lib/block_scout_web/templates/transaction/overview.html.eex:437
 #, elixir-autogen, elixir-format
-msgid "burned for this transaction. Equals Block Base Fee per Gas * Gas Used."
+msgid "that goes to the Reward Pool for this transaction. Equals Block Base Fee per Gas * Gas Used."
 msgstr ""
 
 #: lib/block_scout_web/templates/block/overview.html.eex:215
 #, elixir-autogen, elixir-format
-msgid "burned from transactions included in the block (Base fee (per unit of gas) * Gas Used)."
+msgid "awarded to the Reward Pool from transactions included in the block (Base fee (per unit of gas) * Gas Used)."
 msgstr ""
 
 #: lib/block_scout_web/templates/address_contract/index.html.eex:28
