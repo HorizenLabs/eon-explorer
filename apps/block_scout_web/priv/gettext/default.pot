@@ -623,7 +623,7 @@ msgstr ""
 
 #: lib/block_scout_web/templates/layout/_footer.html.eex:43
 #, elixir-autogen, elixir-format
-msgid "Chat (#blockscout)"
+msgid "Discord"
 msgstr ""
 
 #: lib/block_scout_web/views/block_view.ex:65
