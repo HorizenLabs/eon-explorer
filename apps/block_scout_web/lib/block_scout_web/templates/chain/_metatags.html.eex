@@ -1,5 +1,10 @@
 <title>
   <%= gettext("%{subnetwork} %{network} Block Explorer - Horizen EON", subnetwork: LayoutView.subnetwork_title(), network: LayoutView.network_title()) %>
 </title>
-<meta name="description" content="<%= gettext("Blockscout is a tool for inspecting and analyzing EVM based blockchains.", subnetwork: LayoutView.subnetwork_title()) %>">
+<meta name="description" content="<%= gettext("The Dune Block Explorer allows you to search the Dune Testnet Blockchain for transactions, addresses, statistics and activities taking place on-chain.", subnetwork: LayoutView.subnetwork_title()) %>">
 <meta name="keywords" content="BlockScout, blockchain, api, analytics, address, smart contract">
+<meta property="og:title" content="<%= gettext("%{subnetwork} %{network} Block Explorer - Horizen EON", subnetwork: LayoutView.subnetwork_title(), network: LayoutView.network_title()) %>">
+<meta property="og:url" content="https://dune-explorer.horizen.io/">
+<meta property="og:type" content="website">
+<meta property="og:description" content="<%= gettext("The Dune Block Explorer allows you to search the Dune Testnet Blockchain for transactions, addresses, statistics and activities taking place on-chain.", subnetwork: LayoutView.subnetwork_title()) %>">
+<meta property="og:image" content="https://dune-explorer.horizen.io/images/MetaData_img_blueprint_dune-blockex.jpg">
