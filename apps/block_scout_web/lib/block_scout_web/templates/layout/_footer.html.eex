@@ -34,6 +34,15 @@
       </div>
 
       <div class="col-xs-12 col-md-4 col-lg-<%= col_size %> footer-list">
+        <h3>Horizen EON</h3>
+        <ul>
+          <li><a href="http://eon.horizen.io/" rel="noreferrer" class="footer-link" target="_blank">EON</a></li>
+          <li><a href="http://eon.horizen.io/docs" rel="noreferrer" class="footer-link" target="_blank">EON Documentation</a></li>
+          <li><a href="http://faucet.horizen.io/" rel="noreferrer" class="footer-link" target="_blank">Test Token (TZEN) Faucet</a></li>
+        </ul>
+      </div>
+
+      <div class="col-xs-12 col-md-4 col-lg-<%= col_size %> footer-list">
         <h3>BlockScout</h3>
         <ul>
           <li><a href="<%= issue_link(@conn) %>" rel="noopener noreferrer" class="footer-link" target="_blank"><%= gettext("Submit an Issue") %></a></li>
