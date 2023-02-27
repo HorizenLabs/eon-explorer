@@ -1133,7 +1133,7 @@ $dark-white: #fff;
 }
 
 .dark-theme-applied .btn-no-border-link-to-tems {
-	background-color: $dark-light;
-	border-color: $dark-light;
-	color: $dark-white;
+	background-color: $dark-light !important;
+	border-color: $dark-light !important;
+	color: $dark-white !important;
 }
