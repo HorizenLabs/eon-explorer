@@ -62,6 +62,13 @@ defmodule Explorer.SmartContract.Reader do
       )
       # => %{"sum" => {:error, "Data overflow encoding int, data `abc` cannot fit in 256 bits"}}
   """
+
+  @spec query_verified_contract(Hash.Address.t(), functions(), String.t() | nil, true | false, SmartContract.abi()) ::
+          functions_results()
+  def query_verified_contract(address_hash, functions, _from = "", leave_error_as_map, mabi) do
+    query_verified_contract_inner(address_hash, functions, mabi, nil, leave_error_as_map)
+  end
+
   @spec query_verified_contract(Hash.Address.t(), functions(), String.t() | nil, true | false, SmartContract.abi()) ::
           functions_results()
   def query_verified_contract(address_hash, functions, from, leave_error_as_map, mabi) do
