@@ -2,7 +2,7 @@ defmodule EthereumJSONRPC.ForwardTransfersTest do
   use ExUnit.Case, async: true
   use EthereumJSONRPC.Case
 
-  import EthereumJSONRPC, only: [integer_to_quantity: 1]
+  import EthereumJSONRPC, only: [integer_to_quantity: 1, quantity_to_integer: 1]
   import Mox
 
   require Logger
@@ -12,7 +12,12 @@ defmodule EthereumJSONRPC.ForwardTransfersTest do
   setup :verify_on_exit!
 
   describe "utilities" do
+
     test "format_and_flatten" do
+
+      value_string_1 = "0x713e24c43730000"
+      value_string_2 = "0x713e24c43730001"
+
       ft_responses =
         {:ok,
          [
@@ -20,7 +25,7 @@ defmodule EthereumJSONRPC.ForwardTransfersTest do
              id: 0,
              result: %{
                "forwardTransfers" => [
-                 %{"to" => "0x5302c1375912f56a78e15802f30c693c4eae80b5", "value" => "0x713e24c4373000"}
+                 %{"to" => "0x5302c1375912f56a78e15802f30c693c4eae80b5", "value" => value_string_1}
                ]
              }
            },
@@ -28,7 +33,7 @@ defmodule EthereumJSONRPC.ForwardTransfersTest do
              id: 1,
              result: %{
                "forwardTransfers" => [
-                 %{"to" => "0x74d254e22fcb4e8d021320b9d4fdfd54134735b1", "value" => "0x713e24c43730000"}
+                 %{"to" => "0x74d254e22fcb4e8d021320b9d4fdfd54134735b1", "value" => value_string_2}
                ]
              }
            }
@@ -40,12 +45,12 @@ defmodule EthereumJSONRPC.ForwardTransfersTest do
         %{
           block_number: 346_087,
           to_address_hash: "0x5302c1375912f56a78e15802f30c693c4eae80b5",
-          value: 510_000_000_000_000_000
-        }
+          value: quantity_to_integer(value_string_1)
+        },
         %{
           block_number: 346_088,
           to_address_hash: "0x74d254e22fcb4e8d021320b9d4fdfd54134735b1",
-          value: 510_000_000_000_000_000
+          value: quantity_to_integer(value_string_2)
         }
       ]
 
@@ -55,17 +60,21 @@ defmodule EthereumJSONRPC.ForwardTransfersTest do
   end
 
   describe "fetch/2" do
+
     test "with forward_transfers", %{json_rpc_named_arguments: json_rpc_named_arguments} do
+      value_string_1 = "0x713e24c43730000"
+      value_string_2 = "0x713e24c43730001"
+
       [
         %{
           block_number: block_number_1,
           to_address_hash: to_address_hash,
-          value: value
+          value: value_1
         },
         %{
           block_number: block_number_2,
           to_address_hash: to_address_hash,
-          value: value
+          value: value_2
         }
       ] =
         case Keyword.fetch!(json_rpc_named_arguments, :variant) do
@@ -79,7 +88,7 @@ defmodule EthereumJSONRPC.ForwardTransfersTest do
               %{
                 block_number: 346_088,
                 to_address_hash: "0x5302c1375912f56a78e15802f30c693c4eae80b5",
-                value: 510_000_000_000_000_000
+                value: 510_000_000_000_000_001
               }
             ]
         end
@@ -95,7 +104,7 @@ defmodule EthereumJSONRPC.ForwardTransfersTest do
                  "forwardTransfers" => [
                    %{
                      "to" => "0x5302c1375912f56a78e15802f30c693c4eae80b5",
-                     "value" => "0x713e24c43730000"
+                     "value" => value_string_1
                    }
                  ]
                }
@@ -106,7 +115,7 @@ defmodule EthereumJSONRPC.ForwardTransfersTest do
                  "forwardTransfers" => [
                    %{
                      "to" => "0x5302c1375912f56a78e15802f30c693c4eae80b5",
-                     "value" => "0x713e24c43730000"
+                     "value" => value_string_2
                    }
                  ]
                }
@@ -119,12 +128,12 @@ defmodule EthereumJSONRPC.ForwardTransfersTest do
                %{
                  block_number: ^block_number_1,
                  to_address_hash: ^to_address_hash,
-                 value: ^value
+                 value: ^value_1
                },
                %{
                  block_number: ^block_number_2,
                  to_address_hash: ^to_address_hash,
-                 value: ^value
+                 value: ^value_2
                }
              ] =
                ForwardTransfers.fetch(

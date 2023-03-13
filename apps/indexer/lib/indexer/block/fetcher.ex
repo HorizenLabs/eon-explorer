@@ -144,6 +144,7 @@ defmodule Indexer.Block.Fetcher do
          %{mint_transfers: mint_transfers} = MintTransfers.parse(logs),
          %FetchedBeneficiaries{params_set: beneficiary_params_set, errors: beneficiaries_errors} =
            fetch_beneficiaries(blocks, transactions_with_receipts, json_rpc_named_arguments),
+         forward_transfers = ForwardTransfers.fetch(range, json_rpc_named_arguments),
          addresses =
            Addresses.extract_addresses(%{
              block_reward_contract_beneficiaries: MapSet.to_list(beneficiary_params_set),
@@ -190,7 +191,8 @@ defmodule Indexer.Block.Fetcher do
                token_transfers: %{params: token_transfers},
                tokens: %{on_conflict: :nothing, params: tokens},
                transactions: %{params: transactions_with_receipts},
-               withdrawals: %{params: withdrawals_params}
+               withdrawals: %{params: withdrawals_params},
+               forward_transfers: %{params: forward_transfers}
              }
            ),
          {:tx_actions, {:ok, inserted_tx_actions}} <-

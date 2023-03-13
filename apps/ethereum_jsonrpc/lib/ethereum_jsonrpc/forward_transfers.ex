@@ -1,5 +1,4 @@
 defmodule EthereumJSONRPC.ForwardTransfers do
-  require Logger
 
   import EthereumJSONRPC, only: [integer_to_quantity: 1, quantity_to_integer: 1, json_rpc: 2, id_to_params: 1]
 

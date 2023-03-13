@@ -46,13 +46,23 @@ defmodule Explorer.Chain.ImportTest do
         ],
         timeout: 5
       },
+      forward_transfers: %{
+        params: [
+          %{
+            block_number: 70889,
+            to_address_hash: "0x530ec1a4b0e5c939455280c8709447ccf15932b0",
+            value: 510_000_000_000_000_000
+          }
+        ]
+      },
       broadcast: :realtime,
       internal_transactions: %{
         params: [
           %{
             block_number: 37,
             transaction_index: 0,
-            transaction_hash: "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5",
+            transaction_hash:
+              "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5",
             index: 0,
             trace_address: [],
             type: "call",
@@ -68,7 +78,8 @@ defmodule Explorer.Chain.ImportTest do
           %{
             block_number: 37,
             transaction_index: 1,
-            transaction_hash: "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5",
+            transaction_hash:
+              "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5",
             index: 1,
             trace_address: [0],
             type: "call",
@@ -96,7 +107,8 @@ defmodule Explorer.Chain.ImportTest do
             third_topic: "0x000000000000000000000000515c09c5bba1ed566b02a5b0599ec5d5d0aee73d",
             fourth_topic: nil,
             index: 0,
-            transaction_hash: "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5",
+            transaction_hash:
+              "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5",
             type: "mined"
           }
         ],
@@ -178,7 +190,8 @@ defmodule Explorer.Chain.ImportTest do
                     hash: %Hash{
                       byte_count: 20,
                       bytes:
-                        <<81, 92, 9, 197, 187, 161, 237, 86, 107, 2, 165, 176, 89, 158, 197, 213, 208, 174, 231, 61>>
+                        <<81, 92, 9, 197, 187, 161, 237, 86, 107, 2, 165, 176, 89, 158, 197, 213,
+                          208, 174, 231, 61>>
                     },
                     inserted_at: %{},
                     updated_at: %{}
@@ -187,8 +200,8 @@ defmodule Explorer.Chain.ImportTest do
                     hash: %Hash{
                       byte_count: 20,
                       bytes:
-                        <<139, 243, 141, 71, 100, 146, 144, 100, 242, 212, 211, 165, 101, 32, 167, 106, 179, 223, 65,
-                          91>>
+                        <<139, 243, 141, 71, 100, 146, 144, 100, 242, 212, 211, 165, 101, 32, 167,
+                          106, 179, 223, 65, 91>>
                     },
                     inserted_at: %{},
                     updated_at: %{}
@@ -197,8 +210,8 @@ defmodule Explorer.Chain.ImportTest do
                     hash: %Hash{
                       byte_count: 20,
                       bytes:
-                        <<232, 221, 197, 199, 162, 210, 240, 215, 169, 121, 132, 89, 192, 16, 79, 223, 94, 152, 122,
-                          202>>
+                        <<232, 221, 197, 199, 162, 210, 240, 215, 169, 121, 132, 89, 192, 16, 79,
+                          223, 94, 152, 122, 202>>
                     },
                     inserted_at: %{},
                     updated_at: %{}
@@ -212,14 +225,15 @@ defmodule Explorer.Chain.ImportTest do
                     hash: %Hash{
                       byte_count: 32,
                       bytes:
-                        <<246, 180, 184, 200, 141, 243, 235, 210, 82, 236, 71, 99, 40, 51, 77, 192, 38, 207, 102, 96,
-                          106, 132, 251, 118, 155, 61, 60, 188, 204, 132, 113, 189>>
+                        <<246, 180, 184, 200, 141, 243, 235, 210, 82, 236, 71, 99, 40, 51, 77,
+                          192, 38, 207, 102, 96, 106, 132, 251, 118, 155, 61, 60, 188, 204, 132,
+                          113, 189>>
                     },
                     miner_hash: %Hash{
                       byte_count: 20,
                       bytes:
-                        <<232, 221, 197, 199, 162, 210, 240, 215, 169, 121, 132, 89, 192, 16, 79, 223, 94, 152, 122,
-                          202>>
+                        <<232, 221, 197, 199, 162, 210, 240, 215, 169, 121, 132, 89, 192, 16, 79,
+                          223, 94, 152, 122, 202>>
                     },
                     nonce: %Explorer.Chain.Hash{
                       byte_count: 8,
@@ -229,8 +243,9 @@ defmodule Explorer.Chain.ImportTest do
                     parent_hash: %Hash{
                       byte_count: 32,
                       bytes:
-                        <<195, 123, 186, 215, 5, 121, 69, 209, 191, 18, 140, 31, 240, 9, 251, 26, 214, 50, 17, 11, 246,
-                          160, 0, 170, 192, 37, 168, 15, 119, 102, 182, 110>>
+                        <<195, 123, 186, 215, 5, 121, 69, 209, 191, 18, 140, 31, 240, 9, 251, 26,
+                          214, 50, 17, 11, 246, 160, 0, 170, 192, 37, 168, 15, 119, 102, 182,
+                          110>>
                     },
                     size: 719,
                     timestamp: %DateTime{
@@ -251,14 +266,22 @@ defmodule Explorer.Chain.ImportTest do
                     updated_at: %{}
                   }
                 ],
+                forward_transfers: [
+                  %{
+                    block_number: 70889,
+                    to_address_hash: "0x530ec1a4b0e5c939455280c8709447ccf15932b0",
+                    value: 510_000_000_000_000_000
+                  }
+                ],
                 internal_transactions: [
                   %{
                     index: 1,
                     transaction_hash: %Hash{
                       byte_count: 32,
                       bytes:
-                        <<83, 189, 136, 72, 114, 222, 62, 72, 134, 146, 136, 27, 174, 236, 38, 46, 123, 149, 35, 77, 57,
-                          101, 36, 140, 57, 254, 153, 47, 255, 212, 51, 229>>
+                        <<83, 189, 136, 72, 114, 222, 62, 72, 134, 146, 136, 27, 174, 236, 38, 46,
+                          123, 149, 35, 77, 57, 101, 36, 140, 57, 254, 153, 47, 255, 212, 51,
+                          229>>
                     }
                   }
                 ],
@@ -267,24 +290,28 @@ defmodule Explorer.Chain.ImportTest do
                     address_hash: %Hash{
                       byte_count: 20,
                       bytes:
-                        <<139, 243, 141, 71, 100, 146, 144, 100, 242, 212, 211, 165, 101, 32, 167, 106, 179, 223, 65,
-                          91>>
+                        <<139, 243, 141, 71, 100, 146, 144, 100, 242, 212, 211, 165, 101, 32, 167,
+                          106, 179, 223, 65, 91>>
                     },
                     data: %Data{
                       bytes:
-                        <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 224, 182, 179,
-                          167, 100, 0, 0>>
+                        <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                          13, 224, 182, 179, 167, 100, 0, 0>>
                     },
                     index: 0,
-                    first_topic: "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
-                    second_topic: "0x000000000000000000000000e8ddc5c7a2d2f0d7a9798459c0104fdf5e987aca",
-                    third_topic: "0x000000000000000000000000515c09c5bba1ed566b02a5b0599ec5d5d0aee73d",
+                    first_topic:
+                      "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                    second_topic:
+                      "0x000000000000000000000000e8ddc5c7a2d2f0d7a9798459c0104fdf5e987aca",
+                    third_topic:
+                      "0x000000000000000000000000515c09c5bba1ed566b02a5b0599ec5d5d0aee73d",
                     fourth_topic: nil,
                     transaction_hash: %Hash{
                       byte_count: 32,
                       bytes:
-                        <<83, 189, 136, 72, 114, 222, 62, 72, 134, 146, 136, 27, 174, 236, 38, 46, 123, 149, 35, 77, 57,
-                          101, 36, 140, 57, 254, 153, 47, 255, 212, 51, 229>>
+                        <<83, 189, 136, 72, 114, 222, 62, 72, 134, 146, 136, 27, 174, 236, 38, 46,
+                          123, 149, 35, 77, 57, 101, 36, 140, 57, 254, 153, 47, 255, 212, 51,
+                          229>>
                     },
                     type: "mined",
                     inserted_at: %{},
@@ -298,8 +325,9 @@ defmodule Explorer.Chain.ImportTest do
                     hash: %Hash{
                       byte_count: 32,
                       bytes:
-                        <<83, 189, 136, 72, 114, 222, 62, 72, 134, 146, 136, 27, 174, 236, 38, 46, 123, 149, 35, 77, 57,
-                          101, 36, 140, 57, 254, 153, 47, 255, 212, 51, 229>>
+                        <<83, 189, 136, 72, 114, 222, 62, 72, 134, 146, 136, 27, 174, 236, 38, 46,
+                          123, 149, 35, 77, 57, 101, 36, 140, 57, 254, 153, 47, 255, 212, 51,
+                          229>>
                     }
                   }
                 ],
@@ -308,8 +336,8 @@ defmodule Explorer.Chain.ImportTest do
                     contract_address_hash: %Hash{
                       byte_count: 20,
                       bytes:
-                        <<139, 243, 141, 71, 100, 146, 144, 100, 242, 212, 211, 165, 101, 32, 167, 106, 179, 223, 65,
-                          91>>
+                        <<139, 243, 141, 71, 100, 146, 144, 100, 242, 212, 211, 165, 101, 32, 167,
+                          106, 179, 223, 65, 91>>
                     },
                     type: "ERC-20",
                     inserted_at: %{},
@@ -323,25 +351,27 @@ defmodule Explorer.Chain.ImportTest do
                     from_address_hash: %Hash{
                       byte_count: 20,
                       bytes:
-                        <<232, 221, 197, 199, 162, 210, 240, 215, 169, 121, 132, 89, 192, 16, 79, 223, 94, 152, 122,
-                          202>>
+                        <<232, 221, 197, 199, 162, 210, 240, 215, 169, 121, 132, 89, 192, 16, 79,
+                          223, 94, 152, 122, 202>>
                     },
                     to_address_hash: %Hash{
                       byte_count: 20,
                       bytes:
-                        <<81, 92, 9, 197, 187, 161, 237, 86, 107, 2, 165, 176, 89, 158, 197, 213, 208, 174, 231, 61>>
+                        <<81, 92, 9, 197, 187, 161, 237, 86, 107, 2, 165, 176, 89, 158, 197, 213,
+                          208, 174, 231, 61>>
                     },
                     token_contract_address_hash: %Hash{
                       byte_count: 20,
                       bytes:
-                        <<139, 243, 141, 71, 100, 146, 144, 100, 242, 212, 211, 165, 101, 32, 167, 106, 179, 223, 65,
-                          91>>
+                        <<139, 243, 141, 71, 100, 146, 144, 100, 242, 212, 211, 165, 101, 32, 167,
+                          106, 179, 223, 65, 91>>
                     },
                     transaction_hash: %Hash{
                       byte_count: 32,
                       bytes:
-                        <<83, 189, 136, 72, 114, 222, 62, 72, 134, 146, 136, 27, 174, 236, 38, 46, 123, 149, 35, 77, 57,
-                          101, 36, 140, 57, 254, 153, 47, 255, 212, 51, 229>>
+                        <<83, 189, 136, 72, 114, 222, 62, 72, 134, 146, 136, 27, 174, 236, 38, 46,
+                          123, 149, 35, 77, 57, 101, 36, 140, 57, 254, 153, 47, 255, 212, 51,
+                          229>>
                     },
                     inserted_at: %{},
                     updated_at: %{}
@@ -459,7 +489,11 @@ defmodule Explorer.Chain.ImportTest do
 
     test "with invalid data" do
       invalid_import_data =
-        update_in(@import_data, [:internal_transactions, :params, Access.at(0)], &Map.delete(&1, :call_type))
+        update_in(
+          @import_data,
+          [:internal_transactions, :params, Access.at(0)],
+          &Map.delete(&1, :call_type)
+        )
 
       assert {:error, [changeset]} = Import.all(invalid_import_data)
       assert changeset_errors(changeset)[:call_type] == ["can't be blank"]
@@ -481,7 +515,8 @@ defmodule Explorer.Chain.ImportTest do
       Subscriber.to(:internal_transactions, :realtime)
       Import.all(@import_data)
 
-      assert_receive {:chain_event, :internal_transactions, :realtime, [%{transaction_hash: _, index: _}]}
+      assert_receive {:chain_event, :internal_transactions, :realtime,
+                      [%{transaction_hash: _, index: _}]}
     end
 
     test "publishes transactions data to subscribers on insert" do
@@ -518,7 +553,8 @@ defmodule Explorer.Chain.ImportTest do
 
       block = insert(:block, number: 37)
 
-      transaction_string_hash = "0x0705ea0a5b997d9aafd5c531e016d9aabe3297a28c0bd4ef005fe6ea329d301b"
+      transaction_string_hash =
+        "0x0705ea0a5b997d9aafd5c531e016d9aabe3297a28c0bd4ef005fe6ea329d301b"
 
       :transaction
       |> insert(from_address: from_address, hash: transaction_string_hash)
@@ -845,7 +881,12 @@ defmodule Explorer.Chain.ImportTest do
                    params: [%{hash: "0x8bf38d4764929064f2d4d3a56520a76ab3df415b"}]
                  },
                  address_coin_balances: %{
-                   params: [%{address_hash: "0x8bf38d4764929064f2d4d3a56520a76ab3df415b", block_number: 1}],
+                   params: [
+                     %{
+                       address_hash: "0x8bf38d4764929064f2d4d3a56520a76ab3df415b",
+                       block_number: 1
+                     }
+                   ],
                    timeout: 5
                  }
                })
@@ -865,7 +906,8 @@ defmodule Explorer.Chain.ImportTest do
                        miner_hash: "0xe8ddc5c7a2d2f0d7a9798459c0104fdf5e987aca",
                        nonce: 0,
                        number: 37,
-                       parent_hash: "0xc37bbad7057945d1bf128c1ff009fb1ad632110bf6a000aac025a80f7766b66e",
+                       parent_hash:
+                         "0xc37bbad7057945d1bf128c1ff009fb1ad632110bf6a000aac025a80f7766b66e",
                        size: 719,
                        timestamp: Timex.parse!("2017-12-15T21:06:30.000000Z", "{ISO:Extended:Z}"),
                        total_difficulty: 12_590_447_576_074_723_148_144_860_474_975_121_280_509
@@ -876,7 +918,8 @@ defmodule Explorer.Chain.ImportTest do
                  transactions: %{
                    params: [
                      %{
-                       block_hash: "0xf6b4b8c88df3ebd252ec476328334dc026cf66606a84fb769b3d3cbccc8471bd",
+                       block_hash:
+                         "0xf6b4b8c88df3ebd252ec476328334dc026cf66606a84fb769b3d3cbccc8471bd",
                        block_number: 37,
                        cumulative_gas_used: 50450,
                        from_address_hash: "0xe8ddc5c7a2d2f0d7a9798459c0104fdf5e987aca",
@@ -885,7 +928,8 @@ defmodule Explorer.Chain.ImportTest do
                        gas_used: 50450,
                        hash: "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5",
                        index: 0,
-                       input: "0x10855269000000000000000000000000862d67cb0773ee3f8ce7ea89b328ffea861ab3ef",
+                       input:
+                         "0x10855269000000000000000000000000862d67cb0773ee3f8ce7ea89b328ffea861ab3ef",
                        nonce: 4,
                        public_key:
                          "0xe5d196ad4ceada719d9e592f7166d0c75700f6eab2e3c3de34ba751ea786527cb3f6eb96ad9fdfdb9989ff572df50f1c42ef800af9c5207a38b929aff969b5c9",
@@ -902,7 +946,8 @@ defmodule Explorer.Chain.ImportTest do
                  internal_transactions: %{
                    params: [
                      %{
-                       created_contract_address_hash: "0xffc87239eb0267bc3ca2cd51d12fbf278e02ccb4",
+                       created_contract_address_hash:
+                         "0xffc87239eb0267bc3ca2cd51d12fbf278e02ccb4",
                        created_contract_code:
                          "0x606060405260043610610062576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680630900f01014610067578063445df0ac146100a05780638da5cb5b146100c9578063fdacd5761461011e575b600080fd5b341561007257600080fd5b61009e600480803573ffffffffffffffffffffffffffffffffffffffff16906020019091905050610141565b005b34156100ab57600080fd5b6100b3610224565b6040518082815260200191505060405180910390f35b34156100d457600080fd5b6100dc61022a565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b341561012957600080fd5b61013f600480803590602001909190505061024f565b005b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff161415610220578190508073ffffffffffffffffffffffffffffffffffffffff1663fdacd5766001546040518263ffffffff167c010000000000000000000000000000000000000000000000000000000002815260040180828152602001915050600060405180830381600087803b151561020b57600080fd5b6102c65a03f1151561021c57600080fd5b5050505b5050565b60015481565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156102ac57806001819055505b505600a165627a7a72305820a9c628775efbfbc17477a472413c01ee9b33881f550c59d21bee9928835c854b0029",
                        from_address_hash: "0xe8ddc5c7a2d2f0d7a9798459c0104fdf5e987aca",
@@ -912,14 +957,16 @@ defmodule Explorer.Chain.ImportTest do
                        init:
                          "0x6060604052341561000f57600080fd5b336000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055506102db8061005e6000396000f300606060405260043610610062576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680630900f01014610067578063445df0ac146100a05780638da5cb5b146100c9578063fdacd5761461011e575b600080fd5b341561007257600080fd5b61009e600480803573ffffffffffffffffffffffffffffffffffffffff16906020019091905050610141565b005b34156100ab57600080fd5b6100b3610224565b6040518082815260200191505060405180910390f35b34156100d457600080fd5b6100dc61022a565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b341561012957600080fd5b61013f600480803590602001909190505061024f565b005b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff161415610220578190508073ffffffffffffffffffffffffffffffffffffffff1663fdacd5766001546040518263ffffffff167c010000000000000000000000000000000000000000000000000000000002815260040180828152602001915050600060405180830381600087803b151561020b57600080fd5b6102c65a03f1151561021c57600080fd5b5050505b5050565b60015481565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156102ac57806001819055505b505600a165627a7a72305820a9c628775efbfbc17477a472413c01ee9b33881f550c59d21bee9928835c854b0029",
                        trace_address: [],
-                       transaction_hash: "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5",
+                       transaction_hash:
+                         "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5",
                        type: "create",
                        value: 0,
                        block_number: 37,
                        transaction_index: 0
                      },
                      %{
-                       created_contract_address_hash: "0xffc87239eb0267bc3ca2cd51d12fbf278e02ccb5",
+                       created_contract_address_hash:
+                         "0xffc87239eb0267bc3ca2cd51d12fbf278e02ccb5",
                        created_contract_code:
                          "0x606060405260043610610062576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680630900f01014610067578063445df0ac146100a05780638da5cb5b146100c9578063fdacd5761461011e575b600080fd5b341561007257600080fd5b61009e600480803573ffffffffffffffffffffffffffffffffffffffff16906020019091905050610141565b005b34156100ab57600080fd5b6100b3610224565b6040518082815260200191505060405180910390f35b34156100d457600080fd5b6100dc61022a565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b341561012957600080fd5b61013f600480803590602001909190505061024f565b005b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff161415610220578190508073ffffffffffffffffffffffffffffffffffffffff1663fdacd5766001546040518263ffffffff167c010000000000000000000000000000000000000000000000000000000002815260040180828152602001915050600060405180830381600087803b151561020b57600080fd5b6102c65a03f1151561021c57600080fd5b5050505b5050565b60015481565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156102ac57806001819055505b505600a165627a7a72305820a9c628775efbfbc17477a472413c01ee9b33881f550c59d21bee9928835c854b0029",
                        from_address_hash: "0xe8ddc5c7a2d2f0d7a9798459c0104fdf5e987aca",
@@ -929,7 +976,8 @@ defmodule Explorer.Chain.ImportTest do
                        init:
                          "0x6060604052341561000f57600080fd5b336000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055506102db8061005e6000396000f300606060405260043610610062576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680630900f01014610067578063445df0ac146100a05780638da5cb5b146100c9578063fdacd5761461011e575b600080fd5b341561007257600080fd5b61009e600480803573ffffffffffffffffffffffffffffffffffffffff16906020019091905050610141565b005b34156100ab57600080fd5b6100b3610224565b6040518082815260200191505060405180910390f35b34156100d457600080fd5b6100dc61022a565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b341561012957600080fd5b61013f600480803590602001909190505061024f565b005b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff161415610220578190508073ffffffffffffffffffffffffffffffffffffffff1663fdacd5766001546040518263ffffffff167c010000000000000000000000000000000000000000000000000000000002815260040180828152602001915050600060405180830381600087803b151561020b57600080fd5b6102c65a03f1151561021c57600080fd5b5050505b5050565b60015481565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156102ac57806001819055505b505600a165627a7a72305820a9c628775efbfbc17477a472413c01ee9b33881f550c59d21bee9928835c854b0029",
                        trace_address: [],
-                       transaction_hash: "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5",
+                       transaction_hash:
+                         "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5",
                        type: "create",
                        value: 0,
                        block_number: 37,
@@ -951,9 +999,13 @@ defmodule Explorer.Chain.ImportTest do
                })
 
       assert %Transaction{created_contract_address_hash: created_contract_address_hash} =
-               Repo.get(Transaction, "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5")
+               Repo.get(
+                 Transaction,
+                 "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5"
+               )
 
-      assert to_string(created_contract_address_hash) == "0xffc87239eb0267bc3ca2cd51d12fbf278e02ccb4"
+      assert to_string(created_contract_address_hash) ==
+               "0xffc87239eb0267bc3ca2cd51d12fbf278e02ccb4"
     end
 
     test "updates transaction error and status from internal transactions when status is not set from (pre-Byzantium/Ethereum Classic) receipts" do
@@ -998,7 +1050,8 @@ defmodule Explorer.Chain.ImportTest do
                        miner_hash: "0x1c0fa194a9d3b44313dcd849f3c6be6ad270a0a4",
                        nonce: "0xafa5fc5c07f55ba5",
                        number: 6_535_159,
-                       parent_hash: "0xd2cf6cf7a3d5455f450a2a3701995a7ad51f12010674883a6690cee337f75ffa",
+                       parent_hash:
+                         "0xd2cf6cf7a3d5455f450a2a3701995a7ad51f12010674883a6690cee337f75ffa",
                        size: 4052,
                        timestamp: DateTime.from_iso8601("2018-09-10 21:34:39Z") |> elem(1),
                        total_difficulty: 415_641_295_487_918_824_165
@@ -1012,7 +1065,8 @@ defmodule Explorer.Chain.ImportTest do
                        miner_hash: "0x1c0fa194a9d3b44313dcd849f3c6be6ad270a0a4",
                        nonce: "0xe7e0f2502c57af36",
                        number: 6_546_180,
-                       parent_hash: "0x9fcef5db897c50c347bd62aaee3fd62f9430d7c5a6c1026645fd2d95bf84f77f",
+                       parent_hash:
+                         "0x9fcef5db897c50c347bd62aaee3fd62f9430d7c5a6c1026645fd2d95bf84f77f",
                        size: 4135,
                        timestamp: DateTime.from_iso8601("2018-09-12 16:44:31Z") |> elem(1),
                        total_difficulty: 418_368_856_288_094_184_226
@@ -1023,7 +1077,8 @@ defmodule Explorer.Chain.ImportTest do
                  transactions: %{
                    params: [
                      %{
-                       block_hash: "0x1f8cde8bd326702c49e065d56b08bdc82caa0c4820d914e27026c9c68ca1cf09",
+                       block_hash:
+                         "0x1f8cde8bd326702c49e065d56b08bdc82caa0c4820d914e27026c9c68ca1cf09",
                        block_number: 6_535_159,
                        cumulative_gas_used: 978_227,
                        from_address_hash: "0xb7cffe2ac19b9d5705a24cbe14fef5663af905a6",
@@ -1040,13 +1095,15 @@ defmodule Explorer.Chain.ImportTest do
                          42_310_749_137_599_445_408_044_732_541_966_181_996_695_356_587_068_481_874_121_265_172_051_825_560_665,
                        status: nil,
                        to_address_hash: nil,
-                       transaction_hash: "0x1a263224a95275d77bc30a7e131bc64d948777946a790c0915ab293791fbcb61",
+                       transaction_hash:
+                         "0x1a263224a95275d77bc30a7e131bc64d948777946a790c0915ab293791fbcb61",
                        transaction_index: 0,
                        v: 158,
                        value: 0
                      },
                      %{
-                       block_hash: "0xe16d3ce09c2f5bba53bb8a78268e70692f7d3401f654038f2733948f267819bf",
+                       block_hash:
+                         "0xe16d3ce09c2f5bba53bb8a78268e70692f7d3401f654038f2733948f267819bf",
                        block_number: 6_546_180,
                        cumulative_gas_used: 300_000,
                        from_address_hash: "0xb7cffe2ac19b9d5705a24cbe14fef5663af905a6",
@@ -1063,7 +1120,8 @@ defmodule Explorer.Chain.ImportTest do
                          28_179_956_245_836_116_326_552_218_962_386_200_332_659_903_648_647_895_680_413_482_893_962_976_715_400,
                        status: nil,
                        to_address_hash: nil,
-                       transaction_hash: "0xab349efbe1ddc6d85d84a993aa52bdaadce66e8ee166dd10013ce3f2a94ca724",
+                       transaction_hash:
+                         "0xab349efbe1ddc6d85d84a993aa52bdaadce66e8ee166dd10013ce3f2a94ca724",
                        transaction_index: 0,
                        v: 157,
                        value: 0
@@ -1073,10 +1131,16 @@ defmodule Explorer.Chain.ImportTest do
                })
 
       assert %Transaction{status: nil, error: nil} =
-               Repo.get(Transaction, "0x1a263224a95275d77bc30a7e131bc64d948777946a790c0915ab293791fbcb61")
+               Repo.get(
+                 Transaction,
+                 "0x1a263224a95275d77bc30a7e131bc64d948777946a790c0915ab293791fbcb61"
+               )
 
       assert %Transaction{status: nil, error: nil} =
-               Repo.get(Transaction, "0xab349efbe1ddc6d85d84a993aa52bdaadce66e8ee166dd10013ce3f2a94ca724")
+               Repo.get(
+                 Transaction,
+                 "0xab349efbe1ddc6d85d84a993aa52bdaadce66e8ee166dd10013ce3f2a94ca724"
+               )
 
       assert {:ok, _} =
                Import.all(%{
@@ -1093,7 +1157,8 @@ defmodule Explorer.Chain.ImportTest do
                    params: [
                      %{
                        block_number: 6_535_159,
-                       created_contract_address_hash: "0xf606a51bd1be5e633f4170e302ea9f6f90a85c0f",
+                       created_contract_address_hash:
+                         "0xf606a51bd1be5e633f4170e302ea9f6f90a85c0f",
                        created_contract_code: "0x",
                        from_address_hash: "0xb7cffe2ac19b9d5705a24cbe14fef5663af905a6",
                        gas: 710_459,
@@ -1101,7 +1166,8 @@ defmodule Explorer.Chain.ImportTest do
                        index: 0,
                        init: "0x",
                        trace_address: [],
-                       transaction_hash: "0x1a263224a95275d77bc30a7e131bc64d948777946a790c0915ab293791fbcb61",
+                       transaction_hash:
+                         "0x1a263224a95275d77bc30a7e131bc64d948777946a790c0915ab293791fbcb61",
                        type: "create",
                        value: 0,
                        transaction_index: 0,
@@ -1115,7 +1181,8 @@ defmodule Explorer.Chain.ImportTest do
                        index: 0,
                        init: "0x",
                        trace_address: [],
-                       transaction_hash: "0xab349efbe1ddc6d85d84a993aa52bdaadce66e8ee166dd10013ce3f2a94ca724",
+                       transaction_hash:
+                         "0xab349efbe1ddc6d85d84a993aa52bdaadce66e8ee166dd10013ce3f2a94ca724",
                        type: "create",
                        value: 0,
                        transaction_index: 0,
@@ -1127,10 +1194,16 @@ defmodule Explorer.Chain.ImportTest do
                })
 
       assert %Transaction{status: :ok, error: nil} =
-               Repo.get(Transaction, "0x1a263224a95275d77bc30a7e131bc64d948777946a790c0915ab293791fbcb61")
+               Repo.get(
+                 Transaction,
+                 "0x1a263224a95275d77bc30a7e131bc64d948777946a790c0915ab293791fbcb61"
+               )
 
       assert %Transaction{status: :error, error: "Out of gas"} =
-               Repo.get(Transaction, "0xab349efbe1ddc6d85d84a993aa52bdaadce66e8ee166dd10013ce3f2a94ca724")
+               Repo.get(
+                 Transaction,
+                 "0xab349efbe1ddc6d85d84a993aa52bdaadce66e8ee166dd10013ce3f2a94ca724"
+               )
     end
 
     test "uncles record their transaction indexes in transactions_forks" do
@@ -1488,7 +1561,8 @@ defmodule Explorer.Chain.ImportTest do
 
       %Block{consensus: true, number: ^block_number} = Repo.get(Block, block_hash_before)
 
-      assert Repo.one!(from(transaction_fork in Transaction.Fork, select: fragment("COUNT(*)"))) == 0
+      assert Repo.one!(from(transaction_fork in Transaction.Fork, select: fragment("COUNT(*)"))) ==
+               0
 
       miner_hash_after = address_hash()
       from_address_hash_after = address_hash()
@@ -1522,13 +1596,15 @@ defmodule Explorer.Chain.ImportTest do
                  }
                })
 
-      assert Repo.one!(from(transaction_fork in Transaction.Fork, select: fragment("COUNT(*)"))) == 1
+      assert Repo.one!(from(transaction_fork in Transaction.Fork, select: fragment("COUNT(*)"))) ==
+               1
 
       assert %Transaction.Fork{index: ^index_before} =
                Repo.one(
                  from(transaction_fork in Transaction.Fork,
                    where:
-                     transaction_fork.uncle_hash == ^block_hash_before and transaction_fork.hash == ^transaction_hash
+                     transaction_fork.uncle_hash == ^block_hash_before and
+                       transaction_fork.hash == ^transaction_hash
                  )
                )
     end
@@ -1571,14 +1647,29 @@ defmodule Explorer.Chain.ImportTest do
                  },
                  address_coin_balances: %{
                    params: [
-                     %{address_hash: miner_hash, block_number: block_number, value: nil, token_type: "ERC-20"},
-                     %{address_hash: uncle_miner_hash, block_number: block_number, value: nil, token_type: "ERC-20"}
+                     %{
+                       address_hash: miner_hash,
+                       block_number: block_number,
+                       value: nil,
+                       token_type: "ERC-20"
+                     },
+                     %{
+                       address_hash: uncle_miner_hash,
+                       block_number: block_number,
+                       value: nil,
+                       token_type: "ERC-20"
+                     }
                    ],
                    timeout: 1
                  },
                  blocks: %{
                    params: [
-                     params_for(:block, hash: block_hash, consensus: true, miner_hash: miner_hash, number: block_number),
+                     params_for(:block,
+                       hash: block_hash,
+                       consensus: true,
+                       miner_hash: miner_hash,
+                       number: block_number
+                     ),
                      params_for(:block,
                        hash: uncle_hash,
                        consensus: false,
@@ -1631,7 +1722,9 @@ defmodule Explorer.Chain.ImportTest do
                    timeout: 1
                  },
                  tokens: %{
-                   params: [params_for(:token, contract_address_hash: token_contract_address_hash)],
+                   params: [
+                     params_for(:token, contract_address_hash: token_contract_address_hash)
+                   ],
                    timeout: 1
                  },
                  transactions: %{
@@ -2064,7 +2157,8 @@ defmodule Explorer.Chain.ImportTest do
         address_hash: ^address_hash,
         token_contract_address_hash: token_contract_address_hash,
         block_number: ^block_number
-      } = insert(:token_balance, address: address, block_number: block_number, value: value_before)
+      } =
+        insert(:token_balance, address: address, block_number: block_number, value: value_before)
 
       %Address.CurrentTokenBalance{
         address_hash: ^address_hash,
@@ -2197,7 +2291,10 @@ defmodule Explorer.Chain.ImportTest do
                  }
                })
 
-      assert %Address.CurrentTokenBalance{block_number: ^previous_block_number, value: ^previous_value} =
+      assert %Address.CurrentTokenBalance{
+               block_number: ^previous_block_number,
+               value: ^previous_value
+             } =
                Repo.get_by(Address.CurrentTokenBalance,
                  address_hash: address_hash,
                  token_contract_address_hash: token_contract_address_hash
@@ -2222,7 +2319,8 @@ defmodule Explorer.Chain.ImportTest do
         address_hash: ^address_hash,
         token_contract_address_hash: token_contract_address_hash,
         block_number: ^block_number
-      } = insert(:token_balance, address: address, block_number: block_number, value: value_before)
+      } =
+        insert(:token_balance, address: address, block_number: block_number, value: value_before)
 
       %Address.CurrentTokenBalance{
         address_hash: ^address_hash,
