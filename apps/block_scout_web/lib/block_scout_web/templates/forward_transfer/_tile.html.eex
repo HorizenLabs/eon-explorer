@@ -1,0 +1,36 @@
+
+<div
+  class="tile tile-type-forward-transfer"
+  data-identifier-hash="<%= @forward_transfer.to_address_hash %>"
+>
+  <div class="row tile-body" data-selector="token-transfers-toggle" data-test="chain_transaction">
+    <div class="tile-transaction-type-block col-md-2 d-flex flex-row flex-md-column">
+      <!-- Color Block -->
+      <div>
+        <span class="tile-label" data-test="transaction_type">
+          Forward Transfer
+        </span>
+      </div>
+    </div>
+    <!-- Content -->
+    <div class="col-md-7 col-lg-8 d-flex flex-column pr-2 pr-sm-2 pr-md-0">
+      <span>
+      <div class="text-truncate d-flex">
+        <%= @forward_transfer.to_address_hash %>
+      </div>
+      </span>
+      <span class="d-flex flex-md-row flex-column mt-3 mt-md-0">
+        <span class="tile-title">
+          <%= @forward_transfer.value %> <%= Explorer.coin_name() %>
+        </span>
+      </span>
+    </div>
+    <!-- Block info -->
+    <div class="col-md-3 col-lg-2 d-flex flex-row flex-md-column flex-nowrap justify-content-center text-md-right mt-3 mt-md-0 tile-bottom">
+      <span class="mr-2 mr-md-0 order-1">
+        Block #<%= @forward_transfer.block_number %>
+      </span>
+      <span class="mr-2 mr-md-0 order-2" in-tile data-from-now="<%= @forward_transfer.inserted_at %>"></span>
+    </div>
+  </div>
+</div>

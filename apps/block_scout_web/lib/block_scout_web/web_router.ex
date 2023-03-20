@@ -123,6 +123,10 @@ defmodule BlockScoutWeb.WebRouter do
 
     resources("/pending-transactions", PendingTransactionController, only: [:index])
 
+    resources("/forward-transfers", ForwardTransferController, only: [:index])
+
+    get("/forward-transfers-count", ForwardTransferController, :count, as: :count)
+
     resources("/recent-transactions", RecentTransactionsController, only: [:index])
 
     resources("/verified-contracts", VerifiedContractsController, only: [:index])

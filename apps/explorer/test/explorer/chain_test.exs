@@ -24,7 +24,8 @@ defmodule Explorer.ChainTest do
     TokenTransfer,
     Transaction,
     SmartContract,
-    Wei
+    Wei,
+    ForwardTransfer
   }
 
   alias Explorer.{Chain, Etherscan}
@@ -1175,6 +1176,13 @@ defmodule Explorer.ChainTest do
                },
                :ether
              ) == {:actual, Decimal.new("4e-18")}
+    end
+  end
+
+  describe "fetch_forward_transfers" do
+    test "all forward_transfers" do
+      %ForwardTransfer{block_number: block_number, to_address_hash: to_address_hash, value: value} = insert(:forward_transfer)
+      assert Chain.fetch_forward_transfers() != nil
     end
   end
 
@@ -3909,6 +3917,24 @@ defmodule Explorer.ChainTest do
       assert Chain.missing_block_number_ranges(0..2) == [0..0, 2..2]
     end
   end
+
+
+  describe "recent_collated_forward_transfers/1" do
+    test "returns a list of recent collated forward_transfers" do
+      newest_first_page_fts =
+        50
+        |> insert_list(:forward_transfer)
+        |> Enum.reverse()
+
+
+
+        paging_options = %Explorer.PagingOptions{page_size: 10}
+        recent_collated_fts = Explorer.Chain.fetch_recent_collated_forward_transfers_for_rap(paging_options)
+        assert length(recent_collated_fts) == 11
+        assert hd(recent_collated_fts).block_number == Enum.at(newest_first_page_fts, 11).block_number
+    end
+  end
+
 
   describe "recent_collated_transactions/1" do
     test "with no collated transactions it returns an empty list" do

@@ -55,6 +55,13 @@
                     class: "#{if variant == EthereumJSONRPC.Besu, do: "border-bottom", else: ""} dropdown-item #{tab_status("txs", @conn.request_path)}"
                   ) %>
 
+              <%= link(
+                    gettext("Forward Transfers"),
+                    class: "dropdown-item #{tab_status("forward-transfers", @conn.request_path)}",
+                    "data-test": "forward_transfers_link",
+                    to: forward_transfer_path(@conn, :index)
+                  ) %>
+
               <%= if variant !== EthereumJSONRPC.Besu do %>
                 <%= link(
                       gettext("Pending"),

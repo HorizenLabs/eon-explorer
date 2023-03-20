@@ -62,7 +62,8 @@ defmodule Explorer.Chain do
     TokenTransfer,
     Transaction,
     Wei,
-    Withdrawal
+    Withdrawal,
+    ForwardTransfer
   }
 
   alias Explorer.Chain.Block.{EmissionReward, Reward}
@@ -3432,7 +3433,7 @@ defmodule Explorer.Chain do
     %{total_transactions_count: total_transactions_count, transactions: fetched_transactions}
   end
 
-  def default_page_size, do: @default_page_size
+    def default_page_size, do: @default_page_size
 
   def fetch_recent_collated_transactions_for_rap(paging_options, necessity_by_association) do
     fetch_transactions_for_rap()
@@ -3539,6 +3540,33 @@ defmodule Explorer.Chain do
 
     query
     |> Repo.all(timeout: :infinity)
+  end
+
+  @spec recent_collated_forward_transfers_for_rap([paging_options]) :: %{
+          :total_forward_transfer_count => non_neg_integer(),
+          :forward_transfers => [ForwardTransfers.t()]
+        }
+  def recent_collated_forward_transfers_for_rap(options \\ []) when is_list(options) do
+    paging_options = Keyword.get(options, :paging_options, @default_paging_options)
+
+    total_forward_transfers_count = forward_transfers_count()
+
+    fetched_forward_transfers =
+        fetch_recent_collated_forward_transfers_for_rap(paging_options)
+
+    %{total_forward_transfers_count: total_forward_transfers_count, forward_transfers: fetched_forward_transfers}
+  end
+
+  def fetch_recent_collated_forward_transfers_for_rap(paging_options) do
+    ForwardTransfer
+    |> order_by([forward_transfer], desc: forward_transfer.id)
+    |> handle_random_access_paging_options(paging_options)
+    |> Repo.all()
+  end
+
+  def forward_transfers_count() do
+    ForwardTransfer
+    |> Repo.aggregate(:count)
   end
 
   @doc """
