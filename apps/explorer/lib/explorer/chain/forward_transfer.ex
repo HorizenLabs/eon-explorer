@@ -3,12 +3,16 @@ defmodule Explorer.Chain.ForwardTransfer do
 
   use Explorer.Schema
 
+  alias Explorer.Chain.{
+    Wei,
+  }
+
   @required_attrs ~w(block_number to_address_hash value)a
 
   @type t :: %__MODULE__{
           block_number: :integer,
           to_address_hash: :string,
-          value: :integer,
+          value: Wei.t(),
         }
 
   @derive {Poison.Encoder,
@@ -26,7 +30,7 @@ defmodule Explorer.Chain.ForwardTransfer do
 
   schema "forward_transfers" do
     field(:block_number, :integer)
-    field(:value, :integer)
+    field(:value, Wei)
     field(:to_address_hash, :string)
     timestamps()
   end
