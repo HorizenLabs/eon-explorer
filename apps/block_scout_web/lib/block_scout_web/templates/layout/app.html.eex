@@ -125,6 +125,7 @@
       <%= render BlockScoutWeb.LayoutView, "_footer.html", assigns %>
     </div>
     <%= if (
+      @view_module != Elixir.BlockScoutWeb.ForwardTransferView &&
       @view_module != Elixir.BlockScoutWeb.ChainView &&
       @view_module != Elixir.BlockScoutWeb.BlockView &&
       @view_module != Elixir.BlockScoutWeb.BlockTransactionView &&
