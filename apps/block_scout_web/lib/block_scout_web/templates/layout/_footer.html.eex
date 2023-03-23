@@ -38,7 +38,7 @@
         <ul>
           <li><a href="http://eon.horizen.io/" rel="noopener noreferrer" class="footer-link" target="_blank">EON</a></li>
           <li><a href="http://eon.horizen.io/docs" rel="noopener noreferrer" class="footer-link" target="_blank">EON Documentation</a></li>
-          <li><a href="http://faucet.horizen.io/" rel="noopener noreferrer" class="footer-link" target="_blank">Test Token (TZEN) Faucet</a></li>
+          <li><a href="<%= Application.get_env(:block_scout_web, :footer)[:faucet_link] %>" rel="noopener noreferrer" class="footer-link" target="_blank">Test Token (TZEN) Faucet</a></li>
         </ul>
       </div>
 
