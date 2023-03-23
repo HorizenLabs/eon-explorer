@@ -43,10 +43,7 @@
       </div>
 
       <div class="col-xs-12 col-md-4 col-lg-<%= col_size %> footer-list">
-        <h3>BlockScout</h3>
         <ul>
-          <li><a href="<%= issue_link(@conn) %>" rel="noopener noreferrer" class="footer-link" target="_blank"><%= gettext("Submit an Issue") %></a></li>
-          <li><a href="<%= Application.get_env(:block_scout_web, :footer)[:github_link] %>" target="_blank" rel="noopener noreferrer" class="footer-link"><%= gettext("Contribute") %></a></li>
           <li><a href="<%= Application.get_env(:block_scout_web, :footer)[:chat_link] %>" target="_blank" rel="noopener noreferrer" class="footer-link"><%= gettext("Discord") %></a></li>
           <%= if Application.get_env(:block_scout_web, :footer)[:enable_forum_link] do %>
             <li><a href="<%= Application.get_env(:block_scout_web, :footer)[:forum_link] %>" target="_blank" rel="noopener noreferrer" class="footer-link"><%= gettext("Forum") %></a></li>
