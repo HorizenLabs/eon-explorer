@@ -48,6 +48,14 @@ defmodule BlockScoutWeb.ApiRouter do
 
   alias BlockScoutWeb.Account.Api.V1.{AuthenticateController, EmailController, TagsController, UserController}
   alias BlockScoutWeb.API.V2
+  alias API.MetricsController
+
+  scope "/metrics", BlockScoutWeb do
+    pipe_through(:api)
+
+    get("/total/:table_name", MetricsController, :total, as: :total)
+  end
+
 
   scope "/account/v1", as: :account_v1 do
     pipe_through(:api)

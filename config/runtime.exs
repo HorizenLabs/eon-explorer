@@ -133,7 +133,7 @@ config :block_scout_web,
   new_tags: System.get_env("NEW_TAGS"),
   chain_id: System.get_env("CHAIN_ID"),
   json_rpc: System.get_env("JSON_RPC"),
-  meta_image_url: System.get_env("META_IMAGE_URL",  "/images/MetaData_img_blueprint_dune-blockex.jpg")
+  meta_image_url: System.get_env("META_IMAGE_URL",  "/images/MetaData_img_blueprint_dune-blockex.jpg"),
   verification_max_libraries: verification_max_libraries
 
 config :block_scout_web, :footer,
