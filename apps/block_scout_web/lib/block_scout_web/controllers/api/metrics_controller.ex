@@ -4,8 +4,12 @@ defmodule BlockScoutWeb.API.MetricsController do
   alias Explorer.Metrics
 
   def total(conn, %{"table_name" => table_name}) do
-    inspect "test"
     total = Metrics.total_entries(table_name)
     json(conn, %{"total_#{table_name}" => total})
+  end
+
+  def average_block_time(conn, _params) do
+    avg_block_time = Metrics.average_block_time()
+    json(conn, %{"avg_block_time" => avg_block_time})
   end
 end

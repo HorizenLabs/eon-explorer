@@ -53,7 +53,8 @@ defmodule BlockScoutWeb.ApiRouter do
   scope "/metrics", BlockScoutWeb do
     pipe_through(:api)
 
-    get("/total/:table_name", MetricsController, :total, as: :total)
+    get("/total/:table_name", MetricsController, :total)
+    get("/avg-block-time", MetricsController, :average_block_time)
   end
 
 
