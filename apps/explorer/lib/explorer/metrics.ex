@@ -3,6 +3,12 @@ defmodule Explorer.Metrics do
   alias Explorer.{Repo}
   alias Explorer.Counters.AverageBlockTime
 
+  @spec total_accounts() :: number()
+  def total_accounts() do
+    %Postgrex.Result{rows: [[count]]} = Repo.query!("SELECT COUNT(contract_code IS NULL) FROM addresses;")
+    count
+  end
+
   @spec total_entries(String.t()) :: number()
   def total_entries(table_name) do
     %Postgrex.Result{rows: [[count]]} =
