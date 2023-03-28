@@ -1,5 +1,4 @@
 defmodule Explorer.Metrics do
-
   alias Explorer.{Repo}
   alias Explorer.Counters.AverageBlockTime
 
@@ -12,7 +11,8 @@ defmodule Explorer.Metrics do
   @spec total_entries(String.t()) :: number()
   def total_entries(table_name) do
     %Postgrex.Result{rows: [[count]]} =
-     Repo.query!("SELECT reltuples::BIGINT AS estimate FROM pg_class WHERE relname='#{String.downcase(table_name)}';")
+      Repo.query!("SELECT reltuples::BIGINT AS estimate FROM pg_class WHERE relname='#{String.downcase(table_name)}';")
+
     count
   end
 
@@ -20,5 +20,13 @@ defmodule Explorer.Metrics do
     Timex.format_duration(AverageBlockTime.average_block_time(), Explorer.Counters.AverageBlockTimeDurationFormat)
   end
 
-
+  def thirty_day_contracts_list() do
+    %Postgrex.Result{rows: rows} = Repo.query!(
+      "SELECT to_char(inserted_at, 'yyyy-mm-dd') AS formatted_date, count(contract_code)
+      FROM addresses
+      WHERE inserted_at BETWEEN CURRENT_DATE - interval '30 days' AND CURRENT_DATE
+      GROUP BY formatted_date
+      ORDER BY formatted_date ASC;")
+    Enum.map(rows, fn row -> %{"date" => Enum.at(row, 0), "contract_count" => Enum.at(row, 1)} end)
+  end
 end
