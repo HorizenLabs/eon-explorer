@@ -19,8 +19,13 @@ defmodule BlockScoutWeb.API.MetricsController do
     json(conn, %{"avg_block_time" => avg_block_time})
   end
 
-   def thirty_day_contracts_list(conn, _params) do
-    thirty_day_contracts_list = Metrics.thirty_day_contracts_list()
-    json(conn, thirty_day_contracts_list)
+   def thirty_day_contract_count_list(conn, _params) do
+    thirty_day_contract_count_list = Metrics.thirty_day_contract_count_list()
+    json(conn, thirty_day_contract_count_list)
+   end
+
+   def thirty_day_tx_count_list(conn, _params) do
+    thirty_day_tx_count_list = Metrics.thirty_day_tx_count_list()
+    json(conn, thirty_day_tx_count_list)
    end
 end
