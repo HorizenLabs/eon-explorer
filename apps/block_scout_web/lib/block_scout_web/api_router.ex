@@ -60,6 +60,10 @@ defmodule BlockScoutWeb.ApiRouter do
     scope "/last-thirty" do
       get("/contracts", MetricsController, :thirty_day_contract_count_list)
       get("/transactions", MetricsController, :thirty_day_tx_count_list)
+      get("/active-devs", MetricsController, :thirty_day_active_dev_count_list)
+      get("/avg-tx-fee", MetricsController, :thirty_day_avg_tx_fee_list)
+      get("/gas-used", MetricsController, :thirty_day_gas_used_list)
+      get("/active-accounts", MetricsController, :thirty_day_active_account_count_list)
     end
 
   end

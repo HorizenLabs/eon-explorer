@@ -28,4 +28,24 @@ defmodule BlockScoutWeb.API.MetricsController do
     thirty_day_tx_count_list = Metrics.thirty_day_tx_count_list()
     json(conn, thirty_day_tx_count_list)
    end
+
+   def thirty_day_active_dev_count_list(conn, _params) do
+     thirty_day_active_dev_count_list = Metrics.thirty_day_active_dev_count_list()
+     json(conn, thirty_day_active_dev_count_list)
+   end
+
+   def thirty_day_avg_tx_fee_list(conn, _params) do
+     thirty_day_avg_tx_fee_list = Metrics.thirty_day_avg_tx_fee_list()
+     json(conn, thirty_day_avg_tx_fee_list)
+   end
+
+   def thirty_day_gas_used_list(conn, _params) do
+    thirty_day_gas_used_list = Metrics.thirty_day_gas_used_list()
+    json(conn, thirty_day_gas_used_list)
+   end
+
+   def thirty_day_active_account_count_list(conn, _params) do
+    thirty_day_active_account_count_list = Metrics.thirty_day_active_account_count_list()
+    json(conn, thirty_day_active_account_count_list)
+   end
 end
