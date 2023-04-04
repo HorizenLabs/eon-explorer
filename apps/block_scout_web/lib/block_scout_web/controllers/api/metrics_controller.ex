@@ -4,9 +4,13 @@ defmodule BlockScoutWeb.API.MetricsController do
   alias Explorer.Metrics
 
   def total_accounts(conn, _params) do
-    inspect "test"
     total_accounts = Metrics.total_accounts()
     json(conn, %{"total_accounts" => total_accounts})
+  end
+
+  def total_smart_contracts(conn, _params) do
+    total_smart_contracts = Metrics.total_smart_contracts()
+    json(conn, %{"total_smart_contracts" => total_smart_contracts})
   end
 
   def total(conn, %{"table_name" => table_name}) do

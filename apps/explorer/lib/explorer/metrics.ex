@@ -8,6 +8,12 @@ defmodule Explorer.Metrics do
     count
   end
 
+  @spec total_smart_contracts() :: number()
+  def total_smart_contracts() do
+    %Postgrex.Result{rows: [[count]]} = Repo.query!("SELECT COUNT(contract_code) FROM addresses WHERE contract_code IS NOT NULL;")
+    count
+  end
+
   @spec total_entries(String.t()) :: number()
   def total_entries(table_name) do
     %Postgrex.Result{rows: [[count]]} =
