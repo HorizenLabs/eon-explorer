@@ -254,6 +254,14 @@ $header-logo-text-color: #333 !default;
   width: $navbar-logo-width;
 }
 
+.navbar-logo.light {
+  display: block;
+}
+
+.navbar-logo.dark {
+  display: none;
+}
+
 .logo-text {
   color: $header-logo-text-color;
   font-size: 1rem;

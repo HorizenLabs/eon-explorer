@@ -52,8 +52,11 @@ $dark-white: #fff;
 			background-color: $header-links-background-color-dark-mode;
 		}
 	}
-	.navbar-brand .navbar-logo {
-		filter: brightness(0) invert(1);
+	.navbar-brand .navbar-logo.light {
+		display: none;
+	}
+	.navbar-brand .navbar-logo.dark {
+		display: block;
 	}
 	.navbar.navbar-primary .navbar-nav .nav-link {
 		color: $labels-dark;
