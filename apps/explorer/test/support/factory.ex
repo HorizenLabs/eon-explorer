@@ -7,7 +7,6 @@ defmodule Explorer.Factory do
   import Explorer.Chain, only: [hash_to_lower_case_string: 1]
   import Kernel, except: [+: 2]
 
-  alias Explorer.Chain.ForwardTransfer
   alias Explorer.Account.{
     Identity,
     Watchlist,
@@ -42,7 +41,9 @@ defmodule Explorer.Factory do
     TokenTransfer,
     Token.Instance,
     Transaction,
-    Withdrawal
+    Withdrawal,
+    FeePayment,
+    ForwardTransfer
   }
 
   alias Explorer.SmartContract.Helper
@@ -770,6 +771,13 @@ defmodule Explorer.Factory do
     }
   end
 
+  def fee_payment_factory do
+    %FeePayment{
+      block_number: Enum.random(1..100_000),
+      to_address_hash: "0x530ec1a4b0e5c939455280c8709447ccf15932b0",
+      value: Enum.random(1..100_000)
+    }
+  end
 
   def transaction_factory do
     %Transaction{

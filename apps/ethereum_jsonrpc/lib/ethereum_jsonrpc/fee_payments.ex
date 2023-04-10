@@ -24,7 +24,7 @@ defmodule EthereumJSONRPC.FeePayments do
   def format_and_flatten(fp_responses, id_to_params) do
     elem(fp_responses, 1)
     |> Enum.map(fn response ->
-      Enum.map(response.result["payments"], fn fp ->
+      Enum.map(response_to_payments(response), fn fp ->
         %{
           to_address_hash: fp["address"],
           block_number: id_to_params[response.id].number,
@@ -46,5 +46,14 @@ defmodule EthereumJSONRPC.FeePayments do
       |> request.()
     end)
   end
+
+  def response_to_payments(response) do
+    case response do
+      %{result: nil} -> []
+      %{result: %{"payments" => payments}} -> payments
+      _ -> []
+    end
+  end
+
 
 end
