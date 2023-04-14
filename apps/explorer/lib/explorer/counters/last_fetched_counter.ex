@@ -3,10 +3,14 @@ defmodule Explorer.Counters.LastFetchedCounter do
   Stores last fetched counters.
   """
 
+
+
   alias Explorer.Counters.LastFetchedCounter
   use Explorer.Schema
 
   import Ecto.Changeset
+
+  @last_fetched_counter_types ["extra_transfer_block_number"]
 
   @type t :: %LastFetchedCounter{
           counter_type: String.t(),
@@ -27,4 +31,7 @@ defmodule Explorer.Counters.LastFetchedCounter do
     |> cast(params, [:counter_type, :value])
     |> validate_required([:counter_type])
   end
+
+  def last_fetched_counter_types, do: @last_fetched_counter_types
+
 end

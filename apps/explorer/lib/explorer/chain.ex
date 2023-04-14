@@ -5049,6 +5049,28 @@ defmodule Explorer.Chain do
     |> Repo.stream_reduce(initial, reducer)
   end
 
+  @spec stream_unfetched_fee_payments(
+          initial :: accumulator,
+          reducer :: (entry :: map(), accumulator -> accumulator)
+        ) :: {:ok, accumulator}
+        when accumulator: term()
+  def stream_unfetched_fee_payments(initial, reducer) when is_function(reducer, 2) do
+    missing_fee_payments_blocks_query = unfetched_fee_payments_query()
+    Repo.stream_reduce(missing_fee_payments_blocks_query, initial, reducer)
+  end
+
+  def unfetched_fee_payments_query() do
+    et_type = Enum.at(LastFetchedCounter.last_fetched_counter_types(), 0)
+    from(
+        block in Block,
+        join: lfc in LastFetchedCounter,
+        on: block.number > lfc.value,
+        where: lfc.counter_type == ^et_type,
+        select: block.number,
+        distinct: [block.number],
+        order_by: [asc: block.number])
+  end
+
   @doc """
   Returns a list of block numbers token transfer `t:Log.t/0`s that don't have an
   associated `t:TokenTransfer.t/0` record.

@@ -35,8 +35,7 @@ defmodule Explorer.ChainTest do
   alias Explorer.Chain.InternalTransaction.Type
 
   alias Explorer.Chain.Supply.ProofOfAuthority
-  alias Explorer.Counters.AddressesWithBalanceCounter
-  alias Explorer.Counters.AddressesCounter
+  alias Explorer.Counters.{AddressesWithBalanceCounter, AddressesCounter, LastFetchedCounter}
 
   doctest Explorer.Chain
 
@@ -2041,6 +2040,25 @@ defmodule Explorer.ChainTest do
                 ]
               }} = Chain.import(@import_data)
     end
+
+    test "import fee_payments" do
+      assert {:ok,
+              %{
+                fee_payments: [
+                  %{
+        block_number: 70889,
+        to_address_hash: "0x530ec1a4b0e5c939455280c8709447ccf15932b0",
+        value: value,
+                    inserted_at: %{},
+                    updated_at: %{}
+                  }]}} = Chain.import(%{fee_payments: %{params: [%{
+        block_number: 70889,
+        to_address_hash: "0x530ec1a4b0e5c939455280c8709447ccf15932b0",
+        value: 510000000000000000
+      }]}})
+
+    end
+
   end
 
   describe "list_blocks/2" do
@@ -3918,22 +3936,51 @@ defmodule Explorer.ChainTest do
     end
   end
 
+  describe "last_fetched_counter" do
+    test "upsert and get" do
+      et_type = Enum.at(LastFetchedCounter.last_fetched_counter_types(), 0)
 
-  describe "recent_collated_forward_transfers/1" do
+      params = %{
+          counter_type: et_type,
+          value: 18
+        }
+      upsert_result = Chain.upsert_last_fetched_counter(params)
+      get_result = Chain.get_last_fetched_counter(et_type)
+      assert elem(upsert_result,1).value == get_result
+    end
+  end
+
+
+  describe "extra_transfers tests" do
     test "returns a list of recent collated forward_transfers" do
       newest_first_page_fts =
         50
         |> insert_list(:forward_transfer)
         |> Enum.reverse()
 
-
-
         paging_options = %Explorer.PagingOptions{page_size: 10}
         recent_collated_fts = Explorer.Chain.fetch_recent_collated_forward_transfers_for_rap(paging_options)
         assert length(recent_collated_fts) == 11
         assert hd(recent_collated_fts).block_number == Enum.at(newest_first_page_fts, 11).block_number
     end
+
+    test "query for stream_unfetched_fees with blocks higher than or equal t" do
+      insert(:block, number: 19)
+      insert(:block, number: 30)
+       et_type = Enum.at(LastFetchedCounter.last_fetched_counter_types(), 0)
+
+      params = %{
+          counter_type: et_type,
+          value: 18
+        }
+      upsert_result = Chain.upsert_last_fetched_counter(params)
+
+      assert Repo.all(Chain.unfetched_fee_payments_query()) == [19, 30]
+
+    end
   end
+
+
 
 
   describe "recent_collated_transactions/1" do
