@@ -133,8 +133,12 @@ config :block_scout_web,
   new_tags: System.get_env("NEW_TAGS"),
   chain_id: System.get_env("CHAIN_ID"),
   json_rpc: System.get_env("JSON_RPC"),
-  meta_image_url: System.get_env("META_IMAGE_URL",  "/images/MetaData_img_blueprint_dune-blockex.jpg"),
-  verification_max_libraries: verification_max_libraries
+  meta_image_url: System.get_env("META_IMAGE_URL", "/images/MetaData_img_blueprint_dune-blockex.jpg"),
+  verification_max_libraries: verification_max_libraries,
+  matomo_site_id: System.get_env("MATOMO_SITE_ID"),
+  matomo_disabled: System.get_env("MATOMO_DISABLED", "false"),
+  matomo_cookie_path: System.get_env("MATOMO_COOKIE_PATH"),
+  matomo_domains: System.get_env("MATOMO_DOMAINS")
 
 config :block_scout_web, :footer,
   logo: System.get_env("FOOTER_LOGO"),
