@@ -63,6 +63,13 @@
                     to: forward_transfer_path(@conn, :index)
                   ) %>
 
+              <%= link(
+                    gettext("Fee Payments"),
+                    class: "dropdown-item #{tab_status("fee-payments", @conn.request_path)}",
+                    "data-test": "fee_payments_link",
+                    to: fee_payment_path(@conn, :index)
+                  ) %>
+
               <%= if variant !== EthereumJSONRPC.Besu do %>
                 <%= link(
                       gettext("Pending"),

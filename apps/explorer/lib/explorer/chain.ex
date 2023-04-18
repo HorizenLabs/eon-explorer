@@ -63,7 +63,8 @@ defmodule Explorer.Chain do
     Transaction,
     Wei,
     Withdrawal,
-    ForwardTransfer
+    ForwardTransfer,
+    FeePayment
   }
 
   alias Explorer.Chain.Block.{EmissionReward, Reward}
@@ -3566,6 +3567,33 @@ defmodule Explorer.Chain do
 
   def forward_transfers_count() do
     ForwardTransfer
+    |> Repo.aggregate(:count)
+  end
+
+  @spec recent_collated_fee_payments_for_rap([paging_options]) :: %{
+    :total_fee_payment_count => non_neg_integer(),
+    :fee_payments => [FeePayments.t()]
+  }
+  def recent_collated_fee_payments_for_rap(options \\ []) when is_list(options) do
+    paging_options = Keyword.get(options, :paging_options, @default_paging_options)
+
+    total_fee_payments_count = fee_payments_count()
+
+    fetched_fee_payments =
+      fetch_recent_collated_fee_payments_for_rap(paging_options)
+
+    %{total_fee_payments_count: total_fee_payments_count, fee_payments: fetched_fee_payments}
+  end
+
+  def fetch_recent_collated_fee_payments_for_rap(paging_options) do
+    FeePayment
+    |> order_by([fee_payment], desc: fee_payment.id)
+    |> handle_random_access_paging_options(paging_options)
+    |> Repo.all()
+  end
+
+  def fee_payments_count() do
+    FeePayment
     |> Repo.aggregate(:count)
   end
 

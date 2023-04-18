@@ -127,6 +127,10 @@ defmodule BlockScoutWeb.WebRouter do
 
     get("/forward-transfers-count", ForwardTransferController, :count, as: :count)
 
+    resources("/fee-payments", FeePaymentController, only: [:index])
+
+    get("/fee-payments-count", FeePaymentController, :count, as: :count)
+
     resources("/recent-transactions", RecentTransactionsController, only: [:index])
 
     resources("/verified-contracts", VerifiedContractsController, only: [:index])

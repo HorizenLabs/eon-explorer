@@ -25,7 +25,8 @@ defmodule Explorer.ChainTest do
     Transaction,
     SmartContract,
     Wei,
-    ForwardTransfer
+    ForwardTransfer,
+    FeePayment
   }
 
   alias Explorer.{Chain, Etherscan}
@@ -1182,6 +1183,13 @@ defmodule Explorer.ChainTest do
     test "all forward_transfers" do
       %ForwardTransfer{block_number: block_number, to_address_hash: to_address_hash, value: value} = insert(:forward_transfer)
       assert Chain.fetch_forward_transfers() != nil
+    end
+  end
+
+  describe "fetch_fee_payments" do
+    test "all fee_payments" do
+      %FeePayment{block_number: block_number, to_address_hash: to_address_hash, value: value} = insert(:fee_payment)
+      assert Chain.fetch_fee_payments() != nil
     end
   end
 
@@ -3980,8 +3988,34 @@ defmodule Explorer.ChainTest do
     end
   end
 
+  describe "extra_fee_payments tests" do
+    test "returns a list of recent collated fee_payments" do
+      newest_first_page_fts =
+        50
+        |> insert_list(:fee_payment)
+        |> Enum.reverse()
 
+        paging_options = %Explorer.PagingOptions{page_size: 10}
+        recent_collated_fts = Explorer.Chain.fetch_recent_collated_fee_payments_for_rap(paging_options)
+        assert length(recent_collated_fts) == 11
+        assert hd(recent_collated_fts).block_number == Enum.at(newest_first_page_fts, 11).block_number
+    end
 
+    test "query for stream_unfetched_fees with blocks higher than or equal t" do
+      insert(:block, number: 19)
+      insert(:block, number: 30)
+       et_type = Enum.at(LastFetchedCounter.last_fetched_counter_types(), 0)
+
+      params = %{
+          counter_type: et_type,
+          value: 18
+        }
+      upsert_result = Chain.upsert_last_fetched_counter(params)
+
+      assert Repo.all(Chain.unfetched_fee_payments_query()) == [19, 30]
+
+    end
+  end
 
   describe "recent_collated_transactions/1" do
     test "with no collated transactions it returns an empty list" do
