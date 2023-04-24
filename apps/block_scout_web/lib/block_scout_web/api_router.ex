@@ -57,6 +57,8 @@ defmodule BlockScoutWeb.ApiRouter do
     get("/avg-block-time", MetricsController, :average_block_time)
     get("/total-accounts", MetricsController, :total_accounts)
     get("/total-smart-contracts", MetricsController, :total_smart_contracts)
+    get("/total-transactions", MetricsController, :total_transactions)
+    get("/total-blocks", MetricsController, :total_blocks)
 
     scope "/last-thirty" do
       get("/contracts", MetricsController, :thirty_day_contract_count_list)

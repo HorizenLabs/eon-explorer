@@ -13,6 +13,16 @@ defmodule BlockScoutWeb.API.MetricsController do
     json(conn, %{"total_smart_contracts" => total_smart_contracts})
   end
 
+  def total_transactions(conn, _params) do
+    total_transactions = Metrics.total_transactions()
+    json(conn, %{"total_transactions" => total_transactions})
+  end
+
+  def total_blocks(conn, _params) do
+    total_blocks = Metrics.total_blocks()
+    json(conn, %{"total_blocks" => total_blocks})
+  end
+
   def total(conn, %{"table_name" => table_name}) do
     total = Metrics.total_entries(table_name)
     json(conn, %{"total_#{table_name}" => total})

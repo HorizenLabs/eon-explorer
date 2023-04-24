@@ -1,6 +1,8 @@
 defmodule Explorer.Metrics do
   alias Explorer.{Repo}
   alias Explorer.Counters.AverageBlockTime
+  alias Explorer.Chain.Cache.Transaction, as: TransactionCache
+  alias Explorer.Chain.Cache.Block, as: BlockCache
 
   @spec total_accounts() :: number()
   def total_accounts() do
@@ -12,6 +14,16 @@ defmodule Explorer.Metrics do
   def total_smart_contracts() do
     %Postgrex.Result{rows: [[count]]} = Repo.query!("SELECT COUNT(contract_code) FROM addresses WHERE contract_code IS NOT NULL;")
     count
+  end
+
+  @spec total_transactions() :: number()
+  def total_transactions() do
+    TransactionCache.estimated_count()
+  end
+
+  @spec total_blocks() :: number()
+  def total_blocks() do
+    BlockCache.estimated_count()
   end
 
   @spec total_entries(String.t()) :: number()
