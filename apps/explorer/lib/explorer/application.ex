@@ -23,6 +23,7 @@ defmodule Explorer.Application do
     Transaction,
     Transactions,
     TransactionsApiV2,
+    TotalValueLocked,
     Uncles
   }
 
@@ -71,6 +72,8 @@ defmodule Explorer.Application do
       StateChanges,
       Transactions,
       TransactionsApiV2,
+      TotalValueLocked,
+      Accounts,
       Uncles,
       con_cache_child_spec(MarketHistoryCache.cache_name()),
       con_cache_child_spec(RSK.cache_name(), ttl_check_interval: :timer.minutes(1), global_ttl: :timer.minutes(30)),

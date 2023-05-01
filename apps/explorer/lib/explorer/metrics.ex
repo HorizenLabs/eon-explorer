@@ -3,22 +3,12 @@ defmodule Explorer.Metrics do
   alias Explorer.Counters.AverageBlockTime
   alias Explorer.Chain.Cache.Transaction, as: TransactionCache
   alias Explorer.Chain.Cache.Block, as: BlockCache
+  alias Explorer.Chain.Cache.TotalValueLocked
 
   @spec total_accounts() :: number()
   def total_accounts() do
     %Postgrex.Result{rows: [[count]]} = Repo.query!("SELECT COUNT(contract_code IS NULL) FROM addresses;")
     count
-  end
-
-  @spec total_smart_contracts() :: number()
-  def total_smart_contracts() do
-    %Postgrex.Result{rows: [[count]]} = Repo.query!("SELECT COUNT(contract_code) FROM addresses WHERE contract_code IS NOT NULL;")
-    count
-  end
-
-  @spec total_transactions() :: number()
-  def total_transactions() do
-    TransactionCache.estimated_count()
   end
 
   @spec total_blocks() :: number()
@@ -33,27 +23,33 @@ defmodule Explorer.Metrics do
     count
   end
 
+  @spec total_smart_contracts() :: number()
+  def total_smart_contracts() do
+    %Postgrex.Result{rows: [[count]]} = Repo.query!("SELECT COUNT(contract_code) FROM addresses WHERE contract_code IS NOT NULL;")
+    count
+  end
+
+  @spec total_transactions() :: number()
+  def total_transactions() do
+    TransactionCache.estimated_count()
+  end
+
+  def total_value_locked() do
+    TotalValueLocked.cached_results()
+  end
+
   def average_block_time() do
     Timex.format_duration(AverageBlockTime.average_block_time(), Explorer.Counters.AverageBlockTimeDurationFormat)
   end
 
-  def thirty_day_contract_count_list() do
+  def thirty_day_active_account_count_list() do
     %Postgrex.Result{rows: rows} = Repo.query!(
-      "SELECT to_char(inserted_at, 'yyyy-mm-dd') AS formatted_date, count(contract_code)
-      FROM addresses
-      WHERE inserted_at BETWEEN CURRENT_DATE - interval '30 days' AND CURRENT_DATE-interval '1 day'
+      "SELECT to_char(inserted_at, 'yyyy-mm-dd') as formatted_date, count(DISTINCT from_address_hash)
+      FROM transactions
+      WHERE inserted_at BETWEEN CURRENT_DATE - interval '30 days' AND CURRENT_DATE - interval '1 day'
       GROUP BY formatted_date
-      ORDER BY formatted_date ASC;")
-    Enum.map(rows, fn row -> %{"date" => Enum.at(row, 0), "contract_count" => Enum.at(row, 1)} end)
-  end
-
-  def thirty_day_tx_count_list() do
-    %Postgrex.Result{rows: rows} = Repo.query!(
-      "SELECT to_char(date,'yyyy-mm-dd') AS formatted_date, number_of_transactions
-      FROM transaction_stats
-      WHERE date BETWEEN CURRENT_DATE - interval '30 days' AND CURRENT_DATE-interval '1 day'
-      ORDER BY formatted_date ASC;")
-    Enum.map(rows, fn row -> %{"date" => Enum.at(row, 0), "transaction_count" => Enum.at(row, 1)} end)
+      ORDER BY formatted_date ASC")
+    Enum.map(rows, fn row -> %{"date" => Enum.at(row, 0), "active_accounts" => Enum.at(row, 1)} end)
   end
 
   def thirty_day_active_dev_count_list() do
@@ -79,6 +75,16 @@ defmodule Explorer.Metrics do
     Enum.map(rows, fn row -> %{"date" => Enum.at(row, 0), "avg_tx_fee" => Enum.at(row, 1)} end)
   end
 
+  def thirty_day_contract_count_list() do
+    %Postgrex.Result{rows: rows} = Repo.query!(
+      "SELECT to_char(inserted_at, 'yyyy-mm-dd') AS formatted_date, count(contract_code)
+      FROM addresses
+      WHERE inserted_at BETWEEN CURRENT_DATE - interval '30 days' AND CURRENT_DATE-interval '1 day'
+      GROUP BY formatted_date
+      ORDER BY formatted_date ASC;")
+    Enum.map(rows, fn row -> %{"date" => Enum.at(row, 0), "contract_count" => Enum.at(row, 1)} end)
+  end
+
   def thirty_day_gas_used_list() do
     %Postgrex.Result{rows: rows} = Repo.query!(
       "WITH DATA AS
@@ -91,15 +97,13 @@ defmodule Explorer.Metrics do
     Enum.map(rows, fn row -> %{"date" => Enum.at(row, 0), "gas_used" => Enum.at(row, 1)} end)
   end
 
-  def thirty_day_active_account_count_list() do
+  def thirty_day_tx_count_list() do
     %Postgrex.Result{rows: rows} = Repo.query!(
-      "SELECT to_char(inserted_at, 'yyyy-mm-dd') as formatted_date, count(DISTINCT from_address_hash)
-      FROM transactions
-      WHERE inserted_at BETWEEN CURRENT_DATE - interval '30 days' AND CURRENT_DATE - interval '1 day'
-      GROUP BY formatted_date
-      ORDER BY formatted_date ASC")
-    Enum.map(rows, fn row -> %{"date" => Enum.at(row, 0), "active_accounts" => Enum.at(row, 1)} end)
+      "SELECT to_char(date,'yyyy-mm-dd') AS formatted_date, number_of_transactions
+      FROM transaction_stats
+      WHERE date BETWEEN CURRENT_DATE - interval '30 days' AND CURRENT_DATE-interval '1 day'
+      ORDER BY formatted_date ASC;")
+    Enum.map(rows, fn row -> %{"date" => Enum.at(row, 0), "transaction_count" => Enum.at(row, 1)} end)
   end
-
 
 end

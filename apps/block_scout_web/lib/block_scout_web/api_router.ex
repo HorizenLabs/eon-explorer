@@ -53,20 +53,21 @@ defmodule BlockScoutWeb.ApiRouter do
   scope "/metrics", BlockScoutWeb do
     pipe_through(:api)
 
-    get("/total/:table_name", MetricsController, :total)
     get("/avg-block-time", MetricsController, :average_block_time)
     get("/total-accounts", MetricsController, :total_accounts)
+    get("/total-blocks", MetricsController, :total_blocks)
     get("/total-smart-contracts", MetricsController, :total_smart_contracts)
     get("/total-transactions", MetricsController, :total_transactions)
-    get("/total-blocks", MetricsController, :total_blocks)
+    get("/total-value-locked", MetricsController, :total_value_locked)
+    get("/total/:table_name", MetricsController, :total)
 
     scope "/last-thirty" do
-      get("/contracts", MetricsController, :thirty_day_contract_count_list)
-      get("/transactions", MetricsController, :thirty_day_tx_count_list)
+      get("/active-accounts", MetricsController, :thirty_day_active_account_count_list)
       get("/active-devs", MetricsController, :thirty_day_active_dev_count_list)
       get("/avg-tx-fee", MetricsController, :thirty_day_avg_tx_fee_list)
       get("/gas-used", MetricsController, :thirty_day_gas_used_list)
-      get("/active-accounts", MetricsController, :thirty_day_active_account_count_list)
+      get("/contracts", MetricsController, :thirty_day_contract_count_list)
+      get("/transactions", MetricsController, :thirty_day_tx_count_list)
     end
 
   end
