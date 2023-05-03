@@ -1,12 +1,12 @@
-defmodule Explorer.Chain.Cache.TotalValueLocked do
+defmodule Explorer.Chain.Cache.TotalSmartContracts do
   @moduledoc """
-  Cache for Total Value Locked.
+  Cache for Total Smart Contracts.
   """
 
   @default_cache_period :timer.hours(2)
 
   use Explorer.Chain.MapCache,
-    name: :total_value_locked,
+    name: :total_smart_contracts,
     key: :cached_result,
     key: :async_task,
     global_ttl: cache_period(),
@@ -29,23 +29,12 @@ defmodule Explorer.Chain.Cache.TotalValueLocked do
   end
 
   def db_results do
-    %Postgrex.Result{rows: [[contracts_count]]} = SQL.query!(Repo,
-      "SELECT sum(fetched_coin_balance) as tvl
+    %Postgrex.Result{rows: [[count]]} = SQL.query!(Repo,
+      "SELECT COUNT(contract_code)
       FROM addresses
       WHERE contract_code IS NOT NULL"
     )
-
-    %Postgrex.Result{rows: [[externally_owned_accounts_count]]} = SQL.query!(Repo,
-      "SELECT sum(fetched_coin_balance) as tvl
-      FROM addresses
-      WHERE contract_code IS NULL"
-    )
-
-    %{ "contractZenTVL" => wei_to_ether(contracts_count), "userZenTVL" => wei_to_ether(externally_owned_accounts_count) }
-  end
-
-  def wei_to_ether(value) do
-    Explorer.Chain.Wei.to(%Explorer.Chain.Wei{value: Decimal.new(value)}, :ether)
+    count
   end
 
   defp handle_fallback(:cached_result) do
@@ -68,7 +57,7 @@ defmodule Explorer.Chain.Cache.TotalValueLocked do
         rescue
           e ->
             Logger.debug([
-              "Coudn't update TVL result test #{inspect(e)}"
+              "Coudn't update Total Smart Contracts test #{inspect(e)}"
             ])
         end
 
@@ -85,7 +74,7 @@ defmodule Explorer.Chain.Cache.TotalValueLocked do
   defp async_task_on_deletion(_data), do: nil
 
   defp cache_period do
-    "CACHE_TVL_RESULT"
+    "CACHE_TOTAL_SMART_CONTRACTS"
     |> System.get_env("")
     |> Integer.parse()
     |> case do
