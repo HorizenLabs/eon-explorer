@@ -1784,13 +1784,13 @@ msgstr ""
 #: lib/block_scout_web/templates/chain/_block.html.eex:16
 #: lib/block_scout_web/templates/transaction_state/_state_change.html.eex:22
 #, elixir-autogen, elixir-format
-msgid "Miner"
+msgid "Forger"
 msgstr ""
 
 #: lib/block_scout_web/views/block_view.ex:63
 #: lib/block_scout_web/views/block_view.ex:68
 #, elixir-autogen, elixir-format
-msgid "Miner Reward"
+msgid "Forger Reward"
 msgstr ""
 
 #: lib/block_scout_web/templates/common_components/_minimal_proxy_pattern.html.eex:3
