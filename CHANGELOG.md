@@ -4,6 +4,8 @@
 
 ### Features
 
+- [#7977](https://github.com/blockscout/blockscout/pull/7977) - GraphQL: extend schema with new field for existing objects
+
 ### Fixes
 
 ### Chore
