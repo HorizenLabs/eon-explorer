@@ -54,7 +54,7 @@ defmodule Indexer.Fetcher.FeePayment do
   @impl BufferedTask
   def init(initial_acc, reducer, _) do
     {:ok, final} =
-      Chain.stream_unfetched_fee_payments(initial_acc, fn block_number, acc ->
+      Chain.stream_unfetched_extra_transfers(initial_acc, fn block_number, acc ->
         reducer.(block_number, acc)
       end)
       final

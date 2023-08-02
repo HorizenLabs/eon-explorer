@@ -15,7 +15,8 @@ defmodule Explorer.Chain.ImportTest do
     PendingBlockOperation,
     Token,
     TokenTransfer,
-    Transaction
+    Transaction,
+    Wei
   }
 
   alias Explorer.Chain.Events.Subscriber
@@ -51,7 +52,8 @@ defmodule Explorer.Chain.ImportTest do
           %{
             block_number: 70889,
             to_address_hash: "0x530ec1a4b0e5c939455280c8709447ccf15932b0",
-            value: 510_000_000_000_000_000
+            value: 510_000_000_000_000_000,
+            index: 0
           }
         ]
       },
@@ -270,7 +272,8 @@ defmodule Explorer.Chain.ImportTest do
                   %{
                     block_number: 70889,
                     to_address_hash: "0x530ec1a4b0e5c939455280c8709447ccf15932b0",
-                    value: 510_000_000_000_000_000
+                    value: 510_000_000_000_000_000,
+                    index: 0
                   }
                 ],
                 internal_transactions: [
@@ -2405,4 +2408,46 @@ defmodule Explorer.Chain.ImportTest do
                )
     end
   end
+
+  describe "all/1 extra_transfers only" do
+    @import_data %{
+      addresses: %{
+        params: [
+          %{hash: "0x530ec1a4b0e5c939455280c8709447ccf15932b0"}
+        ],
+        timeout: 5
+      },
+      forward_transfers: %{
+        params: [
+          %{
+            block_number: 70889,
+            to_address_hash: "0x530ec1a4b0e5c939455280c8709447ccf15932b0",
+            value: 510_000_000_000_000_000,
+            index: 0
+          }
+        ]
+      }
+    }
+    test "valid data" do
+      to_address_hash = %Explorer.Chain.Hash{byte_count: 20, bytes: <<83, 14, 193, 164, 176, 229, 201, 57, 69, 82, 128, 200, 112, 148, 71, 204, 241, 89, 50, 176>>}
+      value = %Wei{value: Decimal.new(510_000_000_000_000_000)}
+      assert {:ok, %{forward_transfers: [
+                  %{
+                    block_number: 70889,
+                    to_address_hash: ^to_address_hash,
+                    value: ^value,
+                    index: 0
+                  }
+                ]} } = Import.all(@import_data)
+    end
+
+    test "reject duplicate insert without error" do
+      Import.all(@import_data)
+      assert {:ok, _response } = Import.all(@import_data)
+      assert 1 = Chain.forward_transfers_count()
+
+      end
+
+  end
+
 end

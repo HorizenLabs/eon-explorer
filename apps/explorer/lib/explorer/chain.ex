@@ -3560,7 +3560,7 @@ defmodule Explorer.Chain do
 
   def fetch_recent_collated_forward_transfers_for_rap(paging_options) do
     ForwardTransfer
-    |> order_by([forward_transfer], desc: forward_transfer.id)
+    |> order_by([forward_transfer], desc: [forward_transfer.block_number, forward_transfer.index])
     |> handle_random_access_paging_options(paging_options)
     |> Repo.all()
   end
@@ -5077,23 +5077,23 @@ defmodule Explorer.Chain do
     |> Repo.stream_reduce(initial, reducer)
   end
 
-  @spec stream_unfetched_fee_payments(
+  @spec stream_unfetched_extra_transfers(
           initial :: accumulator,
           reducer :: (entry :: map(), accumulator -> accumulator)
         ) :: {:ok, accumulator}
         when accumulator: term()
-  def stream_unfetched_fee_payments(initial, reducer) when is_function(reducer, 2) do
-    missing_fee_payments_blocks_query = unfetched_fee_payments_query()
-    Repo.stream_reduce(missing_fee_payments_blocks_query, initial, reducer)
+  def stream_unfetched_extra_transfers(initial, reducer) when is_function(reducer, 2) do
+    missing_extra_transfers_blocks_query = unfetched_extra_transfers_query()
+    Repo.stream_reduce(missing_extra_transfers_blocks_query, initial, reducer)
   end
 
-  def unfetched_fee_payments_query() do
-    et_type = Enum.at(LastFetchedCounter.last_fetched_counter_types(), 0)
+  def unfetched_extra_transfers_query() do
+    extra_transfer_type = Enum.at(LastFetchedCounter.last_fetched_counter_types(), 0)
     from(
         block in Block,
         join: lfc in LastFetchedCounter,
         on: block.number > lfc.value,
-        where: lfc.counter_type == ^et_type,
+        where: lfc.counter_type == ^extra_transfer_type,
         select: block.number,
         distinct: [block.number],
         order_by: [asc: block.number])

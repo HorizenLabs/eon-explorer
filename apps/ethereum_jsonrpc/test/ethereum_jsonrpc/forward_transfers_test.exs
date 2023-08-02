@@ -25,14 +25,16 @@ defmodule EthereumJSONRPC.ForwardTransfersTest do
              id: 0,
              result: %{
                "forwardTransfers" => [
+                 %{"to" => "0x5302c1375912f56a78e15802f30c693c4eae80b5", "value" => value_string_1},
                  %{"to" => "0x5302c1375912f56a78e15802f30c693c4eae80b5", "value" => value_string_1}
-               ]
+                ]
              }
            },
            %{
              id: 1,
              result: %{
                "forwardTransfers" => [
+                 %{"to" => "0x74d254e22fcb4e8d021320b9d4fdfd54134735b1", "value" => value_string_2},
                  %{"to" => "0x74d254e22fcb4e8d021320b9d4fdfd54134735b1", "value" => value_string_2}
                ]
              }
@@ -45,12 +47,26 @@ defmodule EthereumJSONRPC.ForwardTransfersTest do
         %{
           block_number: 346_087,
           to_address_hash: "0x5302c1375912f56a78e15802f30c693c4eae80b5",
-          value: quantity_to_integer(value_string_1)
+          value: quantity_to_integer(value_string_1),
+          index: 0
+        },
+        %{
+          block_number: 346_087,
+          to_address_hash: "0x5302c1375912f56a78e15802f30c693c4eae80b5",
+          value: quantity_to_integer(value_string_1),
+          index: 1
         },
         %{
           block_number: 346_088,
           to_address_hash: "0x74d254e22fcb4e8d021320b9d4fdfd54134735b1",
-          value: quantity_to_integer(value_string_2)
+          value: quantity_to_integer(value_string_2),
+          index: 0
+        },
+        %{
+          block_number: 346_088,
+          to_address_hash: "0x74d254e22fcb4e8d021320b9d4fdfd54134735b1",
+          value: quantity_to_integer(value_string_2),
+          index: 1
         }
       ]
 
@@ -128,12 +144,14 @@ defmodule EthereumJSONRPC.ForwardTransfersTest do
                %{
                  block_number: ^block_number_1,
                  to_address_hash: ^to_address_hash,
-                 value: ^value_1
+                 value: ^value_1,
+                 index: 0
                },
                %{
                  block_number: ^block_number_2,
                  to_address_hash: ^to_address_hash,
-                 value: ^value_2
+                 value: ^value_2,
+                 index: 0
                }
              ] =
                ForwardTransfers.fetch(

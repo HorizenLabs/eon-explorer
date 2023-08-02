@@ -73,6 +73,7 @@ defmodule Explorer.Chain.Import.Runner.ForwardTransfers do
       repo,
       changes_list,
       for: ForwardTransfer,
+      on_conflict: :nothing,
       returning: true,
       timeout: timeout,
       timestamps: timestamps

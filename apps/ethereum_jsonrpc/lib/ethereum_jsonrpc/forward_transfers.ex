@@ -24,13 +24,15 @@ defmodule EthereumJSONRPC.ForwardTransfers do
   def format_and_flatten(ft_responses, id_to_params) do
     elem(ft_responses, 1)
     |> Enum.map(fn response ->
-      Enum.map(response.result["forwardTransfers"], fn ft ->
-        %{
+      Enum.reduce(response.result["forwardTransfers"], [], fn ft, acc ->
+        [  %{
           to_address_hash: ft["to"],
           block_number: id_to_params[response.id].number,
-          value: quantity_to_integer(ft["value"])
-        }
+          value: quantity_to_integer(ft["value"]),
+          index: Enum.count(acc)
+          } | acc ]
       end)
+      |> Enum.reverse()
     end)
     |> Enum.flat_map(fn ft -> ft end)
   end

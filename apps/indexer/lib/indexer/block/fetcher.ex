@@ -12,7 +12,7 @@ defmodule Indexer.Block.Fetcher do
   alias EthereumJSONRPC.ForwardTransfers
   alias EthereumJSONRPC.{Blocks, FetchedBeneficiaries}
   alias Explorer.Chain
-  alias Explorer.Chain.{Address, Block, Hash, Import, Transaction, Wei}
+  alias Explorer.Chain.{Address, Block, Hash, Import, Transaction, Wei, ForwardTransfer}
   alias Explorer.Chain.Block.Reward
   alias Explorer.Chain.Cache.Blocks, as: BlocksCache
   alias Explorer.Chain.Cache.{Accounts, BlockNumber, Transactions, Uncles}
@@ -143,7 +143,7 @@ defmodule Indexer.Block.Fetcher do
          %{mint_transfers: mint_transfers} = MintTransfers.parse(logs),
          %FetchedBeneficiaries{params_set: beneficiary_params_set, errors: beneficiaries_errors} =
            fetch_beneficiaries(blocks, transactions_with_receipts, json_rpc_named_arguments),
-         forward_transfers = ForwardTransfers.fetch(range, json_rpc_named_arguments),
+         forward_transfers = ForwardTransfer.add_block_hashes(ForwardTransfers.fetch(range, json_rpc_named_arguments), blocks),
          addresses =
            Addresses.extract_addresses(%{
              block_reward_contract_beneficiaries: MapSet.to_list(beneficiary_params_set),
@@ -152,6 +152,7 @@ defmodule Indexer.Block.Fetcher do
              mint_transfers: mint_transfers,
              token_transfers: token_transfers,
              transactions: transactions_with_receipts,
+             forward_transfers: forward_transfers,
              transaction_actions: transaction_actions,
              withdrawals: withdrawals_params
            }),
@@ -161,6 +162,7 @@ defmodule Indexer.Block.Fetcher do
              blocks_params: blocks,
              logs_params: logs,
              transactions_params: transactions_with_receipts,
+             forward_transfers_params: forward_transfers,
              withdrawals: withdrawals_params
            }
            |> AddressCoinBalances.params_set(),
