@@ -1,7 +1,7 @@
 defmodule BlockScoutWeb.LayoutView do
   use BlockScoutWeb, :view
 
-  alias Explorer.Chain
+  alias Explorer.{Chain, CustomContractsHelper}
   alias Plug.Conn
   alias Poison.Parser
 
