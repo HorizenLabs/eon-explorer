@@ -250,8 +250,8 @@ $header-logo-text-color: #333 !default;
 }
 
 .navbar-logo {
-  max-height: $navbar-logo-height;
-  width: $navbar-logo-width;
+  max-height: auto;
+  width: auto;
 }
 
 .navbar-logo.light {
