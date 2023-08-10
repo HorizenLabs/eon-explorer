@@ -73,6 +73,7 @@ defmodule Explorer.Chain.Import.Runner.FeePayments do
       repo,
       changes_list,
       for: FeePayment,
+      on_conflict: :nothing,
       returning: true,
       timeout: timeout,
       timestamps: timestamps

@@ -32,8 +32,7 @@ defmodule Indexer.Supervisor do
     TokenUpdater,
     TransactionAction,
     UncleBlock,
-    Withdrawal,
-    FeePayment
+    Withdrawal
   }
 
   alias Indexer.Temporary.{
@@ -123,8 +122,6 @@ defmodule Indexer.Supervisor do
         {TokenUpdater.Supervisor,
          [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
         {ReplacedTransaction.Supervisor, [[memory_monitor: memory_monitor]]},
-        {FeePayment.Supervisor,
-         [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
 
         # Out-of-band fetchers
         {EmptyBlocksSanitizer.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments]]},

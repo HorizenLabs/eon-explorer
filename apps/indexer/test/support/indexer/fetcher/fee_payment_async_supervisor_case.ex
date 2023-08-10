@@ -1,5 +1,5 @@
-defmodule Indexer.Fetcher.FeePayment.Supervisor.Case do
-  alias Indexer.Fetcher.FeePayment
+defmodule Indexer.Fetcher.FeePaymentAsync.Supervisor.Case do
+  alias Indexer.Fetcher.FeePaymentAsync, as: FeePayment
 
   def start_supervised!(fetcher_arguments \\ []) when is_list(fetcher_arguments) do
     merged_fetcher_arguments =

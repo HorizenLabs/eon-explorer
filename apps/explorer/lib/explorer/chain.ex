@@ -3544,7 +3544,7 @@ defmodule Explorer.Chain do
   end
 
   @spec recent_collated_forward_transfers_for_rap([paging_options]) :: %{
-          :total_forward_transfer_count => non_neg_integer(),
+          :total_forward_transfers_count => non_neg_integer(),
           :forward_transfers => [ForwardTransfers.t()]
         }
   def recent_collated_forward_transfers_for_rap(options \\ []) when is_list(options) do
@@ -3571,7 +3571,7 @@ defmodule Explorer.Chain do
   end
 
   @spec recent_collated_fee_payments_for_rap([paging_options]) :: %{
-    :total_fee_payment_count => non_neg_integer(),
+    :total_fee_payments_count => non_neg_integer(),
     :fee_payments => [FeePayments.t()]
   }
   def recent_collated_fee_payments_for_rap(options \\ []) when is_list(options) do
@@ -3587,7 +3587,7 @@ defmodule Explorer.Chain do
 
   def fetch_recent_collated_fee_payments_for_rap(paging_options) do
     FeePayment
-    |> order_by([fee_payment], desc: fee_payment.id)
+    |> order_by([fee_payment], desc: [fee_payment.block_number, fee_payment.index])
     |> handle_random_access_paging_options(paging_options)
     |> Repo.all()
   end

@@ -7,7 +7,7 @@ defmodule Indexer.Block.FetcherTest do
   import EthereumJSONRPC, only: [integer_to_quantity: 1]
 
   alias Explorer.Chain
-  alias Explorer.Chain.{Address, Log, Transaction, Wei, ForwardTransfer}
+  alias Explorer.Chain.{Address, Log, Transaction, Wei, ForwardTransfer, FeePayment}
   alias Indexer.Block.Fetcher
   alias Indexer.BufferedTask
 
@@ -293,6 +293,7 @@ defmodule Indexer.Block.FetcherTest do
             from_address_hash = "0xe8ddc5c7a2d2f0d7a9798459c0104fdf5e987aca"
             to_address_hash = "0x8bf38d4764929064f2d4d3a56520a76ab3df415b"
             forward_transfer_address_hash = "0x5302c1375912f56a78e15802f30c693c4eae80b5"
+            fee_payment_address_hash = "0x345d0bc077d10de32ca6bbd0496954922267c913"
 
             transaction_hash =
               "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5"
@@ -456,9 +457,34 @@ defmodule Indexer.Block.FetcherTest do
                  }
                ]}
             end)
+            |> expect(:json_rpc, fn json, _options ->
+              assert [
+                       %{
+                         id: id,
+                         method: "zen_getFeePayments",
+                         params: [^block_quantity]
+                       }
+                     ] = json
+
+              {:ok,
+               [
+                 %{
+                   id: id,
+                   jsonrpc: "2.0",
+                   result: %{
+                     "payments" => [
+                       %{
+                         "address" => fee_payment_address_hash,
+                         "value" => value_string_1
+                       }
+                     ]
+                   }
+                 }
+               ]}
+            end)
             # async requests need to be grouped in one expect because the order is non-deterministic while multiple expect
             # calls on the same name/arity are used in order
-            |> expect(:json_rpc, 11, fn json, _options ->
+            |> expect(:json_rpc, 13, fn json, _options ->
               [request] = json
 
               case request do
@@ -617,6 +643,83 @@ defmodule Indexer.Block.FetcherTest do
                        }
                      }
                    ]}
+                 %{
+                  id: 0,
+                  jsonrpc: "2.0",
+                  method: "eth_getBlockByNumber",
+                  params: [^block_quantity, true]
+                } ->
+                  {:ok,
+                   [
+                     %{
+                       id: 0,
+                       jsonrpc: "2.0",
+                       result: %{
+                         "author" => "0xe8ddc5c7a2d2f0d7a9798459c0104fdf5e987aca",
+                         "difficulty" => "0xfffffffffffffffffffffffffffffffe",
+                         "extraData" => "0xd5830108048650617269747986312e32322e31826c69",
+                         "gasLimit" => "0x69fe20",
+                         "gasUsed" => "0xc512",
+                         "hash" =>
+                           "0xf6b4b8c88df3ebd252ec476328334dc026cf66606a84fb769b3d3cbccc8471bd",
+                         "logsBloom" =>
+                           "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000200000000000000000000020000000000000000200000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                         "miner" => "0xe8ddc5c7a2d2f0d7a9798459c0104fdf5e987aca",
+                         "number" => "0x25",
+                         "parentHash" =>
+                           "0xc37bbad7057945d1bf128c1ff009fb1ad632110bf6a000aac025a80f7766b66e",
+                         "receiptsRoot" =>
+                           "0xd300311aab7dcc98c05ac3f1893629b2c9082c189a0a0c76f4f63e292ac419d5",
+                         "sealFields" => [
+                           "0x84120a71de",
+                           "0xb841fcdb570511ec61edda93849bb7c6b3232af60feb2ea74e4035f0143ab66dfdd00f67eb3eda1adddbb6b572db1e0abd39ce00f9b3ccacb9f47973279ff306fe5401"
+                         ],
+                         "sha3Uncles" =>
+                           "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+                         "signature" =>
+                           "fcdb570511ec61edda93849bb7c6b3232af60feb2ea74e4035f0143ab66dfdd00f67eb3eda1adddbb6b572db1e0abd39ce00f9b3ccacb9f47973279ff306fe5401",
+                         "size" => "0x2cf",
+                         "stateRoot" =>
+                           "0x2cd84079b0d0c267ed387e3895fd1c1dc21ff82717beb1132adac64276886e19",
+                         "step" => "302674398",
+                         "timestamp" => "0x5a343956",
+                         "totalDifficulty" => "0x24ffffffffffffffffffffffffedf78dfd",
+                         "transactions" => [
+                           %{
+                             "blockHash" =>
+                               "0xf6b4b8c88df3ebd252ec476328334dc026cf66606a84fb769b3d3cbccc8471bd",
+                             "blockNumber" => "0x25",
+                             "chainId" => "0x4d",
+                             "condition" => nil,
+                             "creates" => nil,
+                             "from" => from_address_hash,
+                             "gas" => "0x47b760",
+                             "gasPrice" => "0x174876e800",
+                             "hash" => transaction_hash,
+                             "input" =>
+                               "0x10855269000000000000000000000000862d67cb0773ee3f8ce7ea89b328ffea861ab3ef",
+                             "nonce" => "0x4",
+                             "publicKey" =>
+                               "0xe5d196ad4ceada719d9e592f7166d0c75700f6eab2e3c3de34ba751ea786527cb3f6eb96ad9fdfdb9989ff572df50f1c42ef800af9c5207a38b929aff969b5c9",
+                             "r" =>
+                               "0xa7f8f45cce375bb7af8750416e1b03e0473f93c256da2285d1134fc97a700e01",
+                             "raw" =>
+                               "0xf88a0485174876e8008347b760948bf38d4764929064f2d4d3a56520a76ab3df415b80a410855269000000000000000000000000862d67cb0773ee3f8ce7ea89b328ffea861ab3ef81bea0a7f8f45cce375bb7af8750416e1b03e0473f93c256da2285d1134fc97a700e01a01f87a076f13824f4be8963e3dffd7300dae64d5f23c9a062af0c6ead347c135f",
+                             "s" =>
+                               "0x1f87a076f13824f4be8963e3dffd7300dae64d5f23c9a062af0c6ead347c135f",
+                             "standardV" => "0x1",
+                             "to" => to_address_hash,
+                             "transactionIndex" => "0x0",
+                             "v" => "0xbe",
+                             "value" => "0x0"
+                           }
+                         ],
+                         "transactionsRoot" =>
+                           "0x68e314a05495f390f9cd0c36267159522e5450d2adf254a74567b452e767bf34",
+                         "uncles" => []
+                       }
+                     }
+                   ]}
 
                 %{id: id, method: "eth_getBalance", params: [^from_address_hash, ^block_quantity]} ->
                   {:ok, [%{id: id, jsonrpc: "2.0", result: "0xd0d4a965ab52d8cd740000"}]}
@@ -631,7 +734,13 @@ defmodule Indexer.Block.FetcherTest do
                 } ->
                   {:ok, [%{id: id, jsonrpc: "2.0", result: "0x1"}]}
 
-                # 9
+               %{
+                  id: id,
+                  method: "eth_getBalance",
+                  params: [^fee_payment_address_hash, ^block_quantity]
+                } ->
+                  {:ok, [%{id: id, jsonrpc: "2.0", result: "0x1"}]}
+
                 %{
                   id: id,
                   method: "trace_replayBlockTransactions",
@@ -799,11 +908,22 @@ defmodule Indexer.Block.FetcherTest do
 
           assert fifth_address.fetched_coin_balance_block_number == block_number
 
+
+        %Explorer.Chain.Hash{byte_count: 20, bytes: <<52, 93, 11, 192, 119, 209, 13, 227, 44, 166, 187, 208, 73, 105, 84, 146, 34, 103, 201, 19>>}
         EthereumJSONRPC.Nethermind ->
           assert {:ok,
                   %{
                     inserted: %{
                       addresses: [
+                        %Address{
+                          hash:
+                            %Explorer.Chain.Hash{
+                              byte_count: 20,
+                              bytes:
+                                <<52, 93, 11, 192, 119, 209, 13, 227, 44, 166, 187, 208, 73, 105, 84,
+                                 146, 34, 103, 201, 19>>
+                            } = fee_payment_address_hash
+                        },
                         %Address{
                           hash:
                             %Explorer.Chain.Hash{
@@ -879,6 +999,18 @@ defmodule Indexer.Block.FetcherTest do
                                 60, 78, 174, 128, 181>>
                           }
                         }
+                      ],
+                      fee_payments: [
+                        %FeePayment{
+                          block_number: block_number,
+                          index: 0,
+                          to_address_hash: %Explorer.Chain.Hash{
+                            byte_count: 20,
+                            bytes:
+                              <<52, 93, 11, 192, 119, 209, 13, 227, 44, 166, 187, 208, 73, 105, 84,
+                                 146, 34, 103, 201, 19>>
+                          }
+                        }
                       ]
                     },
                     errors: []
@@ -888,7 +1020,7 @@ defmodule Indexer.Block.FetcherTest do
           wait_for_tasks(CoinBalance)
 
           assert Repo.aggregate(Chain.Block, :count, :hash) == 1
-          assert Repo.aggregate(Address, :count, :hash) == 3
+          assert Repo.aggregate(Address, :count, :hash) == 4
           assert Chain.log_count() == 1
           assert Repo.aggregate(Transaction, :count, :hash) == 1
 
@@ -905,20 +1037,20 @@ defmodule Indexer.Block.FetcherTest do
 
           assert second_address.fetched_coin_balance_block_number == block_number
 
-          forward_transfer_address = Repo.get!(Address, forward_transfer_address_hash)
-          assert forward_transfer_address.fetched_coin_balance == %Wei{value: Decimal.new(1)}
-          assert forward_transfer_address.fetched_coin_balance_block_number == block_number
+          fee_payment_address = Repo.get!(Address, fee_payment_address_hash)
+          assert fee_payment_address.fetched_coin_balance == %Wei{value: Decimal.new(1)}
+          assert fee_payment_address.fetched_coin_balance_block_number == block_number
 
-          fwt = Repo.get_by!(ForwardTransfer, to_address_hash: forward_transfer_address_hash)
-          assert fwt.to_address_hash == forward_transfer_address_hash
-          assert fwt.block_hash == block_hash
+          fp = Repo.get_by!(FeePayment, to_address_hash: fee_payment_address_hash)
+          assert fp.to_address_hash == fee_payment_address_hash
+          assert fp.block_hash == block_hash
 
-          fwt_coin_balance = Repo.get_by!(Address.CoinBalance, address_hash: forward_transfer_address_hash)
-          assert fwt_coin_balance.value == %Wei{value: Decimal.new(1)}
-          assert fwt_coin_balance.block_number == block_number
+          fp_coin_balance = Repo.get_by!(Address.CoinBalance, address_hash: fee_payment_address_hash)
+          assert fp_coin_balance.value == %Wei{value: Decimal.new(1)}
+          assert fp_coin_balance.block_number == block_number
 
-          fwt_coin_balance_daily = Repo.get_by!(Address.CoinBalanceDaily, address_hash: forward_transfer_address_hash)
-          assert fwt_coin_balance_daily.address_hash == forward_transfer_address_hash
+          fp_coin_balance_daily = Repo.get_by!(Address.CoinBalanceDaily, address_hash: fee_payment_address_hash)
+          assert fp_coin_balance_daily.address_hash == fee_payment_address_hash
 
         variant ->
           raise ArgumentError, "Unsupported variant (#{variant})"

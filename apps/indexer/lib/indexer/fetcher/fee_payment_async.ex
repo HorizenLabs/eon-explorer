@@ -1,4 +1,4 @@
-defmodule Indexer.Fetcher.FeePayment do
+defmodule Indexer.Fetcher.FeePaymentAsync do
   @moduledoc """
   Fetches information about fee payments, extra transfer events
   which are associated with a block but are not recorded as block transactions.

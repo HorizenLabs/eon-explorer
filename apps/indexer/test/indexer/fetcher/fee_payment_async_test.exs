@@ -1,4 +1,4 @@
-defmodule Indexer.Fetcher.FeePaymentTest do
+defmodule Indexer.Fetcher.FeePaymentAsyncTest do
   use EthereumJSONRPC.Case, async: false
   use Explorer.DataCase
 
@@ -8,7 +8,7 @@ defmodule Indexer.Fetcher.FeePaymentTest do
 
   alias Explorer.Chain
   alias Explorer.Chain.{FeePayment, Wei, LastFetchedCounter}
-  alias Indexer.Fetcher.FeePayment
+  alias Indexer.Fetcher.FeePaymentAsync, as: FeePayment
 
   @moduletag :capture_log
 
@@ -85,6 +85,7 @@ defmodule Indexer.Fetcher.FeePaymentTest do
 
       assert fp.to_address_hash == address_1
       assert fp.value == tuple_to_final(Wei.cast(value_string_1))
+      assert fp.index == 0
 
       another_fp =
         wait(fn ->
@@ -94,7 +95,7 @@ defmodule Indexer.Fetcher.FeePaymentTest do
       assert another_fp.to_address_hash == address_2
       assert another_fp.value == tuple_to_final(Wei.cast(value_string_2))
       et_type = Enum.at(LastFetchedCounter.last_fetched_counter_types(), 0)
-      assert Chain.get_last_fetched_counter(et_type) == 2
+      assert Chain.get_last_fetched_counter(et_type) == Decimal.new(2)
     end
   end
 
@@ -106,6 +107,7 @@ defmodule Indexer.Fetcher.FeePaymentTest do
       address = "0x5302c1375912f56a78e15802f30c693c4eae80b5"
       block_number = 1
       block_quantity = integer_to_quantity(block_number)
+
 
       if json_rpc_named_arguments[:transport] == EthereumJSONRPC.Mox do
         EthereumJSONRPC.Mox
@@ -119,6 +121,10 @@ defmodule Indexer.Fetcher.FeePaymentTest do
                    %{
                      "address" => address,
                      "value" => value_string_1
+                   },
+                   %{
+                     "address" => address,
+                     "value" => value_string_1
                    }
                  ]
                }
@@ -128,6 +134,14 @@ defmodule Indexer.Fetcher.FeePaymentTest do
       end
 
       assert FeePayment.run([1], json_rpc_named_arguments) == :ok
+       fp =
+        wait(fn ->
+          Repo.one!(from(fee_payment in Explorer.Chain.FeePayment, where: fee_payment.block_number == ^block_number))
+        end)
+
+      assert fp.to_address_hash == address
+      assert fp.value == tuple_to_final(Wei.cast(value_string_1))
+      assert fp.index == 0
     end
   end
 

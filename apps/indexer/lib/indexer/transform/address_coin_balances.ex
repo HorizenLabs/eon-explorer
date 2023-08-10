@@ -50,9 +50,20 @@ defmodule Indexer.Transform.AddressCoinBalances do
     Enum.reduce(fwt_params, initial, &forward_transfers_params_reducer/2)
   end
 
+  defp reducer({:fee_payments_params, fp_params}, initial) when is_list(fp_params) do
+    Enum.reduce(fp_params, initial, &fee_payments_params_reducer/2)
+  end
+
   defp reducer({:block_second_degree_relations_params, block_second_degree_relations_params}, initial)
        when is_list(block_second_degree_relations_params) do
       initial
+  end
+
+   defp reducer({:withdrawals, withdrawals}, acc) when is_list(withdrawals) do
+    Enum.into(withdrawals, acc, fn %{address_hash: address_hash, block_number: block_number}
+                                   when is_binary(address_hash) and is_integer(block_number) ->
+      %{address_hash: address_hash, block_number: block_number}
+    end)
   end
 
   defp forward_transfers_params_reducer(%{block_number: block_number, to_address_hash: to_address_hash}, initial)
@@ -60,11 +71,9 @@ defmodule Indexer.Transform.AddressCoinBalances do
     MapSet.put(initial, %{address_hash: to_address_hash, block_number: block_number})
   end
 
-  defp reducer({:withdrawals, withdrawals}, acc) when is_list(withdrawals) do
-    Enum.into(withdrawals, acc, fn %{address_hash: address_hash, block_number: block_number}
-                                   when is_binary(address_hash) and is_integer(block_number) ->
-      %{address_hash: address_hash, block_number: block_number}
-    end)
+  defp fee_payments_params_reducer(%{block_number: block_number, to_address_hash: to_address_hash}, initial)
+       when is_integer(block_number) and is_binary(to_address_hash) do
+    MapSet.put(initial, %{address_hash: to_address_hash, block_number: block_number})
   end
 
   defp internal_transactions_params_reducer(%{block_number: block_number} = internal_transaction_params, acc)
