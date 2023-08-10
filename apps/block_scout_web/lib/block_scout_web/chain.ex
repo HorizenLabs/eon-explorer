@@ -17,7 +17,6 @@ defmodule BlockScoutWeb.Chain do
 
   import Explorer.Helper, only: [parse_integer: 1]
 
-  alias Explorer.Chain.ForwardTransfer
   alias Explorer.Chain.Block.Reward
 
   alias Explorer.Chain.{
@@ -35,6 +34,8 @@ defmodule BlockScoutWeb.Chain do
     Transaction,
     Transaction.StateChange,
     Wei,
+    ForwardTransfer,
+    FeePayment,
     Withdrawal
   }
 
@@ -457,6 +458,14 @@ defmodule BlockScoutWeb.Chain do
   end
 
   defp paging_params(%Transaction{block_number: block_number, index: index}) do
+    %{"block_number" => block_number, "index" => index}
+  end
+
+  defp paging_params(%ForwardTransfer{block_number: block_number, index: index}) do
+    %{"block_number" => block_number, "index" => index}
+  end
+
+  defp paging_params(%FeePayment{block_number: block_number, index: index}) do
     %{"block_number" => block_number, "index" => index}
   end
 
