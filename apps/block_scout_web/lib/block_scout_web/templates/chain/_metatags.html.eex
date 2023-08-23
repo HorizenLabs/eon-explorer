@@ -1,5 +1,10 @@
 <title>
-  <%= gettext("%{subnetwork} %{network} Explorer", subnetwork: LayoutView.subnetwork_title(), network: LayoutView.network_title()) %>
+  <%= gettext("%{subnetwork} %{network} Block Explorer - Horizen EON", subnetwork: LayoutView.subnetwork_title(), network: LayoutView.network_title()) %>
 </title>
-<meta name="description" content="<%= gettext "BlockScout provides analytics data, API, and Smart Contract tools for the %{subnetwork}", subnetwork: LayoutView.subnetwork_title() %>">
+<meta name="description" content="<%= gettext("The %{subnetwork} Block Explorer allows you to search the %{subnetwork} %{network} Blockchain for transactions, addresses, statistics and activities taking place on-chain.", subnetwork: LayoutView.subnetwork_title(), network: LayoutView.network_title()) %>">
 <meta name="keywords" content="BlockScout, blockchain, api, analytics, address, smart contract">
+<meta property="og:title" content="<%= gettext("%{subnetwork} %{network} Block Explorer - Horizen EON", subnetwork: LayoutView.subnetwork_title(), network: LayoutView.network_title()) %>">
+<meta property="og:url" content="<%= APIDocsView.blockscout_url(false) %>">
+<meta property="og:type" content="website">
+<meta property="og:description" content="<%= gettext("The %{subnetwork}  Block Explorer allows you to search the %{subnetwork} %{network} Blockchain for transactions, addresses, statistics and activities taking place on-chain.", subnetwork: LayoutView.subnetwork_title(), network: LayoutView.network_title()) %>">
+<meta property="og:image" content="<%= LayoutView.meta_image_url() %>">

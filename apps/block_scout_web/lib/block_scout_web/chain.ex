@@ -34,6 +34,8 @@ defmodule BlockScoutWeb.Chain do
     Transaction,
     Transaction.StateChange,
     Wei,
+    ForwardTransfer,
+    FeePayment,
     Withdrawal
   }
 
@@ -459,6 +461,14 @@ defmodule BlockScoutWeb.Chain do
     %{"block_number" => block_number, "index" => index}
   end
 
+  defp paging_params(%ForwardTransfer{block_number: block_number, index: index}) do
+    %{"block_number" => block_number, "index" => index}
+  end
+
+  defp paging_params(%FeePayment{block_number: block_number, index: index}) do
+    %{"block_number" => block_number, "index" => index}
+  end
+
   defp paging_params(%TokenTransfer{block_number: block_number, log_index: index}) do
     %{"block_number" => block_number, "index" => index}
   end
@@ -506,6 +516,17 @@ defmodule BlockScoutWeb.Chain do
       "inserted_at" => inserted_at_datetime,
       "item_type" => type
     }
+  end
+
+  defp paging_params(%{
+      block_number: block_number,
+      id: id,
+      inserted_at: inserted_at,
+      to_address_hash: to_address_hash,
+      updated_at: updated_at,
+      value: value
+    }) do
+  %{}
   end
 
   defp paging_params(%Instance{token_id: token_id}) do

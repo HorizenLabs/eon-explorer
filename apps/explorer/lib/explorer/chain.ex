@@ -62,7 +62,9 @@ defmodule Explorer.Chain do
     TokenTransfer,
     Transaction,
     Wei,
-    Withdrawal
+    Withdrawal,
+    ForwardTransfer,
+    FeePayment
   }
 
   alias Explorer.Chain.Block.{EmissionReward, Reward}
@@ -3432,7 +3434,7 @@ defmodule Explorer.Chain do
     %{total_transactions_count: total_transactions_count, transactions: fetched_transactions}
   end
 
-  def default_page_size, do: @default_page_size
+    def default_page_size, do: @default_page_size
 
   def fetch_recent_collated_transactions_for_rap(paging_options, necessity_by_association) do
     fetch_transactions_for_rap()
@@ -3539,6 +3541,60 @@ defmodule Explorer.Chain do
 
     query
     |> Repo.all(timeout: :infinity)
+  end
+
+  @spec recent_collated_forward_transfers_for_rap([paging_options]) :: %{
+          :total_forward_transfers_count => non_neg_integer(),
+          :forward_transfers => [ForwardTransfers.t()]
+        }
+  def recent_collated_forward_transfers_for_rap(options \\ []) when is_list(options) do
+    paging_options = Keyword.get(options, :paging_options, @default_paging_options)
+
+    total_forward_transfers_count = forward_transfers_count()
+
+    fetched_forward_transfers =
+        fetch_recent_collated_forward_transfers_for_rap(paging_options)
+
+    %{total_forward_transfers_count: total_forward_transfers_count, forward_transfers: fetched_forward_transfers}
+  end
+
+  def fetch_recent_collated_forward_transfers_for_rap(paging_options) do
+    ForwardTransfer
+    |> order_by([forward_transfer], desc: [forward_transfer.block_number, forward_transfer.index])
+    |> handle_random_access_paging_options(paging_options)
+    |> Repo.all()
+  end
+
+  def forward_transfers_count() do
+    ForwardTransfer
+    |> Repo.aggregate(:count)
+  end
+
+  @spec recent_collated_fee_payments_for_rap([paging_options]) :: %{
+    :total_fee_payments_count => non_neg_integer(),
+    :fee_payments => [FeePayments.t()]
+  }
+  def recent_collated_fee_payments_for_rap(options \\ []) when is_list(options) do
+    paging_options = Keyword.get(options, :paging_options, @default_paging_options)
+
+    total_fee_payments_count = fee_payments_count()
+
+    fetched_fee_payments =
+      fetch_recent_collated_fee_payments_for_rap(paging_options)
+
+    %{total_fee_payments_count: total_fee_payments_count, fee_payments: fetched_fee_payments}
+  end
+
+  def fetch_recent_collated_fee_payments_for_rap(paging_options) do
+    FeePayment
+    |> order_by([fee_payment], desc: [fee_payment.block_number, fee_payment.index])
+    |> handle_random_access_paging_options(paging_options)
+    |> Repo.all()
+  end
+
+  def fee_payments_count() do
+    FeePayment
+    |> Repo.aggregate(:count)
   end
 
   @doc """
@@ -5019,6 +5075,28 @@ defmodule Explorer.Chain do
     |> add_fetcher_limit(limited?)
     |> order_by(asc: :updated_at)
     |> Repo.stream_reduce(initial, reducer)
+  end
+
+  @spec stream_unfetched_extra_transfers(
+          initial :: accumulator,
+          reducer :: (entry :: map(), accumulator -> accumulator)
+        ) :: {:ok, accumulator}
+        when accumulator: term()
+  def stream_unfetched_extra_transfers(initial, reducer) when is_function(reducer, 2) do
+    missing_extra_transfers_blocks_query = unfetched_extra_transfers_query()
+    Repo.stream_reduce(missing_extra_transfers_blocks_query, initial, reducer)
+  end
+
+  def unfetched_extra_transfers_query() do
+    extra_transfer_type = Enum.at(LastFetchedCounter.last_fetched_counter_types(), 0)
+    from(
+        block in Block,
+        join: lfc in LastFetchedCounter,
+        on: block.number > lfc.value,
+        where: lfc.counter_type == ^extra_transfer_type,
+        select: block.number,
+        distinct: [block.number],
+        order_by: [asc: block.number])
   end
 
   @doc """

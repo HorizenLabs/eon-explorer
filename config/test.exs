@@ -2,10 +2,10 @@ import Config
 
 # Print only warnings and errors during test
 
-config :logger, :console, level: :warn
+config :logger, :console, level: :error
 
 config :logger, :ecto,
-  level: :warn,
+  level: :error,
   path: Path.absname("logs/test/ecto.log")
 
 config :logger, :error, path: Path.absname("logs/test/error.log")

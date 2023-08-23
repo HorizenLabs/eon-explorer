@@ -50,7 +50,9 @@
             <source src=<%= media_src(@instance) %> type="video/mp4">
           </video>
         <% else %>
-          <img src=<%=media_src(@instance)%> />
+          <a href=<%= token_instance_path(@conn, :show, "#{@token.contract_address_hash}", "#{@instance.token_id}") %> >
+            <img src=<%=media_src(@instance)%> />
+          </a>
         <% end %>
       </div>
     </div>

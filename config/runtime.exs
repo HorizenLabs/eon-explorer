@@ -4,6 +4,35 @@ import Config
 |> Path.join()
 |> Code.eval_file()
 
+import Bitwise
+
+indexer_memory_limit_default = 1
+
+indexer_memory_limit =
+  "INDEXER_MEMORY_LIMIT"
+  |> System.get_env(to_string(indexer_memory_limit_default))
+  |> Integer.parse()
+  |> case do
+    {integer, ""} -> integer
+    _ -> indexer_memory_limit_default
+  end
+
+config :indexer,
+  memory_limit: indexer_memory_limit <<< 30
+
+indexer_empty_blocks_sanitizer_batch_size_default = 100
+
+indexer_empty_blocks_sanitizer_batch_size =
+  "INDEXER_EMPTY_BLOCKS_SANITIZER_BATCH_SIZE"
+  |> System.get_env(to_string(indexer_empty_blocks_sanitizer_batch_size_default))
+  |> Integer.parse()
+  |> case do
+    {integer, ""} -> integer
+    _ -> indexer_empty_blocks_sanitizer_batch_size_default
+  end
+
+config :indexer, Indexer.Fetcher.EmptyBlocksSanitizer, batch_size: indexer_empty_blocks_sanitizer_batch_size
+
 ######################
 ### BlockScout Web ###
 ######################
@@ -66,22 +95,65 @@ config :block_scout_web, BlockScoutWeb.Chain,
   subnetwork: System.get_env("SUBNETWORK"),
   network_icon: System.get_env("NETWORK_ICON"),
   logo: System.get_env("LOGO"),
+  logo_footer: System.get_env("LOGO_FOOTER"),
   logo_text: System.get_env("LOGO_TEXT"),
   has_emission_funds: false,
-  show_maintenance_alert: ConfigHelper.parse_bool_env_var("SHOW_MAINTENANCE_ALERT"),
-  enable_testnet_label: ConfigHelper.parse_bool_env_var("SHOW_TESTNET_LABEL"),
+  show_maintenance_alert: System.get_env("SHOW_MAINTENANCE_ALERT", "false") == "true",
+  enable_testnet_label: System.get_env("SHOW_TESTNET_LABEL", "false") == "true",
   testnet_label_text: System.get_env("TESTNET_LABEL_TEXT", "Testnet")
+
+verification_max_libraries_default = 10
+
+verification_max_libraries =
+  "CONTRACT_VERIFICATION_MAX_LIBRARIES"
+  |> System.get_env(to_string(verification_max_libraries_default))
+  |> Integer.parse()
+  |> case do
+    {integer, ""} -> integer
+    _ -> verification_max_libraries_default
+  end
+
+config :block_scout_web,
+  link_to_other_explorers: System.get_env("LINK_TO_OTHER_EXPLORERS") == "true",
+  other_explorers: System.get_env("OTHER_EXPLORERS"),
+  other_networks: System.get_env("SUPPORTED_CHAINS"),
+  webapp_url: System.get_env("WEBAPP_URL"),
+  api_url: System.get_env("API_URL"),
+  apps_menu: if(System.get_env("APPS_MENU", "false") == "true", do: true, else: false),
+  apps: System.get_env("APPS") || System.get_env("EXTERNAL_APPS"),
+  gas_price: System.get_env("GAS_PRICE", nil),
+  dark_forest_addresses: System.get_env("CUSTOM_CONTRACT_ADDRESSES_DARK_FOREST"),
+  dark_forest_addresses_v_0_5: System.get_env("CUSTOM_CONTRACT_ADDRESSES_DARK_FOREST_V_0_5"),
+  circles_addresses: System.get_env("CUSTOM_CONTRACT_ADDRESSES_CIRCLES"),
+  test_tokens_addresses: System.get_env("CUSTOM_CONTRACT_ADDRESSES_TEST_TOKEN"),
+  max_size_to_show_array_as_is: Integer.parse(System.get_env("MAX_SIZE_UNLESS_HIDE_ARRAY", "50")),
+  max_length_to_show_string_without_trimming: System.get_env("MAX_STRING_LENGTH_WITHOUT_TRIMMING", "2040"),
+  re_captcha_secret_key: System.get_env("RE_CAPTCHA_SECRET_KEY", nil),
+  re_captcha_client_key: System.get_env("RE_CAPTCHA_CLIENT_KEY", nil),
+  new_tags: System.get_env("NEW_TAGS"),
+  chain_id: System.get_env("CHAIN_ID"),
+  json_rpc: System.get_env("JSON_RPC"),
+  meta_image_url: System.get_env("META_IMAGE_URL", "/images/MetaData_img_blueprint_dune-blockex.jpg"),
+  verification_max_libraries: verification_max_libraries,
+  matomo_site_id: System.get_env("MATOMO_SITE_ID"),
+  matomo_disabled: System.get_env("MATOMO_DISABLED", "false"),
+  matomo_cookie_path: System.get_env("MATOMO_COOKIE_PATH"),
+  matomo_domains: System.get_env("MATOMO_DOMAINS")
 
 config :block_scout_web, :footer,
   logo: System.get_env("FOOTER_LOGO"),
   chat_link: System.get_env("FOOTER_CHAT_LINK", "https://discord.gg/blockscout"),
+  forum_link: System.get_env("FOOTER_FORUM_LINK", "https://forum.poa.network/c/blockscout"),
   github_link: System.get_env("FOOTER_GITHUB_LINK", "https://github.com/blockscout/blockscout"),
+  enable_forum_link: System.get_env("FOOTER_ENABLE_FORUM_LINK", "false") == "true",
   forum_link_enabled: ConfigHelper.parse_bool_env_var("FOOTER_FORUM_LINK_ENABLED"),
   forum_link: System.get_env("FOOTER_FORUM_LINK", "https://forum.poa.network/c/blockscout"),
   telegram_link_enabled: ConfigHelper.parse_bool_env_var("FOOTER_TELEGRAM_LINK_ENABLED"),
   telegram_link: System.get_env("FOOTER_TELEGRAM_LINK"),
   link_to_other_explorers: ConfigHelper.parse_bool_env_var("FOOTER_LINK_TO_OTHER_EXPLORERS"),
-  other_explorers: System.get_env("FOOTER_OTHER_EXPLORERS", "")
+  other_explorers: System.get_env("FOOTER_OTHER_EXPLORERS", ""),
+  subnetwork: System.get_env("SUBNETWORK", "Horizen EON"),
+  faucet_link: System.get_env("FAUCET_LINK", "https://yuma-testnet-faucet.horizen.io")
 
 config :block_scout_web, :contract,
   verification_max_libraries: ConfigHelper.parse_integer_env_var("CONTRACT_VERIFICATION_MAX_LIBRARIES", 10),
@@ -139,7 +211,77 @@ config :ueberauth, Ueberauth.Strategy.Auth0.OAuth,
   client_secret: System.get_env("ACCOUNT_AUTH0_CLIENT_SECRET")
 
 # Configures Ueberauth local settings
-config :ueberauth, Ueberauth, logout_url: "https://#{System.get_env("ACCOUNT_AUTH0_DOMAIN")}/v2/logout"
+config :ueberauth, Ueberauth,
+  logout_url: "https://#{System.get_env("ACCOUNT_AUTH0_DOMAIN")}/v2/logout",
+  logout_return_to_url: System.get_env("ACCOUNT_AUTH0_LOGOUT_RETURN_URL")
+
+default_api_rate_limit = 50
+default_api_rate_limit_str = Integer.to_string(default_api_rate_limit)
+
+global_api_rate_limit_value =
+  "API_RATE_LIMIT"
+  |> System.get_env(default_api_rate_limit_str)
+  |> Integer.parse()
+  |> case do
+    {integer, ""} -> integer
+    _ -> default_api_rate_limit
+  end
+
+api_rate_limit_by_key_value =
+  "API_RATE_LIMIT_BY_KEY"
+  |> System.get_env(default_api_rate_limit_str)
+  |> Integer.parse()
+  |> case do
+    {integer, ""} -> integer
+    _ -> default_api_rate_limit
+  end
+
+api_rate_limit_by_ip_value =
+  "API_RATE_LIMIT_BY_IP"
+  |> System.get_env(default_api_rate_limit_str)
+  |> Integer.parse()
+  |> case do
+    {integer, ""} -> integer
+    _ -> default_api_rate_limit
+  end
+
+config :block_scout_web, :api_rate_limit,
+  global_limit: global_api_rate_limit_value,
+  limit_by_key: api_rate_limit_by_key_value,
+  limit_by_ip: api_rate_limit_by_ip_value,
+  static_api_key: System.get_env("API_RATE_LIMIT_STATIC_API_KEY", nil),
+  whitelisted_ips: System.get_env("API_RATE_LIMIT_WHITELISTED_IPS", nil)
+
+config :block_scout_web, BlockScoutWeb.Endpoint,
+  server: true,
+  url: [
+    scheme: System.get_env("BLOCKSCOUT_PROTOCOL") || "http",
+    host: System.get_env("BLOCKSCOUT_HOST") || "localhost"
+  ]
+
+# Configures History
+price_chart_config =
+  if System.get_env("SHOW_PRICE_CHART", "false") != "false" do
+    %{market: [:price, :market_cap]}
+  else
+    %{}
+  end
+
+tx_chart_config =
+  if System.get_env("SHOW_TXS_CHART", "true") == "true" do
+    %{transactions: [:transactions_per_day]}
+  else
+    %{}
+  end
+
+config :block_scout_web,
+  chart_config: Map.merge(price_chart_config, tx_chart_config)
+
+config :block_scout_web, BlockScoutWeb.Chain.Address.CoinBalance,
+  # days
+  coin_balance_history_days: System.get_env("COIN_BALANCE_HISTORY_DAYS", "10")
+
+config :block_scout_web, BlockScoutWeb.API.V2, enabled: System.get_env("API_V2_ENABLED") == "true"
 
 ########################
 ### Ethereum JSONRPC ###

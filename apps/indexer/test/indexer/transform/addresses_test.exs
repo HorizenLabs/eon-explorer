@@ -6,14 +6,22 @@ defmodule Indexer.Transform.AddressesTest do
   doctest Addresses
 
   describe "extract_addresses/1" do
-    test "blocks without a `miner_hash` aren't extracted" do
+    test "forward_transfer addresses are extracted" do
       assert Addresses.extract_addresses(%{
-               blocks: [
-                 %{
-                   number: 34
-                 }
+               forward_transfers: [
+                %{
+                  block_number: 70889,
+                  to_address_hash: "0x530ec1a4b0e5c939455280c8709447ccf15932b0",
+                  value: 510_000_000_000_000_000,
+                  index: 0
+                }
                ]
-             }) == []
+             }) == [
+               %{
+                 hash: "0x530ec1a4b0e5c939455280c8709447ccf15932b0",
+                 fetched_coin_balance_block_number: 70889
+               }
+             ]
     end
 
     test "blocks without a `number` aren't extracted" do
@@ -21,6 +29,16 @@ defmodule Indexer.Transform.AddressesTest do
                blocks: [
                  %{
                    miner_hash: "0xe8ddc5c7a2d2f0d7a9798459c0104fdf5e987aca"
+                 }
+               ]
+             }) == []
+    end
+
+    test "blocks without a `miner_hash` aren't extracted" do
+      assert Addresses.extract_addresses(%{
+               blocks: [
+                 %{
+                   number: 34
                  }
                ]
              }) == []

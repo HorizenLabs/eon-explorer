@@ -137,6 +137,8 @@ defmodule Explorer.Mixfile do
 
   defp env_aliases(:dev), do: []
 
+  defp env_aliases(:test), do: []
+
   defp env_aliases(_env) do
     [compile: "compile --warnings-as-errors"]
   end

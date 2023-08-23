@@ -3,6 +3,9 @@ $tile-type-uncle-color: $cyan !default;
 $tile-type-reorg-color: $purple !default;
 $tile-type-emission-reward-color: $lilac !default;
 $tile-type-transaction-color: $blue !default;
+$tile-type-backward-transfer-color: $cyan !default;
+$tile-type-forward-transfer-color: #cf54a3;
+$tile-type-fee-payments-color: #0D8FD0;
 $tile-type-contract-call-color: $green !default;
 $tile-type-contract-creation-color: $dark-purple !default;
 $tile-type-token-transfer-color: $orange !default;
@@ -230,6 +233,18 @@ $tile-body-a-color: #5959d8 !default;
   @include generate-tile-block(
     ".tile-type-transaction",
     $tile-type-transaction-color
+  );
+  @include generate-tile-block(
+    ".tile-type-backward-transfer",
+    $tile-type-backward-transfer-color
+  );
+  @include generate-tile-block(
+    ".tile-type-forward-transfer",
+    $tile-type-forward-transfer-color
+  );
+  @include generate-tile-block(
+    ".tile-type-fee-payments",
+    $tile-type-fee-payments-color
   );
   @include generate-tile-block(
     ".tile-type-contract-call",

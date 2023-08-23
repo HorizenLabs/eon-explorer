@@ -27,6 +27,8 @@ defmodule BlockScoutWeb.TransactionView do
   @token_creation_type :token_spawning
   @token_transfer_type :token_transfer
 
+  @backward_transfer_address "0x0000000000000000000011111111111111111111"
+
   defguardp is_transaction_type(mod) when mod in [InternalTransaction, Transaction]
 
   defdelegate formatted_timestamp(block), to: BlockView
@@ -428,6 +430,10 @@ defmodule BlockScoutWeb.TransactionView do
     to_string(hash)
   end
 
+  def backward_transfer?(%Transaction{to_address: to_address}) do
+   to_string(to_address) == @backward_transfer_address
+  end
+
   def involves_contract?(%Transaction{from_address: from_address, to_address: to_address}) do
     AddressView.contract?(from_address) || AddressView.contract?(to_address)
   end
@@ -477,6 +483,9 @@ defmodule BlockScoutWeb.TransactionView do
       involves_contract?(transaction) ->
         gettext("Contract Call")
 
+      backward_transfer?(transaction) ->
+        gettext("Backward Transfer")
+
       true ->
         gettext("Transaction")
     end
@@ -487,6 +496,7 @@ defmodule BlockScoutWeb.TransactionView do
       involves_token_transfers?(transaction) -> "token-transfer"
       contract_creation?(transaction) -> "contract-creation"
       involves_contract?(transaction) -> "contract-call"
+      backward_transfer?(transaction) -> "backward-transfer"
       true -> "transaction"
     end
   end

@@ -1,19 +1,13 @@
 defmodule Explorer.Counters.AverageBlockTime do
   use GenServer
 
-  @moduledoc """
-  Caches the number of token holders of a token.
-  """
-
   import Ecto.Query, only: [from: 2, where: 2]
 
   alias Explorer.Chain.Block
   alias Explorer.Repo
   alias Timex.Duration
 
-  @doc """
-  Starts a process to periodically update the counter of the token holders.
-  """
+ 
   @spec start_link(term()) :: GenServer.on_start()
   def start_link(_) do
     GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
