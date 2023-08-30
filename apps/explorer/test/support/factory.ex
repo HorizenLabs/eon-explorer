@@ -764,10 +764,12 @@ defmodule Explorer.Factory do
   end
 
   def forward_transfer_factory do
+    block = insert(:block)
+    address = insert(:address)
     %ForwardTransfer{
-      block_number: Enum.random(1..100_000),
-      block_hash: block_hash(),
-      to_address_hash: build(:address),
+      block_number: block.number,
+      block_hash: block.hash,
+      to_address_hash: address.hash,
       value: Enum.random(1..100_000),
       index: 0
     }

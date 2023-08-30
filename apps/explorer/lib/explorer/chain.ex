@@ -3548,20 +3548,22 @@ defmodule Explorer.Chain do
           :forward_transfers => [ForwardTransfers.t()]
         }
   def recent_collated_forward_transfers_for_rap(options \\ []) when is_list(options) do
+    necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
     paging_options = Keyword.get(options, :paging_options, @default_paging_options)
 
     total_forward_transfers_count = forward_transfers_count()
 
     fetched_forward_transfers =
-        fetch_recent_collated_forward_transfers_for_rap(paging_options)
+        fetch_recent_collated_forward_transfers_for_rap(paging_options, necessity_by_association)
 
     %{total_forward_transfers_count: total_forward_transfers_count, forward_transfers: fetched_forward_transfers}
   end
 
-  def fetch_recent_collated_forward_transfers_for_rap(paging_options) do
+  def fetch_recent_collated_forward_transfers_for_rap(paging_options, necessity_by_association) do
     ForwardTransfer
     |> order_by([forward_transfer], desc: [forward_transfer.block_number, forward_transfer.index])
     |> handle_random_access_paging_options(paging_options)
+    |> join_associations(necessity_by_association)
     |> Repo.all()
   end
 
@@ -3575,20 +3577,22 @@ defmodule Explorer.Chain do
     :fee_payments => [FeePayments.t()]
   }
   def recent_collated_fee_payments_for_rap(options \\ []) when is_list(options) do
+    necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
     paging_options = Keyword.get(options, :paging_options, @default_paging_options)
 
     total_fee_payments_count = fee_payments_count()
 
     fetched_fee_payments =
-      fetch_recent_collated_fee_payments_for_rap(paging_options)
+      fetch_recent_collated_fee_payments_for_rap(paging_options, necessity_by_association)
 
     %{total_fee_payments_count: total_fee_payments_count, fee_payments: fetched_fee_payments}
   end
 
-  def fetch_recent_collated_fee_payments_for_rap(paging_options) do
+  def fetch_recent_collated_fee_payments_for_rap(paging_options, necessity_by_association) do
     FeePayment
     |> order_by([fee_payment], desc: [fee_payment.block_number, fee_payment.index])
     |> handle_random_access_paging_options(paging_options)
+    |> join_associations(necessity_by_association)
     |> Repo.all()
   end
 

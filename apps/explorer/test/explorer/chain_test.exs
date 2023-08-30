@@ -3959,17 +3959,35 @@ defmodule Explorer.ChainTest do
   end
 
 
-  describe "extra_transfers tests" do
+  describe "forward_transfer tests" do
     test "returns a list of recent collated forward_transfers" do
       newest_first_page_fts =
         50
         |> insert_list(:forward_transfer)
         |> Enum.reverse()
 
+        paging_options = [%Explorer.PagingOptions{page_size: 10}]
+        recent_collated_fts = Explorer.Chain.recent_collated_forward_transfers_for_rap(paging_options)
+        assert length(recent_collated_fts.forward_transfers) == 11
+        assert hd(recent_collated_fts.forward_transfers).block_number == Enum.at(newest_first_page_fts, 11).block_number
+    end
+
+    test "loads associated blocks and address when forward_transfers are fetched from db" do
+      newest_first_page_fts =
+        50
+        |> insert_list(:forward_transfer)
+        |> Enum.reverse()
+
         paging_options = %Explorer.PagingOptions{page_size: 10}
-        recent_collated_fts = Explorer.Chain.fetch_recent_collated_forward_transfers_for_rap(paging_options)
-        assert length(recent_collated_fts) == 11
-        assert hd(recent_collated_fts).block_number == Enum.at(newest_first_page_fts, 11).block_number
+
+        oldest_seen = Enum.at(newest_first_page_fts, 9)
+        recent_collated_fts = Explorer.Chain.recent_collated_forward_transfers_for_rap([paging_options: paging_options, necessity_by_association: %{
+          :block => :required,
+          [to_address: :smart_contract] => :optional,
+          [to_address: :names] => :optional
+          }])
+        assert length(recent_collated_fts.forward_transfers) == 11
+        assert hd(recent_collated_fts.forward_transfers) == Enum.at(newest_first_page_fts, 11)
     end
 
     test "query for stream_unfetched_fees with blocks higher than or equal t" do
@@ -3988,7 +4006,7 @@ defmodule Explorer.ChainTest do
     end
   end
 
-  describe "extra_fee_payments tests" do
+  describe "fee_payment tests" do
     test "returns a list of recent collated fee_payments" do
       newest_first_page_fts =
         50

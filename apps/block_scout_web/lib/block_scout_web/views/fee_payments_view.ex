@@ -1,8 +1,10 @@
 defmodule BlockScoutWeb.FeePaymentView do
   use BlockScoutWeb, :view
 
-  @dialyzer :no_match
+  alias Explorer.Chain.FeePayment
+  alias BlockScoutWeb.{ BlockView }
 
+  @dialyzer :no_match
 
   @doc """
   Converts a transaction's Wei value to Ether and returns a formatted display value.
@@ -15,6 +17,9 @@ defmodule BlockScoutWeb.FeePaymentView do
     include_label? = Keyword.get(opts, :include_label, true)
     format_wei_value(value, :ether, include_unit_label: include_label?)
   end
+
+
+  def block_number(%FeePayment{block: block}), do: [view_module: BlockView, partial: "_link.html", block: block]
 
   def format_wei_value(value) do
     format_wei_value(value, :ether, include_unit_label: false)

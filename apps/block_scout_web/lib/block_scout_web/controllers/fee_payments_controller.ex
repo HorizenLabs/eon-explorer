@@ -16,10 +16,26 @@ defmodule BlockScoutWeb.FeePaymentController do
 
   alias Explorer.{Chain}
 
+  @necessity_by_association %{
+    :block => :optional,
+    [to_address: :names] => :optional,
+    [to_address: :smart_contract] => :optional
+  }
+
+  @default_options [
+    necessity_by_association: %{
+      :block => :required,
+      [to_address: :names] => :optional,
+      [to_address: :smart_contract] => :optional
+    }
+  ]
+
   def index(conn, %{"type" => "JSON"} = params) do
 
-    options = paging_options(params)
-
+    options =
+      @default_options
+      |> Keyword.merge(paging_options(params))
+      
     full_options =
       options
       |> Keyword.put(

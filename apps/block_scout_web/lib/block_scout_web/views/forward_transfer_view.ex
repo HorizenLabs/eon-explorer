@@ -1,6 +1,9 @@
 defmodule BlockScoutWeb.ForwardTransferView do
   use BlockScoutWeb, :view
 
+  alias Explorer.Chain.ForwardTransfer
+  alias BlockScoutWeb.{ BlockView }
+
   @dialyzer :no_match
 
 
@@ -15,6 +18,8 @@ defmodule BlockScoutWeb.ForwardTransferView do
     include_label? = Keyword.get(opts, :include_label, true)
     format_wei_value(value, :ether, include_unit_label: include_label?)
   end
+
+  def block_number(%ForwardTransfer{block: block}), do: [view_module: BlockView, partial: "_link.html", block: block]
 
   def format_wei_value(value) do
     format_wei_value(value, :ether, include_unit_label: false)
