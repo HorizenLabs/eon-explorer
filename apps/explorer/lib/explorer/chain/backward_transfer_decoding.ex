@@ -4,11 +4,11 @@ defmodule BackwardTransfersDecoding do
   >>
 
   defp pub_key_hash_prefix do
-    subnetwork = System.get_env("SUBNETWORK") || ""
-    if String.contains?(subnetwork, "Testnet") do
-      <<32, 152>> # testnet, 2098
-    else
+    # from zencash: https://github.com/HorizenOfficial/zencashjs/blob/master/lib/config.js#L23
+    if System.get_env("IS_MAINNET") == "true" do
       <<32, 137>> # mainnet, 2089
+    else
+      <<32, 152>> # testnet, 2098
     end
   end
 
