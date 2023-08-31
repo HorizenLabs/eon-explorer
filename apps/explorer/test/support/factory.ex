@@ -776,10 +776,14 @@ defmodule Explorer.Factory do
   end
 
   def fee_payment_factory do
+    block = insert(:block)
+    address = insert(:address)
     %FeePayment{
-      block_number: Enum.random(1..100_000),
-      to_address_hash: "0x530ec1a4b0e5c939455280c8709447ccf15932b0",
-      value: Enum.random(1..100_000)
+      block_number: block.number,
+      block_hash: block.hash,
+      to_address_hash: address.hash,
+      value: Enum.random(1..100_000),
+      index: 0
     }
   end
 

@@ -3960,64 +3960,101 @@ defmodule Explorer.ChainTest do
 
 
   describe "forward_transfer tests" do
-    test "returns a list of recent collated forward_transfers" do
-      newest_first_page_fts =
+    test "returns a list of recent collated forward_transfers for page 1" do
+      newest_first_fts =
         50
         |> insert_list(:forward_transfer)
         |> Enum.reverse()
 
-        paging_options = [%Explorer.PagingOptions{page_size: 10}]
-        recent_collated_fts = Explorer.Chain.recent_collated_forward_transfers_for_rap(paging_options)
+        oldest_seen = Enum.at(newest_first_fts, 9)
+        paging_options = %Explorer.PagingOptions{page_size: 10, page_number: 1, key: {oldest_seen.block_number, oldest_seen.index}}
+        recent_collated_fts = Explorer.Chain.recent_collated_forward_transfers_for_rap([paging_options: paging_options])
+        # first page gets page_size plus one
         assert length(recent_collated_fts.forward_transfers) == 11
-        assert hd(recent_collated_fts.forward_transfers).block_number == Enum.at(newest_first_page_fts, 11).block_number
+        assert hd(recent_collated_fts.forward_transfers).block_number == Enum.at(newest_first_fts, 0).block_number
+    end
+
+    test "returns a list of recent collated forward_transfers for page 2" do
+      newest_first_fts =
+        50
+        |> insert_list(:forward_transfer)
+        |> Enum.reverse()
+
+        oldest_seen = Enum.at(newest_first_fts, 9)
+        paging_options = %Explorer.PagingOptions{page_size: 10, page_number: 2, key: {oldest_seen.block_number, oldest_seen.index}}
+        recent_collated_fts = Explorer.Chain.recent_collated_forward_transfers_for_rap([paging_options: paging_options])
+        assert length(recent_collated_fts.forward_transfers) == 10
+        assert hd(recent_collated_fts.forward_transfers).block_number == Enum.at(newest_first_fts, 10).block_number
     end
 
     test "loads associated blocks and address when forward_transfers are fetched from db" do
-      newest_first_page_fts =
-        50
+      ft =
+        1
         |> insert_list(:forward_transfer)
-        |> Enum.reverse()
 
         paging_options = %Explorer.PagingOptions{page_size: 10}
 
-        oldest_seen = Enum.at(newest_first_page_fts, 9)
+        oldest_seen = Enum.at(ft, 0)
         recent_collated_fts = Explorer.Chain.recent_collated_forward_transfers_for_rap([paging_options: paging_options, necessity_by_association: %{
           :block => :required,
           [to_address: :smart_contract] => :optional,
           [to_address: :names] => :optional
           }])
-        assert length(recent_collated_fts.forward_transfers) == 11
-        assert hd(recent_collated_fts.forward_transfers) == Enum.at(newest_first_page_fts, 11)
-    end
-
-    test "query for stream_unfetched_fees with blocks higher than or equal t" do
-      insert(:block, number: 19)
-      insert(:block, number: 30)
-       et_type = Enum.at(LastFetchedCounter.last_fetched_counter_types(), 0)
-
-      params = %{
-          counter_type: et_type,
-          value: 18
-        }
-      upsert_result = Chain.upsert_last_fetched_counter(params)
-
-      assert Repo.all(Chain.unfetched_fee_payments_query()) == [19, 30]
-
+        assert length(recent_collated_fts.forward_transfers) == 1
+        assert hd(recent_collated_fts.forward_transfers).block.inserted_at == Repo.one(from(b in Block)).inserted_at
+        fetched_ft = hd(recent_collated_fts.forward_transfers)
+        assert fetched_ft.to_address.inserted_at == Repo.one(from(a in Address, where: a.hash == ^fetched_ft.to_address_hash)).inserted_at
     end
   end
 
   describe "fee_payment tests" do
-    test "returns a list of recent collated fee_payments" do
-      newest_first_page_fts =
+    test "returns a list of recent collated fee_payments for page 1" do
+      newest_first_fps =
         50
         |> insert_list(:fee_payment)
         |> Enum.reverse()
 
-        paging_options = %Explorer.PagingOptions{page_size: 10}
-        recent_collated_fts = Explorer.Chain.fetch_recent_collated_fee_payments_for_rap(paging_options)
-        assert length(recent_collated_fts) == 11
-        assert hd(recent_collated_fts).block_number == Enum.at(newest_first_page_fts, 11).block_number
+        oldest_seen = Enum.at(newest_first_fps, 9)
+        paging_options = %Explorer.PagingOptions{page_size: 10, page_number: 1, key: {oldest_seen.block_number, oldest_seen.index}}
+        recent_collated_fps = Explorer.Chain.recent_collated_fee_payments_for_rap([paging_options: paging_options])
+        # first page gets page_size plus one
+        assert length(recent_collated_fps.fee_payments) == 11
+        assert hd(recent_collated_fps.fee_payments).block_number == Enum.at(newest_first_fps, 0).block_number
     end
+
+    test "returns a list of recent collated fee_payments for page 2" do
+      newest_first_fps =
+        50
+        |> insert_list(:fee_payment)
+        |> Enum.reverse()
+
+        oldest_seen = Enum.at(newest_first_fps, 9)
+        paging_options = %Explorer.PagingOptions{page_size: 10, page_number: 2, key: {oldest_seen.block_number, oldest_seen.index}}
+        recent_collated_fps = Explorer.Chain.recent_collated_fee_payments_for_rap([paging_options: paging_options])
+        assert length(recent_collated_fps.fee_payments) == 10
+        assert hd(recent_collated_fps.fee_payments).block_number == Enum.at(newest_first_fps, 10).block_number
+    end
+
+    test "loads associated blocks and address when fee_payments are fetched from db" do
+      fp =
+        1
+        |> insert_list(:fee_payment)
+
+        paging_options = %Explorer.PagingOptions{page_size: 10}
+
+        oldest_seen = Enum.at(fp, 0)
+        recent_collated_fps = Explorer.Chain.recent_collated_fee_payments_for_rap([paging_options: paging_options, necessity_by_association: %{
+          :block => :required,
+          [to_address: :smart_contract] => :optional,
+          [to_address: :names] => :optional
+          }])
+        assert length(recent_collated_fps.fee_payments) == 1
+        assert hd(recent_collated_fps.fee_payments).block.inserted_at == Repo.one(from(b in Block)).inserted_at
+        fetched_fp = hd(recent_collated_fps.fee_payments)
+        assert fetched_fp.to_address.inserted_at == Repo.one(from(a in Address, where: a.hash == ^fetched_fp.to_address_hash)).inserted_at
+    end
+
+
 
     test "query for stream_unfetched_fees with blocks higher than or equal t" do
       insert(:block, number: 19)
@@ -4030,7 +4067,7 @@ defmodule Explorer.ChainTest do
         }
       upsert_result = Chain.upsert_last_fetched_counter(params)
 
-      assert Repo.all(Chain.unfetched_fee_payments_query()) == [19, 30]
+      assert Repo.all(Chain.unfetched_extra_transfers_query()) == [19, 30]
 
     end
   end
