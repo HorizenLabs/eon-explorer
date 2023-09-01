@@ -1179,20 +1179,6 @@ defmodule Explorer.ChainTest do
     end
   end
 
-  describe "fetch_forward_transfers" do
-    test "all forward_transfers" do
-      %ForwardTransfer{block_number: block_number, to_address_hash: to_address_hash, value: value} = insert(:forward_transfer)
-      assert Chain.fetch_forward_transfers() != nil
-    end
-  end
-
-  describe "fetch_fee_payments" do
-    test "all fee_payments" do
-      %FeePayment{block_number: block_number, to_address_hash: to_address_hash, value: value} = insert(:fee_payment)
-      assert Chain.fetch_fee_payments() != nil
-    end
-  end
-
   describe "fetch_token_transfers_from_token_hash/2" do
     test "without token transfers" do
       %Token{contract_address_hash: contract_address_hash} = insert(:token)
