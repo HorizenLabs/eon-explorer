@@ -16,7 +16,7 @@
     <div class="col-md-7 col-lg-8 d-flex flex-column pr-2 pr-sm-2 pr-md-0">
       <span>
       <div class="text-truncate d-flex">
-        <%= @fee_payment.to_address_hash %>
+         <%= @fee_payment |> BlockScoutWeb.AddressView.address_partial_selector(:to, assigns[:current_address]) |> BlockScoutWeb.RenderHelper.render_partial() %>
       </div>
       </span>
       <span class="d-flex flex-md-row flex-column mt-3 mt-md-0">
@@ -28,7 +28,7 @@
     <!-- Block info -->
     <div class="col-md-3 col-lg-2 d-flex flex-row flex-md-column flex-nowrap justify-content-center text-md-right mt-3 mt-md-0 tile-bottom">
       <span class="mr-2 mr-md-0 order-1">
-        Block #<%= @fee_payment.block_number %>
+          <%= @fee_payment |> block_number() |> BlockScoutWeb.RenderHelper.render_partial() %>
       </span>
       <span class="mr-2 mr-md-0 order-2" in-tile data-from-now="<%= @fee_payment.inserted_at %>"></span>
     </div>

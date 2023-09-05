@@ -394,6 +394,8 @@ defmodule BlockScoutWeb.Chain do
 
   def split_list_by_page(list_plus_one), do: Enum.split(list_plus_one, @page_size)
 
+  def split_list_by_page(list_plus_one, page_size), do: Enum.split(list_plus_one, page_size)
+
   defp address_from_param(param) do
     case string_to_address_hash(param) do
       {:ok, hash} ->

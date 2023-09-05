@@ -7,7 +7,7 @@ defmodule BlockScoutWeb.FeePaymentController do
       paging_options: 1,
       next_page_params: 3,
       update_page_parameters: 3,
-      split_list_by_page: 1
+      split_list_by_page: 2
     ]
 
   alias BlockScoutWeb.{Controller}
@@ -16,9 +16,25 @@ defmodule BlockScoutWeb.FeePaymentController do
 
   alias Explorer.{Chain}
 
+  @necessity_by_association %{
+    :block => :optional,
+    [to_address: :names] => :optional,
+    [to_address: :smart_contract] => :optional
+  }
+
+  @default_options [
+    necessity_by_association: %{
+      :block => :required,
+      [to_address: :names] => :optional,
+      [to_address: :smart_contract] => :optional
+    }
+  ]
+
   def index(conn, %{"type" => "JSON"} = params) do
 
-    options = paging_options(params)
+    options =
+      @default_options
+      |> Keyword.merge(paging_options(params))
 
     full_options =
       options
@@ -35,7 +51,7 @@ defmodule BlockScoutWeb.FeePaymentController do
 
     {fee_payments, next_page} =
       if fetch_page_number(params) == 1 do
-        split_list_by_page(fee_payments_plus_one)
+        split_list_by_page(fee_payments_plus_one, Chain.default_page_size())
       else
         {fee_payments_plus_one, nil}
       end
