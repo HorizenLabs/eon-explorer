@@ -66,7 +66,7 @@ RUN mkdir -p /opt/release \
 FROM hexpm/elixir:1.14.5-erlang-25.3.2.4-alpine-3.18.2
 
 ARG RELEASE_VERSION
-ENV RELEASE_VERSION=${RELEASE_VERSION}
+ENV RELEASE_VERSION_ENV=${RELEASE_VERSION}
 ARG BLOCKSCOUT_VERSION
 ENV BLOCKSCOUT_VERSION=${BLOCKSCOUT_VERSION}
 
@@ -77,4 +77,4 @@ WORKDIR /app
 COPY --from=builder /opt/release/blockscout .
 COPY --from=builder /app/apps/explorer/node_modules ./node_modules
 COPY --from=builder /app/config/config_helper.exs ./config/config_helper.exs
-COPY ./config/config_helper.exs /app/releases/$RELEASE_VERSION/config_helper.exs
+COPY ./config/config_helper.exs /app/releases/${RELEASE_VERSION_ENV}/config_helper.exs
