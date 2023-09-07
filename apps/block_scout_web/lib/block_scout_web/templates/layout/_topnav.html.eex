@@ -62,6 +62,13 @@
                     "data-test": "forward_transfers_link",
                     to: forward_transfer_path(@conn, :index)
                   ) %>
+                
+              <%= link(
+                    gettext("Backward Transfers"),
+                    class: "dropdown-item #{tab_status(BlockScoutWeb.TransactionView.backward_transfer_address(), @conn.request_path)}",
+                    "data-test": "backward_transfers_link",
+                    to: "/address/#{BlockScoutWeb.TransactionView.backward_transfer_address()}"
+                  ) %>
 
               <%= link(
                     gettext("Fee Payments"),

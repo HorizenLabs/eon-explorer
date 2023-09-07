@@ -430,6 +430,10 @@ defmodule BlockScoutWeb.TransactionView do
     to_string(hash)
   end
 
+  def backward_transfer_address() do
+    @backward_transfer_address
+  end
+
   def backward_transfer?(%Transaction{to_address: to_address}) do
    to_string(to_address) == @backward_transfer_address
   end
