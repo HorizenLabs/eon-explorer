@@ -22,8 +22,9 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
   @behaviour BufferedTask
 
-  @default_max_batch_size 10
-  @default_max_concurrency 4
+  @default_max_batch_size 1
+  @default_max_concurrency 1
+  @default_wait_time 1000
 
   @doc """
   Asynchronously fetches internal transactions.
@@ -93,6 +94,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
               tracer: Tracer
             )
   def run(block_numbers, json_rpc_named_arguments) do
+    :timer.sleep(Keyword.get(defaults(), :wait_time))
     unique_numbers =
       block_numbers
       |> Enum.uniq()
@@ -367,6 +369,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
       flush_interval: :timer.seconds(3),
       max_concurrency: Application.get_env(:indexer, __MODULE__)[:concurrency] || @default_max_concurrency,
       max_batch_size: Application.get_env(:indexer, __MODULE__)[:batch_size] || @default_max_batch_size,
+      wait_time: Application.get_env(:indexer, __MODULE__)[:wait_time] || @default_wait_time,
       task_supervisor: Indexer.Fetcher.InternalTransaction.TaskSupervisor,
       metadata: [fetcher: :internal_transaction]
     ]
