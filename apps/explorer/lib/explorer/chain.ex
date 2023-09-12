@@ -379,13 +379,13 @@ defmodule Explorer.Chain do
   def address_to_transactions_with_rewards(address_hash, options \\ []) when is_list(options) do
     paging_options = Keyword.get(options, :paging_options, @default_paging_options)
 
-    if Application.get_env(:block_scout_web, BlockScoutWeb.Chain)[:has_emission_funds] do
+    if true do
       cond do
         Keyword.get(options, :direction) == :from ->
           address_to_transactions_without_rewards(address_hash, options)
 
-        address_has_rewards?(address_hash) ->
-          address_with_rewards(address_hash, options, paging_options)
+        true ->
+          transactions_with_ft_results(address_hash, options, paging_options)
 
         true ->
           address_to_transactions_without_rewards(address_hash, options)
@@ -403,6 +403,43 @@ defmodule Explorer.Chain do
     else
       address_to_transactions_without_rewards(address_hash, options)
     end
+  end
+
+
+  defp transactions_with_ft_results(address_hash, _options, paging_options) do
+   options = [
+    necessity_by_association: %{
+      :block => :required,
+      [to_address: :names] => :optional,
+      [to_address: :smart_contract] => :optional
+    }
+  ]
+    full_options = Keyword.put(options, :paging_options, paging_options)
+
+    rewards_task =
+      Task.async(fn -> Chain.fetch_recent_collated_forward_transfers_for_rap(full_options) end)
+
+    [rewards_task | address_to_transactions_tasks(address_hash, options, true)]
+    |> wait_for_address_transactions()
+    |> Enum.sort_by(fn item ->
+      case item do
+        %ForwardTransfer{} = ft ->
+          {-ft.block.number, 1}
+
+        item ->
+          process_item(item)
+      end
+    end)
+    # |> Enum.dedup_by(fn item ->
+    #   case item do
+    #     %ForwardTransfer{} = ft ->
+    #       {ft.block_hash, ft.to_address_hash}
+
+    #     transaction ->
+    #       transaction.hash
+    #   end
+    # end)
+    |> Enum.take(paging_options.page_size)
   end
 
   defp transactions_with_rewards_results(address_hash, options, paging_options) do
@@ -3557,6 +3594,12 @@ defmodule Explorer.Chain do
         fetch_recent_collated_forward_transfers_for_rap(paging_options, necessity_by_association)
 
     %{total_forward_transfers_count: total_forward_transfers_count, forward_transfers: fetched_forward_transfers}
+  end
+
+  def fetch_recent_collated_forward_transfers_for_rap(options \\ []) when is_list(options) do
+    necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
+    paging_options = Keyword.get(options, :paging_options, @default_paging_options)
+    fetch_recent_collated_forward_transfers_for_rap(paging_options, necessity_by_association)
   end
 
   def fetch_recent_collated_forward_transfers_for_rap(paging_options, necessity_by_association) do

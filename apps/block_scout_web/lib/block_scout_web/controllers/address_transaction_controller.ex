@@ -2,6 +2,7 @@ defmodule BlockScoutWeb.AddressTransactionController do
   @moduledoc """
     Display all the Transactions that terminate at this Address.
   """
+  require Logger
 
   use BlockScoutWeb, :controller
 
@@ -54,7 +55,9 @@ defmodule BlockScoutWeb.AddressTransactionController do
         |> Keyword.merge(paging_options(params))
         |> Keyword.merge(current_filter(params))
 
+
       results_plus_one = Chain.address_to_transactions_with_rewards(address_hash, options)
+      Logger.error(inspect(results_plus_one))
       {results, next_page} = split_list_by_page(results_plus_one)
 
       next_page_url =
@@ -73,14 +76,14 @@ defmodule BlockScoutWeb.AddressTransactionController do
 
       items_json =
         Enum.map(results, fn result ->
+          Logger.error(inspect(result))
           case result do
-            {%Chain.Block.Reward{} = emission_reward, %Chain.Block.Reward{} = validator_reward} ->
+            %Chain.ForwardTransfer{} = ft ->
               View.render_to_string(
-                TransactionView,
-                "_emission_reward_tile.html",
-                current_address: address,
-                emission_funds: emission_reward,
-                validator: validator_reward
+              BlockScoutWeb.ForwardTransferView,
+              "_tile.html",
+              forward_transfer: ft,
+              conn: conn
               )
 
             %Chain.Transaction{} = transaction ->

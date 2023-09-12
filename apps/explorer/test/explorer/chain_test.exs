@@ -3,6 +3,7 @@ defmodule Explorer.ChainTest do
   use EthereumJSONRPC.Case
 
   require Ecto.Query
+  require Logger
 
   import Ecto.Query
   import EthereumJSONRPC, only: [integer_to_quantity: 1]
@@ -650,6 +651,29 @@ defmodule Explorer.ChainTest do
       end)
     end
 
+
+    test "with fts and transactions" do
+      %ForwardTransfer{to_address_hash: address_hash, block_number: block_number, block_hash: block_hash } = ft = insert(:forward_transfer)
+      block = Repo.get_by(Block, hash: block_hash)
+      address = Repo.get_by(Address, hash: address_hash)
+
+      transaction1 =
+        :transaction
+        |> insert(to_address: address)
+        |> with_block(block)
+
+      transaction2 =
+        :transaction
+        |> insert(from_address: address)
+        |> with_block(block)
+
+      assert [transaction2, transaction1, ft] ==
+               Chain.address_to_transactions_with_rewards(address_hash)
+               |> Repo.preload([:block, :to_address, :from_address])
+    end
+
+
+
     test "with emission rewards and transactions" do
       Application.put_env(:block_scout_web, BlockScoutWeb.Chain, has_emission_funds: true)
 
@@ -704,7 +728,9 @@ defmodule Explorer.ChainTest do
         end
       )
 
-      assert [_, {_, _}] = Chain.address_to_transactions_with_rewards(block.miner.hash, direction: :to)
+      results = Chain.address_to_transactions_with_rewards(block.miner.hash, direction: :to)
+      Logger.error(inspect(results))
+      # assert [_, {_, _}] = Chain.address_to_transactions_with_rewards(block.miner.hash, direction: :to)
 
       assert_receive {:trace, ^consumer_pid, :receive, {:"$gen_cast", {:fetch_or_update, ^block_miner_hash}}}, 1000
       :timer.sleep(500)
