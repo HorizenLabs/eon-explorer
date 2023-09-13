@@ -57,7 +57,7 @@ defmodule BlockScoutWeb.AddressTransactionController do
 
 
       results_plus_one = Chain.address_to_transactions_with_rewards(address_hash, options)
-      Logger.error(inspect(results_plus_one))
+
       {results, next_page} = split_list_by_page(results_plus_one)
 
       next_page_url =
@@ -76,8 +76,16 @@ defmodule BlockScoutWeb.AddressTransactionController do
 
       items_json =
         Enum.map(results, fn result ->
-          Logger.error(inspect(result))
           case result do
+            %Chain.FeePayment{} = fp ->
+              View.render_to_string(
+              BlockScoutWeb.FeePaymentView,
+              "_tile.html",
+              fee_payment: fp,
+              conn: conn
+              )
+
+
             %Chain.ForwardTransfer{} = ft ->
               View.render_to_string(
               BlockScoutWeb.ForwardTransferView,

@@ -3,12 +3,15 @@ defmodule Explorer.Chain.ForwardTransfer do
 
   use Explorer.Schema
 
+  require Logger
+
   alias Explorer.Chain.{
     Block,
     Wei,
     Hash,
     Address
   }
+  alias Explorer.PagingOptions
 
   @required_attrs ~w(block_number block_hash to_address_hash value index)a
 
@@ -75,5 +78,32 @@ defmodule Explorer.Chain.ForwardTransfer do
 
       Map.put(fwt, :block_hash, hash)
     end)
+  end
+
+  def address_ets_blocks_ranges_clause(query, min_block_number, max_block_number, paging_options) do
+    if is_number(min_block_number) and max_block_number > 0 and min_block_number > 0 do
+      cond do
+        paging_options.page_number == 1 ->
+          query
+          |> where([_, block], block.number >= ^min_block_number)
+
+        min_block_number == max_block_number ->
+          query
+          |> where([_, block], block.number == ^min_block_number)
+
+        true ->
+          query
+          |> where([_, block], block.number >= ^min_block_number)
+          |> where([_, block], block.number <= ^max_block_number)
+      end
+    else
+      query
+    end
+  end
+
+  def paginate(query, %PagingOptions{key: nil}), do: query
+
+  def paginate(query, %PagingOptions{key: {block_number, _}}) do
+    where(query, [_, block], block.number < ^block_number)
   end
 end

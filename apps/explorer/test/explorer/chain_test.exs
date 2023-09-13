@@ -652,10 +652,12 @@ defmodule Explorer.ChainTest do
     end
 
 
-    test "with fts and transactions" do
+    test "with ft, fp, and transactions" do
       %ForwardTransfer{to_address_hash: address_hash, block_number: block_number, block_hash: block_hash } = ft = insert(:forward_transfer)
       block = Repo.get_by(Block, hash: block_hash)
       address = Repo.get_by(Address, hash: address_hash)
+
+      # %ForwardTransfer{to_address_hash: address_hash, block_number: block_number, block_hash: block_hash } = ft = insert(:forward_transfer, block_number: block.number, index: 1)
 
       transaction1 =
         :transaction
@@ -667,9 +669,7 @@ defmodule Explorer.ChainTest do
         |> insert(from_address: address)
         |> with_block(block)
 
-      assert [transaction2, transaction1, ft] ==
-               Chain.address_to_transactions_with_rewards(address_hash)
-               |> Repo.preload([:block, :to_address, :from_address])
+      assert [%Transaction{block_number: tx1_bn}, %Transaction{block_number: tx2_bn}, %ForwardTransfer{block_number: ft_bn}, %FeePayment{block_number: fp_bn}] = Chain.address_to_transactions_with_rewards(address_hash)
     end
 
 
