@@ -9,12 +9,12 @@ defmodule Indexer.Transform.AddressesTest do
     test "forward_transfer addresses are extracted" do
       assert Addresses.extract_addresses(%{
                forward_transfers: [
-                %{
-                  block_number: 70889,
-                  to_address_hash: "0x530ec1a4b0e5c939455280c8709447ccf15932b0",
-                  value: 510_000_000_000_000_000,
-                  index: 0
-                }
+                 %{
+                   block_number: 70889,
+                   to_address_hash: "0x530ec1a4b0e5c939455280c8709447ccf15932b0",
+                   value: 510_000_000_000_000_000,
+                   index: 0
+                 }
                ]
              }) == [
                %{

@@ -29,11 +29,14 @@ defmodule Explorer.Chain.Cache.TotalEntries do
   end
 
   def db_results(table_name) do
-    %Postgrex.Result{rows: [[count]]} = SQL.query!(Repo,
-      "SELECT reltuples::BIGINT AS estimate
+    %Postgrex.Result{rows: [[count]]} =
+      SQL.query!(
+        Repo,
+        "SELECT reltuples::BIGINT AS estimate
       FROM pg_class
       WHERE relname='#{String.downcase(table_name)}';"
-    )
+      )
+
     count
   end
 
@@ -82,5 +85,4 @@ defmodule Explorer.Chain.Cache.TotalEntries do
       _ -> @default_cache_period
     end
   end
-
 end

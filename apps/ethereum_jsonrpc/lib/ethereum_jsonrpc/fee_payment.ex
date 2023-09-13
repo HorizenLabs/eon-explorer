@@ -1,5 +1,4 @@
 defmodule EthereumJSONRPC.FeePayment do
-
   alias EthereumJSONRPC
 
   @type t :: %{
@@ -18,5 +17,4 @@ defmodule EthereumJSONRPC.FeePayment do
           to_address_hash: EthereumJSONRPC.address(),
           value: non_neg_integer()
         }
-
 end

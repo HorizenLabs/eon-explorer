@@ -57,7 +57,8 @@ defmodule Indexer.Fetcher.FeePaymentAsync do
       Chain.stream_unfetched_extra_transfers(initial_acc, fn block_number, acc ->
         reducer.(block_number, acc)
       end)
-      final
+
+    final
   end
 
   @impl BufferedTask

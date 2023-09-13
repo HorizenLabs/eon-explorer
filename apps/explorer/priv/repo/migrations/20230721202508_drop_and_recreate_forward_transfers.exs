@@ -3,6 +3,7 @@ defmodule Explorer.Repo.Migrations.DropAndRecreateForwardTransfers do
 
   def change do
     drop_if_exists(table(:forward_transfers))
+
     create table(:forward_transfers, primary_key: false) do
       add(:to_address_hash, references(:addresses, column: :hash, on_delete: :delete_all, type: :bytea), null: false)
       add(:value, :numeric, precision: 100, null: false)
@@ -11,6 +12,5 @@ defmodule Explorer.Repo.Migrations.DropAndRecreateForwardTransfers do
       add(:index, :integer, null: false, primary_key: true)
       timestamps(null: false, type: :utc_datetime_usec)
     end
-
   end
 end

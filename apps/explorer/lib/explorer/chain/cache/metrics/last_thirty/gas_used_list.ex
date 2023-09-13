@@ -29,15 +29,18 @@ defmodule Explorer.Chain.Cache.ThirtyDayGasUsedList do
   end
 
   def db_results do
-    %Postgrex.Result{rows: rows} = SQL.query!(Repo,
-      "WITH DATA AS
+    %Postgrex.Result{rows: rows} =
+      SQL.query!(
+        Repo,
+        "WITH DATA AS
         (SELECT date, gas_used
         FROM transaction_stats ts
         WHERE date BETWEEN CURRENT_DATE - interval '30 days' AND CURRENT_DATE - interval '1 day')
       SELECT to_char(date, 'yyyy-mm-dd') as formatted_date, sum(gas_used) OVER
         (ORDER BY date ASC ROWS BETWEEN UNBOUNDED preceding AND CURRENT ROW) AS gas_used
       FROM DATA"
-    )
+      )
+
     Enum.map(rows, fn row -> %{"date" => Enum.at(row, 0), "gas_used" => Enum.at(row, 1)} end)
   end
 
@@ -86,5 +89,4 @@ defmodule Explorer.Chain.Cache.ThirtyDayGasUsedList do
       _ -> @default_cache_period
     end
   end
-
 end

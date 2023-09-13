@@ -458,7 +458,7 @@ defmodule Indexer.Transform.Addresses do
               required(:block_number) => non_neg_integer()
             }
           ],
-           optional(:fee_payments) => [
+          optional(:fee_payments) => [
             %{
               required(:to_address_hash) => String.t(),
               required(:block_number) => non_neg_integer()

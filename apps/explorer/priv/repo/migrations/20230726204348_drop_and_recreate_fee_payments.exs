@@ -3,6 +3,7 @@ defmodule Explorer.Repo.Migrations.DropAndRecreateFeePayments do
 
   def change do
     drop_if_exists(table(:fee_payments))
+
     create table(:fee_payments, primary_key: false) do
       add(:to_address_hash, references(:addresses, column: :hash, on_delete: :delete_all, type: :bytea), null: false)
       add(:value, :numeric, precision: 100, null: false)

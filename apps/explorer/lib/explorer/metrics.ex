@@ -77,5 +77,4 @@ defmodule Explorer.Metrics do
   def thirty_day_tx_count_list() do
     ThirtyDayTransactionCountList.cached_results()
   end
-
 end

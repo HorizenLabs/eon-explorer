@@ -5,8 +5,7 @@ defmodule BackwardTransfersDecodingTest do
   import Explorer.Chain.Transaction
 
   test "pub_key_hash_to_addr converts public key hash to address" do
-    pub_key_hash = <<80, 123, 144, 240, 20, 80, 54, 168, 59, 92, 137, 79, 81, 132, 243, 71, 48,
-    230, 11, 240>>
+    pub_key_hash = <<80, 123, 144, 240, 20, 80, 54, 168, 59, 92, 137, 79, 81, 132, 243, 71, 48, 230, 11, 240>>
     expected_prefix = <<32, 152>>
 
     expected_address = "ztaVWqvnzQ7cC58rC94UB1VpMzfv5Cpvts4"
@@ -58,12 +57,16 @@ defmodule BackwardTransfersDecodingTest do
 
   test "decoded_input_data returns expected output" do
     input_data = %Explorer.Chain.Transaction{
-      input: %{bytes: <<66, 103, 236, 94, 80, 123, 144, 240, 20, 80, 54, 168, 59, 92, 137, 79, 81,
-      132, 243, 71, 48, 230, 11, 240, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>},
+      input: %{
+        bytes:
+          <<66, 103, 236, 94, 80, 123, 144, 240, 20, 80, 54, 168, 59, 92, 137, 79, 81, 132, 243, 71, 48, 230, 11, 240,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>
+      },
       hash: %Explorer.Chain.Hash{
         byte_count: 32,
-        bytes: <<117, 221, 76, 112, 42, 234, 190, 2, 176, 77, 83, 55, 124, 152, 185,
-          44, 78, 59, 23, 240, 46, 17, 105, 68, 243, 35, 34, 230, 192, 177, 135, 219>>
+        bytes:
+          <<117, 221, 76, 112, 42, 234, 190, 2, 176, 77, 83, 55, 124, 152, 185, 44, 78, 59, 23, 240, 46, 17, 105, 68,
+            243, 35, 34, 230, 192, 177, 135, 219>>
       },
       to_address: %{
         hash: %Explorer.Chain.Hash{
@@ -74,7 +77,12 @@ defmodule BackwardTransfersDecodingTest do
     }
 
     expected_output = {
-      {:ok, "4267ec5e", "backwardTransfer(bytes20 mcAddress)", [{"decoded mcAddress", "string", "ztaVWqvnzQ7cC58rC94UB1VpMzfv5Cpvts4"}, {"mcAddress", "bytes20", <<80, 123, 144, 240, 20, 80, 54, 168, 59, 92, 137, 79, 81, 132, 243, 71, 48, 230, 11, 240>>}]},
+      {:ok, "4267ec5e", "backwardTransfer(bytes20 mcAddress)",
+       [
+         {"decoded mcAddress", "string", "ztaVWqvnzQ7cC58rC94UB1VpMzfv5Cpvts4"},
+         {"mcAddress", "bytes20",
+          <<80, 123, 144, 240, 20, 80, 54, 168, 59, 92, 137, 79, 81, 132, 243, 71, 48, 230, 11, 240>>}
+       ]},
       %{},
       %{}
     }

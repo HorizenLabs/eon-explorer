@@ -7,21 +7,17 @@ defmodule Explorer.Chain.Import.Runner.ForwardTransfersTest do
 
   describe "run/1" do
     test "forward_transfer" do
-
-      ft =
-        insert(:forward_transfer
-        )
+      ft = insert(:forward_transfer)
 
       assert not is_nil(ft.to_address_hash)
 
       forward_transfer_params = %{
         block_number: 70889,
         to_address_hash: "0x530ec1a4b0e5c939455280c8709447ccf15932b0",
-        value: 510000000000000000
+        value: 510_000_000_000_000_000
       }
 
       assert {:ok, _} = run_transactions([forward_transfer_params])
-
     end
   end
 

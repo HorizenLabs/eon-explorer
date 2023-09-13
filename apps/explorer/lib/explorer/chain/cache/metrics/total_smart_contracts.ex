@@ -29,11 +29,14 @@ defmodule Explorer.Chain.Cache.TotalSmartContracts do
   end
 
   def db_results do
-    %Postgrex.Result{rows: [[count]]} = SQL.query!(Repo,
-      "SELECT COUNT(contract_code)
+    %Postgrex.Result{rows: [[count]]} =
+      SQL.query!(
+        Repo,
+        "SELECT COUNT(contract_code)
       FROM addresses
       WHERE contract_code IS NOT NULL"
-    )
+      )
+
     count
   end
 
@@ -82,5 +85,4 @@ defmodule Explorer.Chain.Cache.TotalSmartContracts do
       _ -> @default_cache_period
     end
   end
-
 end

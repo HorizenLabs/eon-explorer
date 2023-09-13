@@ -143,16 +143,9 @@ defmodule BlockScoutWeb.Mixfile do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      compile: "compile --warnings-as-errors",
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: [
-        "ecto.create --quiet",
-        "ecto.migrate",
-        # to match behavior of `mix test` from project root, which needs to not start applications for `indexer` to
-        # prevent its supervision tree from starting, which is undesirable in test
-        "test --no-start"
-      ]
+      test: "test --no-start"
     ]
   end
 

@@ -435,7 +435,7 @@ defmodule BlockScoutWeb.TransactionView do
   end
 
   def backward_transfer?(%Transaction{to_address: to_address}) do
-   to_string(to_address) == @backward_transfer_address
+    to_string(to_address) == @backward_transfer_address
   end
 
   def involves_contract?(%Transaction{from_address: from_address, to_address: to_address}) do

@@ -3,8 +3,6 @@ defmodule Explorer.Counters.LastFetchedCounter do
   Stores last fetched counters.
   """
 
-
-
   alias Explorer.Counters.LastFetchedCounter
   use Explorer.Schema
 
@@ -33,5 +31,4 @@ defmodule Explorer.Counters.LastFetchedCounter do
   end
 
   def last_fetched_counter_types, do: @last_fetched_counter_types
-
 end
