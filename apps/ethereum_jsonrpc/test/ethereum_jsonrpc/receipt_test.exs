@@ -37,4 +37,56 @@ defmodule EthereumJSONRPC.ReceiptTest do
              "blockNumber" => nil
            }
   end
+
+  describe "elixir_to_params/1" do
+    test "handles contract address" do
+      assert EthereumJSONRPC.Receipt.elixir_to_params(%{
+               "cumulativeGasUsed" => 21000,
+               "effectiveGasPrice" => "0x59682f07",
+               "from" => "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+               "gas" => 21000,
+               "gasUsed" => 21000,
+               "logs" => [],
+               "logsBloom" =>
+                 "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+               "status" => :ok,
+               "contractAddress" => "0x70997970c51812dc3a010c7d01b50e0d17dc79c8",
+               "transactionHash" => "0xb8dedadedf168a7fcc2c19d77e7733d732fa0c31ef5898226139b7ef9432679f",
+               "transactionIndex" => 0,
+               "type" => "0x02"
+             }) ==
+             %{
+              cumulative_gas_used: 21000,
+              gas_used: 21000,
+              created_contract_address_hash: "0x70997970c51812dc3a010c7d01b50e0d17dc79c8",
+              status: :ok,
+              transaction_hash: "0xb8dedadedf168a7fcc2c19d77e7733d732fa0c31ef5898226139b7ef9432679f",
+              transaction_index: 0
+            }
+    end
+    test "handles no contract address" do
+      assert EthereumJSONRPC.Receipt.elixir_to_params(%{
+               "cumulativeGasUsed" => 21000,
+               "effectiveGasPrice" => "0x59682f07",
+               "from" => "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+               "gas" => 21000,
+               "gasUsed" => 21000,
+               "logs" => [],
+               "logsBloom" =>
+                 "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+               "status" => :ok,
+               "transactionHash" => "0xb8dedadedf168a7fcc2c19d77e7733d732fa0c31ef5898226139b7ef9432679f",
+               "transactionIndex" => 0,
+               "type" => "0x02"
+             }) ==
+             %{
+              cumulative_gas_used: 21000,
+              gas_used: 21000,
+              created_contract_address_hash: nil,
+              status: :ok,
+              transaction_hash: "0xb8dedadedf168a7fcc2c19d77e7733d732fa0c31ef5898226139b7ef9432679f",
+              transaction_index: 0
+            }
+    end
+  end
 end

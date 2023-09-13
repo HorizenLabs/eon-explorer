@@ -7,6 +7,8 @@ defmodule Explorer.Chain.Transaction do
 
   import Ecto.Query, only: [from: 2, preload: 3, subquery: 1, where: 3]
 
+  import BackwardTransfersDecoding
+
   alias ABI.FunctionSelector
 
   alias Ecto.Association.NotLoaded
@@ -498,6 +500,20 @@ defmodule Explorer.Chain.Transaction do
     end
   end
 
+  def decoded_input_data(%__MODULE__{
+    input: %{bytes: data},
+    hash: hash,
+    to_address: %{hash: %Explorer.Chain.Hash{
+      byte_count: 20,
+      bytes: backward_transfer_contract_address
+    }}
+  }, _, _, _, _) do
+  case do_decoded_input_data_bw(data, hash) do
+    output ->
+      {output, %{}, %{}}
+  end
+end
+
   # Because there is no contract association, we know the contract was not verified
   def decoded_input_data(tx, skip_sig_provider? \\ false, options, full_abi_acc \\ %{}, methods_acc \\ %{})
 
@@ -646,6 +662,22 @@ defmodule Explorer.Chain.Transaction do
         {:error, :contract_verified, result}
     end
   end
+
+  defp do_decoded_input_data_bw(data, hash) do
+    with {:ok, {selector, values}} <- find_and_decode(backward_transfer_ABI(), data, hash),
+         {:ok, mapping} <- selector_mapping(selector, values, hash),
+         identifier <- Base.encode16(selector.method_id, case: :lower),
+         text <- function_call(selector.function, mapping),
+         mc_address_entry = hd(Enum.filter(mapping, fn
+           {"mcAddress", _type, _value} -> true
+           _ -> false
+         end)),
+         new_tuple = {"decoded mcAddress", "string", pub_key_hash_to_addr(elem(mc_address_entry, 2))},
+         updated_mapping = [new_tuple | mapping] do
+      {:ok, identifier, text, updated_mapping}
+    end
+  end
+
 
   defp do_decoded_input_data(data, smart_contract, hash, options, full_abi_acc) do
     {full_abi, full_abi_acc} = check_full_abi_cache(smart_contract, full_abi_acc, options)

@@ -31,6 +31,7 @@ defmodule Explorer.Factory do
     ContractMethod,
     Data,
     DecompiledSmartContract,
+    ForwardTransfer,
     Hash,
     InternalTransaction,
     Log,
@@ -40,7 +41,9 @@ defmodule Explorer.Factory do
     TokenTransfer,
     Token.Instance,
     Transaction,
-    Withdrawal
+    Withdrawal,
+    FeePayment,
+    ForwardTransfer
   }
 
   alias Explorer.SmartContract.Helper
@@ -757,6 +760,30 @@ defmodule Explorer.Factory do
       address_type: :validator,
       block_hash: build(:block).hash,
       reward: Decimal.new(3)
+    }
+  end
+
+  def forward_transfer_factory do
+    block = insert(:block)
+    address = insert(:address)
+    %ForwardTransfer{
+      block_number: block.number,
+      block_hash: block.hash,
+      to_address_hash: address.hash,
+      value: Enum.random(1..100_000),
+      index: 0
+    }
+  end
+
+  def fee_payment_factory do
+    block = insert(:block)
+    address = insert(:address)
+    %FeePayment{
+      block_number: block.number,
+      block_hash: block.hash,
+      to_address_hash: address.hash,
+      value: Enum.random(1..100_000),
+      index: 0
     }
   end
 

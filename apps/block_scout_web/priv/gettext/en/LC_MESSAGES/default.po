@@ -568,8 +568,8 @@ msgstr ""
 
 #: lib/block_scout_web/templates/layout/_footer.html.eex:22
 #, elixir-autogen, elixir-format
-msgid "Blockscout is a tool for inspecting and analyzing EVM based blockchains. Blockchain explorer for Ethereum Networks."
-msgstr ""
+msgid "Blockscout is a tool for inspecting and analyzing EVM based blockchains."
+msgstr "The %{subnetwork} Block Explorer allows you to search the %{subnetwork} Blockchain for transactions, addresses, statistics and activities taking place on-chain."
 
 #: lib/block_scout_web/templates/transaction_state/_state_change.html.eex:8
 #, elixir-autogen, elixir-format
@@ -579,7 +579,7 @@ msgstr ""
 #: lib/block_scout_web/templates/block/_tile.html.eex:64
 #: lib/block_scout_web/templates/block/overview.html.eex:216
 #, elixir-autogen, elixir-format
-msgid "Burnt Fees"
+msgid "Reward Pool Fees"
 msgstr ""
 
 #: lib/block_scout_web/templates/address_token/overview.html.eex:65
@@ -621,9 +621,9 @@ msgstr ""
 msgid "Change"
 msgstr ""
 
-#: lib/block_scout_web/templates/layout/_footer.html.eex:43
+#: lib/block_scout_web/templates/layout/_footer.html.eex:47
 #, elixir-autogen, elixir-format
-msgid "Chat (#blockscout)"
+msgid "Discord"
 msgstr ""
 
 #: lib/block_scout_web/views/block_view.ex:65
@@ -1403,7 +1403,7 @@ msgstr ""
 msgid "Forked Blocks (Reorgs)"
 msgstr ""
 
-#: lib/block_scout_web/templates/layout/_footer.html.eex:45
+#: lib/block_scout_web/templates/layout/_footer.html.eex:48
 #, elixir-autogen, elixir-format
 msgid "Forum"
 msgstr ""
@@ -1784,13 +1784,13 @@ msgstr ""
 #: lib/block_scout_web/templates/chain/_block.html.eex:16
 #: lib/block_scout_web/templates/transaction_state/_state_change.html.eex:22
 #, elixir-autogen, elixir-format
-msgid "Miner"
+msgid "Forger"
 msgstr ""
 
 #: lib/block_scout_web/views/block_view.ex:63
 #: lib/block_scout_web/views/block_view.ex:68
 #, elixir-autogen, elixir-format
-msgid "Miner Reward"
+msgid "Forger Reward"
 msgstr ""
 
 #: lib/block_scout_web/templates/common_components/_minimal_proxy_pattern.html.eex:3
@@ -3044,7 +3044,7 @@ msgstr ""
 
 #: lib/block_scout_web/templates/transaction/overview.html.eex:438
 #, elixir-autogen, elixir-format
-msgid "Transaction Burnt Fee"
+msgid "Reward Pool Fee"
 msgstr ""
 
 #: lib/block_scout_web/templates/transaction/overview.html.eex:50
@@ -3547,12 +3547,12 @@ msgstr ""
 
 #: lib/block_scout_web/templates/transaction/overview.html.eex:437
 #, elixir-autogen, elixir-format
-msgid "burned for this transaction. Equals Block Base Fee per Gas * Gas Used."
+msgid "that goes to the Reward Pool for this transaction. Equals Block Base Fee per Gas * Gas Used."
 msgstr ""
 
 #: lib/block_scout_web/templates/block/overview.html.eex:215
 #, elixir-autogen, elixir-format
-msgid "burned from transactions included in the block (Base fee (per unit of gas) * Gas Used)."
+msgid "awarded to the Reward Pool from transactions included in the block (Base fee (per unit of gas) * Gas Used)."
 msgstr ""
 
 #: lib/block_scout_web/templates/address_contract/index.html.eex:28

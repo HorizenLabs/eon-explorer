@@ -59,6 +59,7 @@ defmodule Explorer.Mixfile do
     [
       {:bamboo, "~> 2.3.0"},
       {:mime, "~> 2.0"},
+      {:b58, "~> 1.0.2"},
       {:bcrypt_elixir, "~> 3.0"},
       # benchmark optimizations
       {:benchee, "~> 1.1.0", only: :test},
@@ -136,6 +137,8 @@ defmodule Explorer.Mixfile do
   end
 
   defp env_aliases(:dev), do: []
+
+  defp env_aliases(:test), do: []
 
   defp env_aliases(_env) do
     [compile: "compile --warnings-as-errors"]

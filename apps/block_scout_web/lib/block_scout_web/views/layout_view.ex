@@ -1,10 +1,11 @@
 defmodule BlockScoutWeb.LayoutView do
   use BlockScoutWeb, :view
 
-  alias Explorer.Chain
+  alias Explorer.{Chain, CustomContractsHelper}
   alias Plug.Conn
   alias Poison.Parser
 
+  import BlockScoutWeb.AddressView, only: [from_address_hash: 1]
   import BlockScoutWeb.APIDocsView, only: [blockscout_url: 1]
 
   @default_other_networks [
@@ -40,7 +41,7 @@ defmodule BlockScoutWeb.LayoutView do
   end
 
   def logo_footer do
-    Keyword.get(application_config(), :footer)[:logo] || Keyword.get(application_config(), :logo)
+    Keyword.get(application_config(), :logo_footer) || Keyword.get(application_config(), :logo)
   end
 
   def logo_text do
@@ -61,6 +62,10 @@ defmodule BlockScoutWeb.LayoutView do
 
   def configured_social_media_services do
     SocialMedia.links()
+  end
+
+  def meta_image_url do
+    "#{blockscout_url(false)}#{Application.get_env(:block_scout_web, :meta_image_url)}"
   end
 
   def issue_link(conn) do
