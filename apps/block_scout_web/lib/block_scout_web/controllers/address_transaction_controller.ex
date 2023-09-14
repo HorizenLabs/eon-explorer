@@ -56,7 +56,7 @@ defmodule BlockScoutWeb.AddressTransactionController do
         |> Keyword.merge(current_filter(params))
 
 
-      results_plus_one = Chain.address_to_transactions_with_rewards(address_hash, options)
+      results_plus_one = Chain.address_to_transactions_with_extra_transfers(address_hash, options)
 
       {results, next_page} = split_list_by_page(results_plus_one)
 

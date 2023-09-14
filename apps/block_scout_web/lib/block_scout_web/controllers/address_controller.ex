@@ -43,6 +43,8 @@ defmodule BlockScoutWeb.AddressController do
     exchange_rate = Market.get_coin_exchange_rate()
     total_supply = Chain.total_supply()
 
+    extra_transfers_count = Chain.fee_payments_count()
+
     items_count_str = Map.get(params, "items_count")
 
     items_count =

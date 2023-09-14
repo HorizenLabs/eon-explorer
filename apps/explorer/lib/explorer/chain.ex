@@ -353,7 +353,7 @@ defmodule Explorer.Chain do
   @doc """
   Fetches the transactions related to the address with the given hash, including
   transactions that only have the address in the `token_transfers` related table
-  and rewards for block validation.
+  and extra transfers, e.g. forward transfers and fee payments.
 
   This query is divided into multiple subqueries intentionally in order to
   improve the listing performance.
@@ -375,41 +375,22 @@ defmodule Explorer.Chain do
       the `block_number` and `index` that are passed.
 
   """
-  @spec address_to_transactions_with_rewards(Hash.Address.t(), [paging_options | necessity_by_association_option]) ::
+  @spec address_to_transactions_with_extra_transfers(Hash.Address.t(), [paging_options | necessity_by_association_option]) ::
           [
             Transaction.t()
           ]
-  def address_to_transactions_with_rewards(address_hash, options \\ []) when is_list(options) do
+  def address_to_transactions_with_extra_transfers(address_hash, options \\ []) when is_list(options) do
     paging_options = Keyword.get(options, :paging_options, @default_paging_options)
+    cond do
+      Keyword.get(options, :direction) == :from ->
+        address_to_transactions_without_rewards(address_hash, options)
 
-    if true do
-      cond do
-        Keyword.get(options, :direction) == :from ->
-          address_to_transactions_without_rewards(address_hash, options)
-
-        true ->
-          transactions_with_ft_results(address_hash, options, paging_options)
-
-        true ->
-          address_to_transactions_without_rewards(address_hash, options)
-      end
-    else
-      address_to_transactions_without_rewards(address_hash, options)
+      true ->
+        transactions_with_extra_transfer_results(address_hash, options, paging_options)
     end
   end
 
-  defp address_with_rewards(address_hash, options, paging_options) do
-    %{payout_key: block_miner_payout_address} = Reward.get_validator_payout_key_by_mining_from_db(address_hash, options)
-
-    if block_miner_payout_address && address_hash == block_miner_payout_address do
-      transactions_with_rewards_results(address_hash, options, paging_options)
-    else
-      address_to_transactions_without_rewards(address_hash, options)
-    end
-  end
-
-
-  defp transactions_with_ft_results(address_hash, options, paging_options) do
+  defp transactions_with_extra_transfer_results(address_hash, options, paging_options) do
     et_necessity_by_association = [
         necessity_by_association: %{
           :block => :required,
@@ -417,9 +398,7 @@ defmodule Explorer.Chain do
           [to_address: :smart_contract] => :optional
         }]
     et_options = Keyword.put(et_necessity_by_association, :paging_options, paging_options)
-          Logger.error(inspect(options))
-          Logger.error(inspect(paging_options))
-     blocks_range = address_to_transactions_tasks_range_of_blocks(address_hash, options)
+    blocks_range = address_to_transactions_tasks_range_of_blocks(address_hash, options)
     fts_task =
       Task.async(fn -> Chain.fetch_recent_extra_transfers(ForwardTransfer, address_hash, et_options, blocks_range) end)
     fps_task =
@@ -445,35 +424,6 @@ defmodule Explorer.Chain do
 
         %ForwardTransfer{} = ft ->
           {ft.block_hash, ft.to_address_hash, ft.index}
-
-        transaction ->
-          transaction.hash
-      end
-    end)
-    |> Enum.take(paging_options.page_size)
-  end
-
-  defp transactions_with_rewards_results(address_hash, options, paging_options) do
-    blocks_range = address_to_transactions_tasks_range_of_blocks(address_hash, options)
-
-    rewards_task =
-      Task.async(fn -> Reward.fetch_emission_rewards_tuples(address_hash, paging_options, blocks_range, options) end)
-
-    [rewards_task | address_to_transactions_tasks(address_hash, options, true)]
-    |> wait_for_address_transactions()
-    |> Enum.sort_by(fn item ->
-      case item do
-        {%Reward{} = emission_reward, _} ->
-          {-emission_reward.block.number, 1}
-
-        item ->
-          process_item(item)
-      end
-    end)
-    |> Enum.dedup_by(fn item ->
-      case item do
-        {%Reward{} = emission_reward, _} ->
-          {emission_reward.block_hash, emission_reward.address_hash, emission_reward.address_type}
 
         transaction ->
           transaction.hash
@@ -3641,6 +3591,12 @@ defmodule Explorer.Chain do
     |> Repo.aggregate(:count)
   end
 
+  def forward_transfers_count(address_hash) do
+    ForwardTransfer
+    |> where([ft], ft.to_address_hash == ^address_hash)
+    |> Repo.aggregate(:count)
+  end
+
   @spec recent_collated_fee_payments_for_rap([paging_options]) :: %{
     :total_fee_payments_count => non_neg_integer(),
     :fee_payments => [FeePayments.t()]
@@ -3667,6 +3623,12 @@ defmodule Explorer.Chain do
 
   def fee_payments_count() do
     FeePayment
+    |> Repo.aggregate(:count)
+  end
+
+  def fee_payments_count(address_hash) do
+    FeePayment
+    |> where([fp], fp.to_address_hash == ^address_hash)
     |> Repo.aggregate(:count)
   end
 
