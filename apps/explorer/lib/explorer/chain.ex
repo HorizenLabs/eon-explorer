@@ -3581,7 +3581,6 @@ defmodule Explorer.Chain do
     necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
     paging_options =
       Keyword.get(options, :paging_options, @default_paging_options)
-      |> Map.replace(:is_et, true)
     total_fee_payments_count = fee_payments_count()
 
     fetched_fee_payments =
@@ -3591,7 +3590,6 @@ defmodule Explorer.Chain do
   end
 
   defp fetch_recent_collated_fee_payments_for_rap(paging_options, necessity_by_association, is_et) do
-    Logger.error("fee_payment paging_options: #{inspect(paging_options)}")
     FeePayment
     |> order_by([fee_payment], desc: [fee_payment.block_number, fee_payment.index])
     |> handle_random_access_paging_options(paging_options, is_et)
