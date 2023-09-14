@@ -140,7 +140,7 @@ defmodule Explorer.Chain do
   @burn_address_hash_str "0x0000000000000000000000000000000000000000"
 
   @limit_showing_transactions 10_000
-  @default_page_size 1
+  @default_page_size 50
 
   @typedoc """
   The name of an association on the `t:Ecto.Schema.t/0`

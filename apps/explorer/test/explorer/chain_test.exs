@@ -631,6 +631,28 @@ defmodule Explorer.ChainTest do
       assert [%ForwardTransfer{block_number: ^bn_ft}, %FeePayment{block_number: ^bn_fp}, %Transaction{block_number: ^bn_t1}, %Transaction{block_number: ^bn_t2}] = Chain.address_to_transactions_with_extra_transfers(address_hash)
     end
 
+    test "with ft, fp, and transactions in different blocks, fts/fps older than oldest transaction" do
+      %Block{hash: bh_ft, number: bn_ft} = insert(:block, number: 10)
+      %ForwardTransfer{to_address_hash: address_hash} = ft1 = insert(:forward_transfer, block_number: bn_ft, block_hash: bh_ft, index: 0)
+      address = Repo.get_by(Address, hash: address_hash)
+      %Block{hash: bh_fp, number: bn_fp} = insert(:block, number: 9)
+      fp = insert(:fee_payment, block_number: bn_fp, block_hash: bh_fp, index: 0, to_address_hash: address_hash)
+
+      transaction1 =
+        :transaction
+        |> insert(to_address: address)
+        |> with_block(insert(:block, number: 8))
+      %Transaction{block_number: bn_t1} = transaction1
+      transaction2 =
+        :transaction
+        |> insert(from_address: address)
+        |> with_block(insert(:block, number: 7))
+      %Transaction{block_number: bn_t2} = transaction2
+
+      # order matters in match below
+      assert [%ForwardTransfer{block_number: ^bn_ft}, %FeePayment{block_number: ^bn_fp}, %Transaction{block_number: ^bn_t1}, %Transaction{block_number: ^bn_t2}] = Chain.address_to_transactions_with_extra_transfers(address_hash)
+    end
+
   end
 
   describe "address_to_transactions_tasks_range_of_blocks/2" do
