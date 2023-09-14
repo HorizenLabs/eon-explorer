@@ -4613,8 +4613,6 @@ defmodule Explorer.Chain do
     |> limit(^paging_options.page_size)
   end
 
-
-
   defp handle_random_access_paging_options(query, empty_options) when empty_options in [nil, [], %{}],
     do: limit(query, ^(@default_page_size + 1))
 
@@ -4642,14 +4640,13 @@ defmodule Explorer.Chain do
   defp handle_page(query, paging_options) do
     page_number = paging_options |> Map.get(:page_number, 1) |> process_page_number()
     page_size = Map.get(paging_options, :page_size, @default_page_size)
-    is_extra_transfer = Map.get(paging_options, :is_et, false)
 
     cond do
       page_in_bounds?(page_number, page_size) && page_number == 1 ->
         query
         |> limit(^(page_size + 1))
 
-      page_in_bounds?(page_number, page_size) || is_extra_transfer ->
+      page_in_bounds?(page_number, page_size) ->
         query
         |> limit(^page_size)
         |> offset(^((page_number - 2) * page_size))
