@@ -766,6 +766,7 @@ defmodule Explorer.Factory do
   def forward_transfer_factory do
     block = insert(:block)
     address = insert(:address)
+
     %ForwardTransfer{
       block_number: block.number,
       block_hash: block.hash,
@@ -778,6 +779,7 @@ defmodule Explorer.Factory do
   def fee_payment_factory do
     block = insert(:block)
     address = insert(:address)
+
     %FeePayment{
       block_number: block.number,
       block_hash: block.hash,

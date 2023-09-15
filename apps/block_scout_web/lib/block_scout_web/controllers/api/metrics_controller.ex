@@ -67,5 +67,4 @@ defmodule BlockScoutWeb.API.MetricsController do
     total_value_locked = Metrics.total_value_locked()
     json(conn, %{"total_value_locked" => total_value_locked})
   end
-
 end

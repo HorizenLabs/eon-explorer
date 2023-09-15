@@ -29,13 +29,16 @@ defmodule Explorer.Chain.Cache.ThirtyDayActiveAccountCountList do
   end
 
   def db_results do
-    %Postgrex.Result{rows: rows} = SQL.query!(Repo,
-      "SELECT to_char(inserted_at, 'yyyy-mm-dd') as formatted_date, count(DISTINCT from_address_hash)
+    %Postgrex.Result{rows: rows} =
+      SQL.query!(
+        Repo,
+        "SELECT to_char(inserted_at, 'yyyy-mm-dd') as formatted_date, count(DISTINCT from_address_hash)
       FROM transactions
       WHERE inserted_at BETWEEN CURRENT_DATE - interval '30 days' AND CURRENT_DATE - interval '1 day'
       GROUP BY formatted_date
       ORDER BY formatted_date ASC"
-    )
+      )
+
     Enum.map(rows, fn row -> %{"date" => Enum.at(row, 0), "active_accounts" => Enum.at(row, 1)} end)
   end
 
@@ -84,5 +87,4 @@ defmodule Explorer.Chain.Cache.ThirtyDayActiveAccountCountList do
       _ -> @default_cache_period
     end
   end
-
 end

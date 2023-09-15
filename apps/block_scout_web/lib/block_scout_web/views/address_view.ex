@@ -6,7 +6,21 @@ defmodule BlockScoutWeb.AddressView do
   alias BlockScoutWeb.{AccessHelper, LayoutView}
   alias Explorer.Account.CustomABI
   alias Explorer.{Chain, CustomContractsHelper, Repo}
-  alias Explorer.Chain.{Address, Hash, InternalTransaction, Log, SmartContract, Token, TokenTransfer, Transaction, Wei, FeePayment, ForwardTransfer}
+
+  alias Explorer.Chain.{
+    Address,
+    Hash,
+    InternalTransaction,
+    Log,
+    SmartContract,
+    Token,
+    TokenTransfer,
+    Transaction,
+    Wei,
+    FeePayment,
+    ForwardTransfer
+  }
+
   alias Explorer.Chain.Block.Reward
   alias Explorer.ExchangeRates.Token, as: TokenExchangeRate
   alias Explorer.SmartContract.{Helper, Writer}
@@ -107,7 +121,6 @@ defmodule BlockScoutWeb.AddressView do
   def address_partial_selector(%FeePayment{to_address: address}, _, current_address, truncate) do
     matching_address_check(current_address, address, contract?(address), truncate)
   end
-
 
   def address_title(%Address{} = address) do
     if contract?(address) do

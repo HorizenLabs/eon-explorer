@@ -1,0 +1,25 @@
+os: linux
+dist: jammy
+language: generic
+services:
+  - docker
+
+git:
+  depth: false
+
+env:
+  global:
+    - DOCKER_IMAGE_NAME=zencash/blockscout
+
+before_script:
+  - source ci/setup_env.sh
+
+jobs:
+  include:
+    - name: build_and_publish
+      vm:
+        size: 2x-large
+      script: ci/script.sh
+      env:
+        - TEST_IMAGE_NAME=hexpm/elixir
+        - TEST_IMAGE_TAG=1.14.5-erlang-25.3.2.6-ubuntu-jammy-20230126

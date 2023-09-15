@@ -12,7 +12,7 @@ defmodule Explorer.Chain.FeePayment do
 
   @required_attrs ~w(block_number block_hash to_address_hash value index)a
 
- @type t :: %__MODULE__{
+  @type t :: %__MODULE__{
           block: %Ecto.Association.NotLoaded{} | Block.t() | nil,
           block_hash: Hash.t() | nil,
           block_number: Block.block_number() | nil,
@@ -76,5 +76,4 @@ defmodule Explorer.Chain.FeePayment do
       Map.put(fp, :block_hash, hash)
     end)
   end
-
 end

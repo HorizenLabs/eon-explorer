@@ -7,7 +7,6 @@ defmodule Explorer.Counters.AverageBlockTime do
   alias Explorer.Repo
   alias Timex.Duration
 
- 
   @spec start_link(term()) :: GenServer.on_start()
   def start_link(_) do
     GenServer.start_link(__MODULE__, :ok, name: __MODULE__)

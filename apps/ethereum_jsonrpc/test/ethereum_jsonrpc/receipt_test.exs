@@ -55,15 +55,16 @@ defmodule EthereumJSONRPC.ReceiptTest do
                "transactionIndex" => 0,
                "type" => "0x02"
              }) ==
-             %{
-              cumulative_gas_used: 21000,
-              gas_used: 21000,
-              created_contract_address_hash: "0x70997970c51812dc3a010c7d01b50e0d17dc79c8",
-              status: :ok,
-              transaction_hash: "0xb8dedadedf168a7fcc2c19d77e7733d732fa0c31ef5898226139b7ef9432679f",
-              transaction_index: 0
-            }
+               %{
+                 cumulative_gas_used: 21000,
+                 gas_used: 21000,
+                 created_contract_address_hash: "0x70997970c51812dc3a010c7d01b50e0d17dc79c8",
+                 status: :ok,
+                 transaction_hash: "0xb8dedadedf168a7fcc2c19d77e7733d732fa0c31ef5898226139b7ef9432679f",
+                 transaction_index: 0
+               }
     end
+
     test "handles no contract address" do
       assert EthereumJSONRPC.Receipt.elixir_to_params(%{
                "cumulativeGasUsed" => 21000,
@@ -79,14 +80,14 @@ defmodule EthereumJSONRPC.ReceiptTest do
                "transactionIndex" => 0,
                "type" => "0x02"
              }) ==
-             %{
-              cumulative_gas_used: 21000,
-              gas_used: 21000,
-              created_contract_address_hash: nil,
-              status: :ok,
-              transaction_hash: "0xb8dedadedf168a7fcc2c19d77e7733d732fa0c31ef5898226139b7ef9432679f",
-              transaction_index: 0
-            }
+               %{
+                 cumulative_gas_used: 21000,
+                 gas_used: 21000,
+                 created_contract_address_hash: nil,
+                 status: :ok,
+                 transaction_hash: "0xb8dedadedf168a7fcc2c19d77e7733d732fa0c31ef5898226139b7ef9432679f",
+                 transaction_index: 0
+               }
     end
   end
 end

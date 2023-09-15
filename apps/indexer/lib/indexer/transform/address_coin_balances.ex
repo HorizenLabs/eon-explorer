@@ -56,10 +56,10 @@ defmodule Indexer.Transform.AddressCoinBalances do
 
   defp reducer({:block_second_degree_relations_params, block_second_degree_relations_params}, initial)
        when is_list(block_second_degree_relations_params) do
-      initial
+    initial
   end
 
-   defp reducer({:withdrawals, withdrawals}, acc) when is_list(withdrawals) do
+  defp reducer({:withdrawals, withdrawals}, acc) when is_list(withdrawals) do
     Enum.into(withdrawals, acc, fn %{address_hash: address_hash, block_number: block_number}
                                    when is_binary(address_hash) and is_integer(block_number) ->
       %{address_hash: address_hash, block_number: block_number}
