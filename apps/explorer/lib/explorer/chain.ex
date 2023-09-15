@@ -4613,23 +4613,23 @@ defmodule Explorer.Chain do
     |> limit(^paging_options.page_size)
   end
 
-  defp handle_random_access_paging_options(query, paging_options, is_extra_transfer \\ false)
+  defp handle_random_access_paging_options(query, paging_options, no_page_limit \\ false)
 
-  defp handle_random_access_paging_options(query, empty_options, _is_extra_transfer) when empty_options in [nil, [], %{}],
+  defp handle_random_access_paging_options(query, empty_options, _no_page_limit) when empty_options in [nil, [], %{}],
     do: limit(query, ^(@default_page_size + 1))
 
-  defp handle_random_access_paging_options(query, paging_options, is_extra_transfer) do
+  defp handle_random_access_paging_options(query, paging_options, no_page_limit) do
     query
     |> (&if(paging_options |> Map.get(:page_number, 1) |> process_page_number() == 1,
           do: &1,
           else: page_transaction(&1, paging_options)
         )).()
-    |> handle_page(paging_options, is_extra_transfer)
+    |> handle_page(paging_options, no_page_limit)
   end
 
-  defp handle_page(query, paging_options, is_extra_transfer \\ false)
+  defp handle_page(query, paging_options, no_page_limit \\ false)
 
-  defp handle_page(query, paging_options, is_extra_transfer) do
+  defp handle_page(query, paging_options, no_page_limit) do
     page_number = paging_options |> Map.get(:page_number, 1) |> process_page_number()
     page_size = Map.get(paging_options, :page_size, @default_page_size)
 
@@ -4638,7 +4638,7 @@ defmodule Explorer.Chain do
         query
         |> limit(^(page_size + 1))
 
-      page_in_bounds?(page_number, page_size) || is_extra_transfer ->
+      page_in_bounds?(page_number, page_size) || no_page_limit ->
         query
         |> limit(^page_size)
         |> offset(^((page_number - 2) * page_size))
