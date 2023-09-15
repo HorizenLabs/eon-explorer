@@ -3549,7 +3549,8 @@ defmodule Explorer.Chain do
         }
   def recent_collated_forward_transfers_for_rap(options \\ []) when is_list(options) do
     necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
-    paging_options = Keyword.get(options, :paging_options, @default_paging_options)
+    paging_options =
+      Keyword.get(options, :paging_options, @default_paging_options)
 
     total_forward_transfers_count = forward_transfers_count()
 
@@ -3559,10 +3560,10 @@ defmodule Explorer.Chain do
     %{total_forward_transfers_count: total_forward_transfers_count, forward_transfers: fetched_forward_transfers}
   end
 
-  def fetch_recent_collated_forward_transfers_for_rap(paging_options, necessity_by_association) do
+  defp fetch_recent_collated_forward_transfers_for_rap(paging_options, necessity_by_association) do
     ForwardTransfer
     |> order_by([forward_transfer], desc: [forward_transfer.block_number, forward_transfer.index])
-    |> handle_random_access_paging_options(paging_options)
+    |> handle_random_access_paging_options(paging_options, true)
     |> join_associations(necessity_by_association)
     |> Repo.all()
   end
@@ -3578,8 +3579,8 @@ defmodule Explorer.Chain do
   }
   def recent_collated_fee_payments_for_rap(options \\ []) when is_list(options) do
     necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
-    paging_options = Keyword.get(options, :paging_options, @default_paging_options)
-
+    paging_options =
+      Keyword.get(options, :paging_options, @default_paging_options)
     total_fee_payments_count = fee_payments_count()
 
     fetched_fee_payments =
@@ -3588,10 +3589,10 @@ defmodule Explorer.Chain do
     %{total_fee_payments_count: total_fee_payments_count, fee_payments: fetched_fee_payments}
   end
 
-  def fetch_recent_collated_fee_payments_for_rap(paging_options, necessity_by_association) do
+  defp fetch_recent_collated_fee_payments_for_rap(paging_options, necessity_by_association) do
     FeePayment
     |> order_by([fee_payment], desc: [fee_payment.block_number, fee_payment.index])
-    |> handle_random_access_paging_options(paging_options)
+    |> handle_random_access_paging_options(paging_options, true)
     |> join_associations(necessity_by_association)
     |> Repo.all()
   end
@@ -4612,19 +4613,23 @@ defmodule Explorer.Chain do
     |> limit(^paging_options.page_size)
   end
 
-  defp handle_random_access_paging_options(query, empty_options) when empty_options in [nil, [], %{}],
+  defp handle_random_access_paging_options(query, paging_options, no_page_limit \\ false)
+
+  defp handle_random_access_paging_options(query, empty_options, _no_page_limit) when empty_options in [nil, [], %{}],
     do: limit(query, ^(@default_page_size + 1))
 
-  defp handle_random_access_paging_options(query, paging_options) do
+  defp handle_random_access_paging_options(query, paging_options, no_page_limit) do
     query
     |> (&if(paging_options |> Map.get(:page_number, 1) |> process_page_number() == 1,
           do: &1,
           else: page_transaction(&1, paging_options)
         )).()
-    |> handle_page(paging_options)
+    |> handle_page(paging_options, no_page_limit)
   end
 
-  defp handle_page(query, paging_options) do
+  defp handle_page(query, paging_options, no_page_limit \\ false)
+
+  defp handle_page(query, paging_options, no_page_limit) do
     page_number = paging_options |> Map.get(:page_number, 1) |> process_page_number()
     page_size = Map.get(paging_options, :page_size, @default_page_size)
 
@@ -4633,7 +4638,7 @@ defmodule Explorer.Chain do
         query
         |> limit(^(page_size + 1))
 
-      page_in_bounds?(page_number, page_size) ->
+      page_in_bounds?(page_number, page_size) || no_page_limit ->
         query
         |> limit(^page_size)
         |> offset(^((page_number - 2) * page_size))

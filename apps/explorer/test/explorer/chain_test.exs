@@ -2036,19 +2036,25 @@ defmodule Explorer.ChainTest do
     end
 
     test "import fee_payments" do
+      %FeePayment{block_number: block_number, block_hash: block_hash, to_address_hash: to_address_hash, index: index, value: value} = build(:fee_payment)
+      wei_value = %Wei{value: Decimal.new(value)}
       assert {:ok,
               %{
                 fee_payments: [
                   %{
-        block_number: 70889,
-        to_address_hash: "0x530ec1a4b0e5c939455280c8709447ccf15932b0",
-        value: value,
+        block_number: ^block_number,
+        to_address_hash: ^to_address_hash,
+        value: ^wei_value,
+        index: ^index,
+        block_hash: ^block_hash,
                     inserted_at: %{},
                     updated_at: %{}
                   }]}} = Chain.import(%{fee_payments: %{params: [%{
-        block_number: 70889,
-        to_address_hash: "0x530ec1a4b0e5c939455280c8709447ccf15932b0",
-        value: 510000000000000000
+        block_number: block_number,
+        block_hash: block_hash,
+        to_address_hash: to_address_hash,
+        value: value,
+        index: index
       }]}})
 
     end
