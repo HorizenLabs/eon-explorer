@@ -4626,8 +4626,6 @@ defmodule Explorer.Chain do
     |> handle_page(paging_options, no_page_limit)
   end
 
-  defp handle_page(query, paging_options, no_page_limit \\ false)
-
   defp handle_page(query, paging_options, no_page_limit) do
     page_number = paging_options |> Map.get(:page_number, 1) |> process_page_number()
     page_size = Map.get(paging_options, :page_size, @default_page_size)

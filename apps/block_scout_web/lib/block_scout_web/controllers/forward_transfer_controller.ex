@@ -16,12 +16,6 @@ defmodule BlockScoutWeb.ForwardTransferController do
 
   alias Explorer.{Chain}
 
-  @necessity_by_association %{
-    :block => :optional,
-    [to_address: :names] => :optional,
-    [to_address: :smart_contract] => :optional
-  }
-
   @default_options [
     necessity_by_association: %{
       :block => :required,
