@@ -22,7 +22,7 @@ RUN mix do deps.get, local.rebar --force, deps.compile
 ADD apps ./apps
 ADD config ./config
 ADD rel ./rel
-ADD *.exs .
+ADD *.exs /app
 
 # Run forderground build and phoenix digest
 RUN mix compile && npm install npm@latest
