@@ -11,30 +11,23 @@ RUN apk --no-cache --update add alpine-sdk gmp-dev automake libtool inotify-tool
 
 # Cache elixir deps
 ADD mix.exs mix.lock ./
-ADD apps/block_scout_web/mix.exs ./apps/block_scout_web/
-ADD apps/explorer/mix.exs ./apps/explorer/
-ADD apps/ethereum_jsonrpc/mix.exs ./apps/ethereum_jsonrpc/
-ADD apps/indexer/mix.exs ./apps/indexer/
-
-RUN mix local.hex --force
-RUN mix do deps.get, local.rebar --force, deps.compile
-
 ADD apps ./apps
 ADD config ./config
 ADD rel ./rel
-ADD *.exs /app
 
-# Run forderground build and phoenix digest
-RUN mix compile && npm install npm@latest
+RUN mix local.hex --force
+RUN mix do deps.get, local.rebar --force, deps.compile
+RUN mix compile
 
 # Add blockscout npm deps
-RUN cd /app/apps/block_scout_web/assets/ && \
-    npm install && \
-    npm run deploy && \
-    cd /app/apps/explorer/ && \
-    npm install && \
-    apk update && \
-    apk del --force-broken-world alpine-sdk gmp-dev automake libtool inotify-tools autoconf python3
+RUN cd /app/apps/block_scout_web/assets/  \
+    && npm install npm@latest \
+    && npm install \
+    && npm run deploy \
+    && cd /app/apps/explorer/ \
+    && npm install \
+    && apk update \
+    && apk del --force-broken-world alpine-sdk gmp-dev automake libtool inotify-tools autoconf python3
 
 RUN export "CFLAGS=-I/usr/local/include -L/usr/local/lib" && cd deps/ex_secp256k1 && mix deps.get && mix compile
 RUN mix phx.digest
