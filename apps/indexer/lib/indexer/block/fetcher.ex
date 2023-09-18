@@ -124,6 +124,7 @@ defmodule Indexer.Block.Fetcher do
       when callback_module != nil do
     {fetch_time, fetched_blocks} =
       :timer.tc(fn -> EthereumJSONRPC.fetch_blocks_by_range(range, json_rpc_named_arguments) end)
+
     with {:blocks,
           {:ok,
            %Blocks{
@@ -142,7 +143,8 @@ defmodule Indexer.Block.Fetcher do
          %{mint_transfers: mint_transfers} = MintTransfers.parse(logs),
          %FetchedBeneficiaries{params_set: beneficiary_params_set, errors: beneficiaries_errors} =
            fetch_beneficiaries(blocks, transactions_with_receipts, json_rpc_named_arguments),
-         forward_transfers = ForwardTransfer.add_block_hashes(ForwardTransfers.fetch(range, json_rpc_named_arguments), blocks),
+         forward_transfers =
+           ForwardTransfer.add_block_hashes(ForwardTransfers.fetch(range, json_rpc_named_arguments), blocks),
          fee_payments = FeePayment.add_block_hashes(FeePayments.fetch(range, json_rpc_named_arguments), blocks),
          addresses =
            Addresses.extract_addresses(%{

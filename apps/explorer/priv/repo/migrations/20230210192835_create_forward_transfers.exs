@@ -8,6 +8,5 @@ defmodule Explorer.Repo.Migrations.CreateForwardTransfers do
       add(:block_number, :bigint, null: false)
       timestamps(null: false, type: :utc_datetime_usec)
     end
-
   end
 end

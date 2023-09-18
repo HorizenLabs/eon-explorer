@@ -108,7 +108,6 @@ defmodule Indexer.Fetcher.FeePaymentAsyncTest do
       block_number = 1
       block_quantity = integer_to_quantity(block_number)
 
-
       if json_rpc_named_arguments[:transport] == EthereumJSONRPC.Mox do
         EthereumJSONRPC.Mox
         |> expect(:json_rpc, fn [%{id: _id, method: "zen_getFeePayments", params: [^block_quantity]}], _options ->
@@ -134,7 +133,8 @@ defmodule Indexer.Fetcher.FeePaymentAsyncTest do
       end
 
       assert FeePayment.run([1], json_rpc_named_arguments) == :ok
-       fp =
+
+      fp =
         wait(fn ->
           Repo.one!(from(fee_payment in Explorer.Chain.FeePayment, where: fee_payment.block_number == ^block_number))
         end)

@@ -69,9 +69,7 @@ defmodule BlockScoutWeb.ApiRouter do
       get("/contracts", MetricsController, :thirty_day_contract_count_list)
       get("/transactions", MetricsController, :thirty_day_tx_count_list)
     end
-
   end
-
 
   scope "/account/v1", as: :account_v1 do
     pipe_through(:api)

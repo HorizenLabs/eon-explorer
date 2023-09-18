@@ -29,12 +29,15 @@ defmodule Explorer.Chain.Cache.ThirtyDayTransactionCountList do
   end
 
   def db_results do
-    %Postgrex.Result{rows: rows} = SQL.query!(Repo,
-      "SELECT to_char(date,'yyyy-mm-dd') AS formatted_date, number_of_transactions
+    %Postgrex.Result{rows: rows} =
+      SQL.query!(
+        Repo,
+        "SELECT to_char(date,'yyyy-mm-dd') AS formatted_date, number_of_transactions
       FROM transaction_stats
       WHERE date BETWEEN CURRENT_DATE - interval '30 days' AND CURRENT_DATE-interval '1 day'
       ORDER BY formatted_date ASC"
-    )
+      )
+
     Enum.map(rows, fn row -> %{"date" => Enum.at(row, 0), "transaction_count" => Enum.at(row, 1)} end)
   end
 
@@ -83,5 +86,4 @@ defmodule Explorer.Chain.Cache.ThirtyDayTransactionCountList do
       _ -> @default_cache_period
     end
   end
-
 end

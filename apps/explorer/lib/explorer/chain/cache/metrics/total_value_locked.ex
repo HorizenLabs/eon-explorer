@@ -29,19 +29,23 @@ defmodule Explorer.Chain.Cache.TotalValueLocked do
   end
 
   def db_results do
-    %Postgrex.Result{rows: [[contracts_count]]} = SQL.query!(Repo,
-      "SELECT sum(fetched_coin_balance) as tvl
+    %Postgrex.Result{rows: [[contracts_count]]} =
+      SQL.query!(
+        Repo,
+        "SELECT sum(fetched_coin_balance) as tvl
       FROM addresses
       WHERE contract_code IS NOT NULL"
-    )
+      )
 
-    %Postgrex.Result{rows: [[externally_owned_accounts_count]]} = SQL.query!(Repo,
-      "SELECT sum(fetched_coin_balance) as tvl
+    %Postgrex.Result{rows: [[externally_owned_accounts_count]]} =
+      SQL.query!(
+        Repo,
+        "SELECT sum(fetched_coin_balance) as tvl
       FROM addresses
       WHERE contract_code IS NULL"
-    )
+      )
 
-    %{ "contractZenTVL" => wei_to_ether(contracts_count), "userZenTVL" => wei_to_ether(externally_owned_accounts_count) }
+    %{"contractZenTVL" => wei_to_ether(contracts_count), "userZenTVL" => wei_to_ether(externally_owned_accounts_count)}
   end
 
   def wei_to_ether(value) do
@@ -93,5 +97,4 @@ defmodule Explorer.Chain.Cache.TotalValueLocked do
       _ -> @default_cache_period
     end
   end
-
 end

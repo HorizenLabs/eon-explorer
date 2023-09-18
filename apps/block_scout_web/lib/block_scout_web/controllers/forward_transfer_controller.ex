@@ -8,7 +8,6 @@ defmodule BlockScoutWeb.ForwardTransferController do
       next_page_params: 3,
       update_page_parameters: 3,
       split_list_by_page: 2
-
     ]
 
   alias BlockScoutWeb.{Controller}
@@ -16,12 +15,6 @@ defmodule BlockScoutWeb.ForwardTransferController do
   alias Phoenix.View
 
   alias Explorer.{Chain}
-
-  @necessity_by_association %{
-    :block => :optional,
-    [to_address: :names] => :optional,
-    [to_address: :smart_contract] => :optional
-  }
 
   @default_options [
     necessity_by_association: %{
@@ -32,7 +25,6 @@ defmodule BlockScoutWeb.ForwardTransferController do
   ]
 
   def index(conn, %{"type" => "JSON"} = params) do
-
     options =
       @default_options
       |> Keyword.merge(paging_options(params))
@@ -46,8 +38,7 @@ defmodule BlockScoutWeb.ForwardTransferController do
         |> update_page_parameters(Chain.default_page_size(), Keyword.get(options, :paging_options))
       )
 
-
-   %{total_forward_transfers_count: forward_transfers_count, forward_transfers: forward_transfers_plus_one} =
+    %{total_forward_transfers_count: forward_transfers_count, forward_transfers: forward_transfers_plus_one} =
       Chain.recent_collated_forward_transfers_for_rap(full_options)
 
     {forward_transfers, next_page} =
@@ -84,14 +75,12 @@ defmodule BlockScoutWeb.ForwardTransferController do
       %{
         items:
           Enum.map(forward_transfers, fn transaction ->
-
             View.render_to_string(
               BlockScoutWeb.ForwardTransferView,
               "_tile.html",
               forward_transfer: transaction,
               conn: conn
             )
-
           end),
         next_page_params: next_page_params
       }
@@ -110,5 +99,4 @@ defmodule BlockScoutWeb.ForwardTransferController do
     ft_count = Chain.forward_transfers_count()
     text(conn, "number of forward_transfers #{ft_count}")
   end
-
 end

@@ -33,6 +33,7 @@ defmodule EthereumJSONRPC.ForwardTransfer do
       to_address_hash: to_address_hash,
       value: value
     }
+
     result
   end
 
@@ -76,12 +77,12 @@ defmodule EthereumJSONRPC.ForwardTransfer do
   end
 
   def entry_to_elixir({key, value})
-       when key in ~w(to),
-       do: {key, value}
+      when key in ~w(to),
+      do: {key, value}
 
   def entry_to_elixir({key, quantity})
-       when key in ~w(value blockNumber) and
-              quantity != nil do
+      when key in ~w(value blockNumber) and
+             quantity != nil do
     {key, quantity_to_integer(quantity)}
   end
 

@@ -521,12 +521,12 @@ defmodule BlockScoutWeb.Chain do
   end
 
   defp paging_params(%{
-      block_number: block_number,
-      id: id,
-      inserted_at: inserted_at,
-      to_address_hash: to_address_hash,
-      updated_at: updated_at,
-      value: value
+      block_number: _block_number,
+      id: _id,
+      inserted_at: _inserted_at,
+      to_address_hash: _to_address_hash,
+      updated_at: _updated_at,
+      value: _value
     }) do
   %{}
   end

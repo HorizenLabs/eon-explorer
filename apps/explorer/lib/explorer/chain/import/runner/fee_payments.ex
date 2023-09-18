@@ -38,7 +38,7 @@ defmodule Explorer.Chain.Import.Runner.FeePayments do
       |> Map.put_new(:timeout, @timeout)
       |> Map.put(:timestamps, timestamps)
 
-      multi
+    multi
     |> Multi.run(:fee_payments, fn repo, _ ->
       Instrumenter.block_import_stage_runner(
         fn -> insert(repo, changes_list, insert_options) end,
@@ -51,8 +51,6 @@ defmodule Explorer.Chain.Import.Runner.FeePayments do
 
   @impl Import.Runner
   def timeout, do: @timeout
-
-
 
   @spec insert(Repo.t(), [map()], %{
           optional(:on_conflict) => Import.Runner.on_conflict(),
@@ -68,7 +66,6 @@ defmodule Explorer.Chain.Import.Runner.FeePayments do
          } = _options
        )
        when is_list(changes_list) do
-
     Import.insert_changes_list(
       repo,
       changes_list,
@@ -79,5 +76,4 @@ defmodule Explorer.Chain.Import.Runner.FeePayments do
       timestamps: timestamps
     )
   end
-
 end

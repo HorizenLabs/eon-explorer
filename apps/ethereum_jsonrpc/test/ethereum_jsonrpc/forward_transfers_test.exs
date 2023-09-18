@@ -12,9 +12,7 @@ defmodule EthereumJSONRPC.ForwardTransfersTest do
   setup :verify_on_exit!
 
   describe "utilities" do
-
     test "format_and_flatten" do
-
       value_string_1 = "0x713e24c43730000"
       value_string_2 = "0x713e24c43730001"
 
@@ -27,7 +25,7 @@ defmodule EthereumJSONRPC.ForwardTransfersTest do
                "forwardTransfers" => [
                  %{"to" => "0x5302c1375912f56a78e15802f30c693c4eae80b5", "value" => value_string_1},
                  %{"to" => "0x5302c1375912f56a78e15802f30c693c4eae80b5", "value" => value_string_1}
-                ]
+               ]
              }
            },
            %{
@@ -76,7 +74,6 @@ defmodule EthereumJSONRPC.ForwardTransfersTest do
   end
 
   describe "fetch/2" do
-
     test "with forward_transfers", %{json_rpc_named_arguments: json_rpc_named_arguments} do
       value_string_1 = "0x713e24c43730000"
       value_string_2 = "0x713e24c43730001"
@@ -108,7 +105,6 @@ defmodule EthereumJSONRPC.ForwardTransfersTest do
               }
             ]
         end
-
 
       if json_rpc_named_arguments[:transport] == EthereumJSONRPC.Mox do
         expect(EthereumJSONRPC.Mox, :json_rpc, fn _json, _options ->

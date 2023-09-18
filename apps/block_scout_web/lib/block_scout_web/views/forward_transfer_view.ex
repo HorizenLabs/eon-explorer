@@ -2,10 +2,9 @@ defmodule BlockScoutWeb.ForwardTransferView do
   use BlockScoutWeb, :view
 
   alias Explorer.Chain.ForwardTransfer
-  alias BlockScoutWeb.{ BlockView }
+  alias BlockScoutWeb.{BlockView}
 
   @dialyzer :no_match
-
 
   @doc """
   Converts a transaction's Wei value to Ether and returns a formatted display value.

@@ -1,6 +1,25 @@
 defmodule BackwardTransfersDecoding do
   @backward_transfer_contract_address <<
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    17,
+    17,
+    17,
+    17,
+    17,
+    17,
+    17,
+    17,
+    17,
+    17
   >>
 
   defp pub_key_hash_prefix do
@@ -8,9 +27,11 @@ defmodule BackwardTransfersDecoding do
     is_mainnet = System.get_env("IS_MAINNET") || "true"
 
     if is_mainnet == "true" do
-      <<32, 137>> # mainnet, 2089
+      # mainnet, 2089
+      <<32, 137>>
     else
-      <<32, 152>> # testnet, 2098
+      # testnet, 2098
+      <<32, 152>>
     end
   end
 
@@ -50,9 +71,11 @@ defmodule BackwardTransfersDecoding do
   def pub_key_hash_to_addr(pub_key_hash) do
     env_pub_key_hash_prefix = pub_key_hash_prefix()
     prepended_key = env_pub_key_hash_prefix <> pub_key_hash
+
     checksum =
       :crypto.hash(:sha256, :crypto.hash(:sha256, prepended_key))
       |> binary_part(0, 4)
+
     payload_with_checksum = <<prepended_key::binary, checksum::binary>>
     Base58.encode(payload_with_checksum)
   end

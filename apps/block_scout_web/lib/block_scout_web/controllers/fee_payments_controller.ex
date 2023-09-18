@@ -16,12 +16,6 @@ defmodule BlockScoutWeb.FeePaymentController do
 
   alias Explorer.{Chain}
 
-  @necessity_by_association %{
-    :block => :optional,
-    [to_address: :names] => :optional,
-    [to_address: :smart_contract] => :optional
-  }
-
   @default_options [
     necessity_by_association: %{
       :block => :required,
@@ -31,7 +25,6 @@ defmodule BlockScoutWeb.FeePaymentController do
   ]
 
   def index(conn, %{"type" => "JSON"} = params) do
-
     options =
       @default_options
       |> Keyword.merge(paging_options(params))
@@ -45,8 +38,7 @@ defmodule BlockScoutWeb.FeePaymentController do
         |> update_page_parameters(Chain.default_page_size(), Keyword.get(options, :paging_options))
       )
 
-
-   %{total_fee_payments_count: fee_payments_count, fee_payments: fee_payments_plus_one} =
+    %{total_fee_payments_count: fee_payments_count, fee_payments: fee_payments_plus_one} =
       Chain.recent_collated_fee_payments_for_rap(full_options)
 
     {fee_payments, next_page} =
@@ -83,14 +75,12 @@ defmodule BlockScoutWeb.FeePaymentController do
       %{
         items:
           Enum.map(fee_payments, fn transaction ->
-
             View.render_to_string(
               BlockScoutWeb.FeePaymentView,
               "_tile.html",
               fee_payment: transaction,
               conn: conn
             )
-
           end),
         next_page_params: next_page_params
       }
@@ -109,5 +99,4 @@ defmodule BlockScoutWeb.FeePaymentController do
     ft_count = Chain.fee_payments_count()
     text(conn, "number of fee_payments #{ft_count}")
   end
-
 end

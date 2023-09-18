@@ -2,7 +2,7 @@ defmodule BlockScoutWeb.FeePaymentView do
   use BlockScoutWeb, :view
 
   alias Explorer.Chain.FeePayment
-  alias BlockScoutWeb.{ BlockView }
+  alias BlockScoutWeb.{BlockView}
 
   @dialyzer :no_match
 
@@ -17,7 +17,6 @@ defmodule BlockScoutWeb.FeePaymentView do
     include_label? = Keyword.get(opts, :include_label, true)
     format_wei_value(value, :ether, include_unit_label: include_label?)
   end
-
 
   def block_number(%FeePayment{block: block}), do: [view_module: BlockView, partial: "_link.html", block: block]
 
