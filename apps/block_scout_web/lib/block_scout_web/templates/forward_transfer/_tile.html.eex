@@ -30,7 +30,7 @@
       <span class="mr-2 mr-md-0 order-1">
         <%= @forward_transfer |> block_number() |> BlockScoutWeb.RenderHelper.render_partial() %>
       </span>
-      <span class="mr-2 mr-md-0 order-2" in-tile data-from-now="<%= @forward_transfer.inserted_at %>"></span>
+      <span class="mr-2 mr-md-0 order-2" in-tile data-from-now="<%= @forward_transfer.block.timestamp %>"></span>
     </div>
   </div>
 </div>
