@@ -586,6 +586,59 @@ defmodule Explorer.ChainTest do
       assert [fourth, third, second, first, sixth, fifth] == result
     end
 
+    test "add identifier to forward_transfer" do
+      %ForwardTransfer{to_address_hash: address_hash, block_number: block_number, block_hash: block_hash} =
+        ft1 = insert(:forward_transfer, index: 1)
+
+       return = Chain.select_extra_transfer_explicit(ForwardTransfer, address_hash, 1) |> Repo.all()
+       Logger.error(inspect(return))
+    end
+
+    test "with transactions" do
+      address = insert(:address)
+
+      transaction1 =
+        :transaction
+        |> insert(to_address: address)
+        |> with_block(insert(:block, number: 8))
+
+      %Transaction{block_number: bn_t1} = transaction1
+      return = Chain.select_transactions(Transaction, address.hash, :to, 3) |> Repo.all()
+      Logger.error(inspect(return))
+    end
+
+    test "using unioin with ft, fp, and transactions in same block" do
+      %ForwardTransfer{to_address_hash: address_hash, block_number: block_number, block_hash: block_hash} =
+        ft1 = insert(:forward_transfer, index: 1)
+
+      block = Repo.get_by(Block, hash: block_hash)
+      address = Repo.get_by(Address, hash: address_hash)
+
+      fp =
+        insert(:fee_payment, block_number: block.number, block_hash: block.hash, index: 0, to_address_hash: address_hash)
+
+      transaction1 =
+        :transaction
+        |> insert(to_address: address)
+        |> with_block(block)
+
+      transaction2 =
+        :transaction
+        |> insert(from_address: address)
+        |> with_block(block)
+
+      bn = block.number
+
+      ft_query = Chain.select_extra_transfers(ForwardTransfer, address_hash, 1)
+      fp_query = Chain.select_extra_transfers(FeePayment, address_hash, 2)
+      tx_query = Chain.select_transactions(Transaction, address.hash, :to, 3)
+
+      union = Chain.union_all_txs_and_ets(tx_query, fp_query, ft_query) |> Repo.all()
+      Logger.error(inspect(union))
+
+      end
+
+
     test "with ft, fp, and transactions in same block" do
       %ForwardTransfer{to_address_hash: address_hash, block_number: block_number, block_hash: block_hash} =
         ft1 = insert(:forward_transfer, index: 1)

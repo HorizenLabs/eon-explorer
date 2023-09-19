@@ -39,6 +39,7 @@ defmodule Explorer.Chain.FeePayment do
     field(:block_number, :integer, primary_key: true)
     field(:value, Wei)
     field(:index, :integer, primary_key: true)
+    field(:zen_identifier, :integer, virtual: true)
     timestamps()
 
     belongs_to(

@@ -243,6 +243,7 @@ defmodule Explorer.Chain.Transaction do
     field(:type, :integer)
     field(:has_error_in_internal_txs, :boolean)
     field(:has_token_transfers, :boolean, virtual: true)
+    field(:zen_identifier, :integer, virtual: true)
 
     # A transient field for deriving old block hash during transaction upserts.
     # Used to force refetch of a block in case a transaction is re-collated
@@ -866,6 +867,14 @@ end
       where(query, [t], t.to_address_hash == ^address_hash),
       where(query, [t], t.created_contract_address_hash == ^address_hash)
     ]
+  end
+
+  def matching_address(query, :to, address_hash) do
+    where(query, [t], t.to_address_hash == ^address_hash)
+  end
+
+  def matching_address(query, _direction, address_hash) do
+    from(query, where: [to_address_hash: ^address_hash], or_where: [from_address_hash: ^address_hash])
   end
 
   def not_pending_transactions(query) do

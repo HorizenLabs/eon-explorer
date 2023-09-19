@@ -14,6 +14,7 @@ defmodule Explorer.Chain.ForwardTransfer do
   alias Explorer.PagingOptions
 
   @required_attrs ~w(block_number block_hash to_address_hash value index)a
+  @optional_attrs
 
   @type t :: %__MODULE__{
           block: %Ecto.Association.NotLoaded{} | Block.t() | nil,
@@ -42,6 +43,7 @@ defmodule Explorer.Chain.ForwardTransfer do
     field(:block_number, :integer, primary_key: true)
     field(:value, Wei)
     field(:index, :integer, primary_key: true)
+    field(:zen_identifier, :integer, virtual: true)
     timestamps()
 
     belongs_to(

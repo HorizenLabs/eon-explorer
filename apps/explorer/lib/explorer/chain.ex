@@ -21,6 +21,7 @@ defmodule Explorer.Chain do
       select: 3,
       subquery: 1,
       union: 2,
+      union_all: 2,
       where: 2,
       where: 3
     ]
@@ -375,12 +376,15 @@ defmodule Explorer.Chain do
       the `block_number` and `index` that are passed.
 
   """
-  @spec address_to_transactions_with_extra_transfers(Hash.Address.t(), [paging_options | necessity_by_association_option]) ::
+  @spec address_to_transactions_with_extra_transfers(Hash.Address.t(), [
+          paging_options | necessity_by_association_option
+        ]) ::
           [
             Transaction.t()
           ]
   def address_to_transactions_with_extra_transfers(address_hash, options \\ []) when is_list(options) do
     paging_options = Keyword.get(options, :paging_options, @default_paging_options)
+
     cond do
       Keyword.get(options, :direction) == :from ->
         address_to_transactions_without_rewards(address_hash, options)
@@ -392,17 +396,22 @@ defmodule Explorer.Chain do
 
   defp transactions_with_extra_transfer_results(address_hash, options, paging_options) do
     et_necessity_by_association = [
-        necessity_by_association: %{
-          :block => :required,
-          [to_address: :names] => :optional,
-          [to_address: :smart_contract] => :optional
-        }]
+      necessity_by_association: %{
+        :block => :required,
+        [to_address: :names] => :optional,
+        [to_address: :smart_contract] => :optional
+      }
+    ]
+
     et_options = Keyword.put(et_necessity_by_association, :paging_options, paging_options)
     blocks_range = address_to_transactions_tasks_range_of_blocks(address_hash, options)
+
     fts_task =
       Task.async(fn -> Chain.fetch_recent_extra_transfers(ForwardTransfer, address_hash, et_options, blocks_range) end)
+
     fps_task =
       Task.async(fn -> Chain.fetch_recent_extra_transfers(FeePayment, address_hash, et_options, blocks_range) end)
+
     [fps_task | [fts_task | address_to_transactions_tasks(address_hash, options, true)]]
     |> wait_for_address_transactions()
     |> Enum.sort_by(fn item ->
@@ -487,6 +496,18 @@ defmodule Explorer.Chain do
     |> address_to_transactions_tasks_query()
     |> Transaction.not_dropped_or_replaced_transactions()
     |> join_associations(necessity_by_association)
+    |> put_has_token_transfers_to_tx(old_ui?)
+    |> Transaction.matching_address_queries_list(direction, address_hash)
+    |> Enum.map(fn query -> Task.async(fn -> select_repo(options).all(query) end) end)
+  end
+
+  defp address_to_transactions_tasks(address_hash, options, old_ui?) do
+    direction = Keyword.get(options, :direction)
+    necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
+
+    options
+    |> address_to_transactions_tasks_query()
+    |> Transaction.not_dropped_or_replaced_transactions()
     |> put_has_token_transfers_to_tx(old_ui?)
     |> Transaction.matching_address_queries_list(direction, address_hash)
     |> Enum.map(fn query -> Task.async(fn -> select_repo(options).all(query) end) end)
@@ -3432,7 +3453,7 @@ defmodule Explorer.Chain do
     %{total_transactions_count: total_transactions_count, transactions: fetched_transactions}
   end
 
-    def default_page_size, do: @default_page_size
+  def default_page_size, do: @default_page_size
 
   def fetch_recent_collated_transactions_for_rap(paging_options, necessity_by_association) do
     fetch_transactions_for_rap()
@@ -3552,17 +3573,19 @@ defmodule Explorer.Chain do
     total_forward_transfers_count = forward_transfers_count()
 
     fetched_forward_transfers =
-        fetch_recent_collated_forward_transfers_for_rap(paging_options, necessity_by_association)
+      fetch_recent_collated_forward_transfers_for_rap(paging_options, necessity_by_association)
 
     %{total_forward_transfers_count: total_forward_transfers_count, forward_transfers: fetched_forward_transfers}
   end
 
   def fetch_recent_extra_transfers(module, address_hash, options \\ [], %{
-          min_block_number: min_block_number,
-          max_block_number: max_block_number
-        }) when is_list(options) do
+        min_block_number: min_block_number,
+        max_block_number: max_block_number
+      })
+      when is_list(options) do
     necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
     paging_options = Keyword.get(options, :paging_options, @default_paging_options)
+
     module
     |> join_associations(necessity_by_association)
     |> paginate(paging_options)
@@ -3576,7 +3599,6 @@ defmodule Explorer.Chain do
   def matching_address_queries_list(query, :from, address_hash) do
     [where(query, [t], t.from_address_hash == ^address_hash)]
   end
-
 
   def fetch_recent_collated_forward_transfers_for_rap(paging_options, necessity_by_association) do
     ForwardTransfer
@@ -3598,17 +3620,16 @@ defmodule Explorer.Chain do
   end
 
   @spec recent_collated_fee_payments_for_rap([paging_options]) :: %{
-    :total_fee_payments_count => non_neg_integer(),
-    :fee_payments => [FeePayments.t()]
-  }
+          :total_fee_payments_count => non_neg_integer(),
+          :fee_payments => [FeePayments.t()]
+        }
   def recent_collated_fee_payments_for_rap(options \\ []) when is_list(options) do
     necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
     paging_options = Keyword.get(options, :paging_options, @default_paging_options)
 
     total_fee_payments_count = fee_payments_count()
 
-    fetched_fee_payments =
-      fetch_recent_collated_fee_payments_for_rap(paging_options, necessity_by_association)
+    fetched_fee_payments = fetch_recent_collated_fee_payments_for_rap(paging_options, necessity_by_association)
 
     %{total_fee_payments_count: total_fee_payments_count, fee_payments: fetched_fee_payments}
   end
@@ -4588,6 +4609,98 @@ defmodule Explorer.Chain do
     )
   end
 
+  # defp transaction_query_for_union()
+
+  def select_transactions_explicit(query) do
+      query |> select([tx], %{
+      # from(tx in Transaction, select: map(tx, [:from_address_hash]))
+      from_address_hash: tx.from_address_hash,
+      to_address_hash: tx.to_address_hash,
+      value: tx.value,
+      block_number: tx.block_number,
+      block_hash: tx.block_hash,
+      index: tx.index,
+      cumulative_gas_used: tx.cumulative_gas_used,
+      gas: tx.gas,
+      gas_price: tx.gas_price,
+      gas_used: tx.gas_used,
+      hash: tx.hash,
+      input: tx.input,
+      nonce: tx.nonce,
+      r: tx.r,
+      s: tx.s,
+      status: tx.status,
+      v: tx.v,
+      created_contract_address_hash: tx.created_contract_address_hash,
+      created_contract_code_indexed_at: tx.created_contract_code_indexed_at,
+      earliest_processing_start: tx.earliest_processing_start,
+      old_block_hash: tx.old_block_hash,
+      revert_reason: tx.revert_reason,
+      max_priority_fee_per_gas: tx.max_priority_fee_per_gas,
+      max_fee_per_gas: tx.max_fee_per_gas,
+      type: tx.type,
+      has_error_in_internal_txs: tx.has_error_in_internal_txs
+})
+  end
+
+  def select_extra_transfers_explicit(query) do
+    # from(ft in ForwardTransfer, select: map(ft, [:from_address_hash]))
+    query |> select([et], %{
+      from_address_hash: nil,
+      to_address_hash: et.to_address_hash,
+      value: et.value,
+      block_number: et.block_number,
+      block_hash: et.block_hash,
+      index: et.index,
+      cumulative_gas_used: nil,
+      gas: nil,
+      gas_price: nil,
+      gas_used: nil,
+      hash: nil,
+      input: nil,
+      nonce: nil,
+      r: nil,
+      s: nil,
+      status: nil,
+      v: nil,
+      created_contract_address_hash: nil,
+      created_contract_code_indexed_at: nil,
+      earliest_processing_start: nil,
+      old_block_hash: nil,
+      revert_reason: nil,
+      max_priority_fee_per_gas: nil,
+      max_fee_per_gas: nil,
+      type: nil,
+      has_error_in_internal_txs: nil,
+      has_token_transfers: nil
+    })
+  end
+
+  def select_transactions(query, address_hash, direction, identifier) do
+    query
+    |> select_transactions_explicit()
+    |> Transaction.not_dropped_or_replaced_transactions()
+    |> put_has_token_transfers_to_tx(false)
+    |> put_special_zen_identifier(identifier)
+    |> Transaction.matching_address(direction, address_hash)
+  end
+
+  def select_extra_transfers(query, address_hash, identifier) do
+    query
+    |> select_extra_transfers_explicit()
+    |> put_special_zen_identifier(identifier)
+    |> where([et], et.to_address_hash == ^address_hash)
+  end
+
+  def union_all_txs_and_ets(tx_query, ft_query, fp_query) do
+    first_union = union_all(tx_query, ^ft_query)
+    final_union = union_all(first_union, ^fp_query)
+  end
+
+  def final_method(address_hash, direction){
+    
+  }
+
   defp order_for_transactions(query, _) do
     query
     |> order_by([transaction], desc: transaction.block_number, desc: transaction.index)
@@ -5124,14 +5237,16 @@ defmodule Explorer.Chain do
 
   def unfetched_extra_transfers_query() do
     extra_transfer_type = Enum.at(LastFetchedCounter.last_fetched_counter_types(), 0)
+
     from(
-        block in Block,
-        join: lfc in LastFetchedCounter,
-        on: block.number > lfc.value,
-        where: lfc.counter_type == ^extra_transfer_type,
-        select: block.number,
-        distinct: [block.number],
-        order_by: [asc: block.number])
+      block in Block,
+      join: lfc in LastFetchedCounter,
+      on: block.number > lfc.value,
+      where: lfc.counter_type == ^extra_transfer_type,
+      select: block.number,
+      distinct: [block.number],
+      order_by: [asc: block.number]
+    )
   end
 
   @doc """
@@ -7002,6 +7117,12 @@ defmodule Explorer.Chain do
             tx.hash
           )
       }
+    )
+  end
+
+  def put_special_zen_identifier(query, identifier) do
+    from(tx in query,
+      select_merge: %{zen_identifier: type(^identifier, :integer)}
     )
   end
 end
