@@ -30,7 +30,7 @@
       <span class="mr-2 mr-md-0 order-1">
           <%= @fee_payment |> block_number() |> BlockScoutWeb.RenderHelper.render_partial() %>
       </span>
-      <span class="mr-2 mr-md-0 order-2" in-tile data-from-now="<%= @fee_payment.inserted_at %>"></span>
+      <span class="mr-2 mr-md-0 order-2" in-tile data-from-now="<%= @fee_payment.block.timestamp %>"></span>
     </div>
   </div>
 </div>
