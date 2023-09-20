@@ -277,10 +277,6 @@ tx_chart_config =
 config :block_scout_web,
   chart_config: Map.merge(price_chart_config, tx_chart_config)
 
-config :block_scout_web, BlockScoutWeb.Chain.Address.CoinBalance,
-  # days
-  coin_balance_history_days: System.get_env("COIN_BALANCE_HISTORY_DAYS", "10")
-
 config :block_scout_web, BlockScoutWeb.API.V2, enabled: System.get_env("API_V2_ENABLED") == "true"
 
 ########################
