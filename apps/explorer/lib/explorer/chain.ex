@@ -3568,6 +3568,20 @@ defmodule Explorer.Chain do
     |> Repo.all()
   end
 
+  def address_to_forward_transfers(address_hash, options \\ []) when is_list(options) do
+    necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
+    paging_options =
+      Keyword.get(options, :paging_options, @default_paging_options)
+
+    ForwardTransfer
+    |> where([ft], ft.to_address_hash == ^address_hash)
+    |> order_by([forward_transfer], desc: [forward_transfer.block_number, forward_transfer.index])
+    |> handle_random_access_paging_options(paging_options, true)
+    |> join_associations(necessity_by_association)
+    |> Repo.all()
+  end
+
+
   def forward_transfers_count do
     ForwardTransfer
     |> Repo.aggregate(:count)

@@ -173,6 +173,7 @@
         @view_module == Elixir.BlockScoutWeb.AddressTokenTransferView ||
         @view_module == Elixir.BlockScoutWeb.AddressTokenView ||
         @view_module == Elixir.BlockScoutWeb.AddressInternalTransactionView ||
+        @view_module == Elixir.BlockScoutWeb.AddressForwardTransferView ||
         @view_module == Elixir.BlockScoutWeb.AddressCoinBalanceView ||
         @view_module == Elixir.BlockScoutWeb.AddressLogsView ||
         @view_module == Elixir.BlockScoutWeb.AddressValidationView ||
@@ -312,6 +313,7 @@
       @view_module != Elixir.BlockScoutWeb.AddressWithdrawalView &&
       @view_module != Elixir.BlockScoutWeb.AddressInternalTransactionView &&
       @view_module != Elixir.BlockScoutWeb.AddressCoinBalanceView &&
+      @view_module != Elixir.BlockScoutWeb.AddressForwardTransferView &&
       @view_module != Elixir.BlockScoutWeb.AddressLogsView &&
       @view_module != Elixir.BlockScoutWeb.AddressValidationView &&
       @view_module != Elixir.BlockScoutWeb.AddressContractView &&

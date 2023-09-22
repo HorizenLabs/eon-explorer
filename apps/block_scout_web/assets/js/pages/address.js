@@ -254,6 +254,7 @@ if ($addressDetailsPage.length) {
   pathParts.includes('withdrawals') ||
   pathParts.includes('internal-transactions') ||
   pathParts.includes('coin-balances') ||
+  pathParts.includes('forward-transfers') ||
   pathParts.includes('logs') ||
   pathParts.includes('validations') ||
   pathParts.includes('contracts') ||

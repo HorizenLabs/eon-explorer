@@ -33,6 +33,7 @@ defmodule BlockScoutWeb.AddressView do
     "coin-balances",
     "contracts",
     "decompiled-contracts",
+    "forward-transfers",
     "internal-transactions",
     "token-transfers",
     "read-contract",
@@ -395,6 +396,7 @@ defmodule BlockScoutWeb.AddressView do
   defp tab_name(["tokens"]), do: gettext("Tokens")
   defp tab_name(["internal-transactions"]), do: gettext("Internal Transactions")
   defp tab_name(["transactions"]), do: gettext("Transactions")
+  defp tab_name(["forward-transfers"]), do: gettext("Forward Transfers")
   defp tab_name(["token-transfers"]), do: gettext("Token Transfers")
   defp tab_name(["contracts"]), do: gettext("Code")
   defp tab_name(["decompiled-contracts"]), do: gettext("Decompiled Code")
