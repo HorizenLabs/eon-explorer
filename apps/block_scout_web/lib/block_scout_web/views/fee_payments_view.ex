@@ -23,4 +23,8 @@ defmodule BlockScoutWeb.FeePaymentView do
   def format_wei_value(value) do
     format_wei_value(value, :ether, include_unit_label: false)
   end
+
+  def identifier(%FeePayment{block_number: block_number, index: index}) do
+    "#{block_number}#{index}"
+  end
 end

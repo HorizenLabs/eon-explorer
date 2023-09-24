@@ -58,42 +58,45 @@ defmodule BlockScoutWeb.AddressForwardTransferControllerTest do
       conn = get(conn, address_forward_transfer_path(conn, :index, Address.checksum(address), %{"type" => "JSON"}))
 
       forward_transfer_tiles = json_response(conn, 200)["items"]
-      forward_transfer_hashes = Enum.map([ft.to_address_hash, another_ft.to_address_hash], &to_string(&1))
+      forward_transfer_block_numbers = Enum.map([ft.block_number, another_ft.block_number], &to_string(&1))
 
-      assert Enum.all?(forward_transfer_hashes, fn forward_transfer_hash ->
-               Enum.any?(forward_transfer_tiles, &String.contains?(&1, forward_transfer_hash))
+      assert Enum.all?(forward_transfer_block_numbers, fn forward_transfer_block_number ->
+               Enum.any?(forward_transfer_tiles, &String.contains?(&1, forward_transfer_block_number))
              end)
     end
     test "returns next page of results based on last seen transaction", %{conn: conn} do
       address = insert(:address)
 
-      oldest_block = insert(:block)
-
+      # blocks are in oldest to newest order
       blocks =
         50
         |> insert_list(:block)
 
 
       second_page_fts =
-        Enum.map(blocks, & insert(:forward_transfer, to_address_hash: address.hash, block_number: &1.number, block_hash: &1.hash, index: Enum.random(0..9)))
+        Enum.map(blocks, &insert(:forward_transfer, to_address_hash: address.hash, block_number: &1.number, block_hash: &1.hash, index: Enum.random(0..9)))
 
 
-      %ForwardTransfer{block_number: oldest_block_number, index: oldest_index} =
+      # add one more, this will be the newest, 51st, we will pretend it page one's last entry
+      last_pg1_block = insert(:block)
+      %ForwardTransfer{block_number: last_pg1_block_number, index: last_pg1_index} =
         :forward_transfer
-        |> insert(to_address_hash: address.hash, block_number: oldest_block.number, block_hash: oldest_block.hash, index: Enum.random(0..9))
-
+        |> insert(to_address_hash: address.hash, block_number: last_pg1_block.number, block_hash: last_pg1_block.hash, index: Enum.random(0..9))
 
       conn =
         get(conn, address_forward_transfer_path(BlockScoutWeb.Endpoint, :index, Address.checksum(address.hash)), %{
-          "block_number" => Integer.to_string(oldest_block_number),
-          "index" => Integer.to_string(oldest_index),
+          "block_number" => Integer.to_string(last_pg1_block_number),
+          "index" => Integer.to_string(last_pg1_index),
           "type" => "JSON"
         })
 
-      transaction_tiles = json_response(conn, 200)["items"]
+      forward_transfer_tiles = json_response(conn, 200)["items"]
+      second_page_ft_block_numbers = Enum.map(second_page_fts, fn second_page_ft -> to_string(second_page_ft.block_number) end)
 
-      assert Enum.all?(second_page_fts, fn ft ->
-               Enum.any?(transaction_tiles, &String.contains?(&1, to_string(ft.to_address_hash)))
+
+      # expect page two to be entries for second_page_blocks
+      assert Enum.all?(second_page_ft_block_numbers, fn forward_transfer_block_number ->
+               Enum.any?(forward_transfer_tiles, &String.contains?(&1, forward_transfer_block_number))
              end)
     end
 end

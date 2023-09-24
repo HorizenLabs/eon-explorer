@@ -15,7 +15,7 @@ export const initialState = {
   channelDisconnected: false,
   addressHash: null,
   filter: null,
-  forwardTransfersBatch: []
+  feePaymentsBatch: []
 }
 
 export function reducer (state, action) {
@@ -29,31 +29,31 @@ export function reducer (state, action) {
 
       return Object.assign({}, state, {
         channelDisconnected: true,
-        forwardTransfersBatch: []
+        feePaymentsBatch: []
       })
     }
-    case 'RECEIVED_NEW_FORWARD_TRANSFER_BATCH': {
+    case 'RECEIVED_NEW_FEE_PAYMENT_BATCH': {
       if (state.channelDisconnected || state.beyondPageOne) return state
 
-      const incomingforwardTransfers = action.msgs
+      const incomingFeePayments = action.msgs
         .filter(({ toAddressHash, fromAddressHash }) => (
           !state.filter ||
           (state.filter === 'to' && toAddressHash === state.addressHash) ||
           (state.filter === 'from' && fromAddressHash === state.addressHash)
-        )).map(msg => msg.forwardTransferHtml)
+        )).map(msg => msg.feePaymentHtml)
 
-      if (!state.forwardTransfersBatch.length && incomingforwardTransfers.length < BATCH_THRESHOLD) {
+      if (!state.feePaymentsBatch.length && incomingFeePayments.length < BATCH_THRESHOLD) {
         return Object.assign({}, state, {
           items: [
-            ...incomingforwardTransfers.reverse(),
+            ...incomingFeePayments.reverse(),
             ...state.items
           ]
         })
       } else {
         return Object.assign({}, state, {
-          forwardTransfersBatch: [
-            ...incomingforwardTransfers.reverse(),
-            ...state.forwardTransfersBatch
+          feePaymentsBatch: [
+            ...incomingFeePayments.reverse(),
+            ...state.feePaymentsBatch
           ]
         })
       }
@@ -73,9 +73,9 @@ const elements = {
   '[data-selector="channel-batching-count"]': {
     render ($el, state) {
       const $channelBatching = $('[data-selector="channel-batching-message"]')
-      if (!state.forwardTransfersBatch.length) return $channelBatching.hide()
+      if (!state.feePaymentsBatch.length) return $channelBatching.hide()
       $channelBatching.show()
-      $el[0].innerHTML = numeral(state.forwardTransfersBatch.length).format()
+      $el[0].innerHTML = numeral(state.feePaymentsBatch.length).format()
     }
   },
   '[data-test="filter_dropdown"]': {
@@ -95,7 +95,7 @@ const elements = {
   }
 }
 
-if ($('[data-page="address-forward-transfers"]').length) {
+if ($('[data-page="address-fee-payments"]').length) {
   window.onbeforeunload = () => {
     // @ts-ignore
     window.loading = true
@@ -112,8 +112,8 @@ if ($('[data-page="address-forward-transfers"]').length) {
   addressChannel.onError(() => store.dispatch({
     type: 'CHANNEL_DISCONNECTED'
   }))
-  addressChannel.on('forward_transfer', batchChannel((msgs) => store.dispatch({
-    type: 'RECEIVED_NEW_FORWARD_TRANSFER_BATCH',
+  addressChannel.on('fee_payment', batchChannel((msgs) => store.dispatch({
+    type: 'RECEIVED_NEW_FEE_PAYMENT_BATCH',
     msgs: humps.camelizeKeys(msgs)
   })))
 }

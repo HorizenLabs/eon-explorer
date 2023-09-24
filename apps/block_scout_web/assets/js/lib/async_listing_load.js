@@ -28,7 +28,7 @@ import '../app'
  *   data-no-first-loading attribute can also be used along with data-async-load
  *   to prevent loading items for the first time
  *
- * If the page has a redux associated with, you need to connect the reducers instead of creating
+ * If the page has a redux associated with it, you need to connect the reducers instead of creating
  * the store using the `createStore`. For instance:
  *
  *   // my_page.js

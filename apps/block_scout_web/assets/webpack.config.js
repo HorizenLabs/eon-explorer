@@ -46,6 +46,7 @@ const appJs =
       'address-token-transfers': './js/pages/address/token_transfers.js',
       'address-coin-balances': './js/pages/address/coin_balances.js',
       'address-forward-transfers': './js/pages/address/forward_transfers.js',
+      'address-fee-payments': './js/pages/address/fee_payments.js',
       'address-internal-transactions': './js/pages/address/internal_transactions.js',
       'address-logs': './js/pages/address/logs.js',
       'address-validations': './js/pages/address/validations.js',

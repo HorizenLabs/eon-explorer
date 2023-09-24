@@ -1,9 +1,7 @@
-defmodule BlockScoutWeb.AddressForwardTransferController do
+defmodule BlockScoutWeb.AddressFeePaymentController do
   @moduledoc """
-    Display all the Forward Transfers that terminate at this Address.
+    Display all the Fee Payments that terminate at this Address.
   """
-
-  require Logger;
 
   use BlockScoutWeb, :controller
 
@@ -13,14 +11,14 @@ defmodule BlockScoutWeb.AddressForwardTransferController do
 
   import BlockScoutWeb.Models.GetAddressTags, only: [get_address_tags: 2]
 
-  alias BlockScoutWeb.{AccessHelper, Controller, ForwardTransferView}
+  alias BlockScoutWeb.{AccessHelper, Controller, FeePaymentView}
   alias Explorer.Chain.Wei
   alias Explorer.{Chain, Market}
 
   alias Indexer.Fetcher.CoinBalanceOnDemand
   alias Phoenix.View
 
-  @forward_transfer_necessity_by_association [
+  @fee_payment_necessity_by_association [
     necessity_by_association: %{
       [to_address: :names] => :optional,
       :block => :optional,
@@ -33,11 +31,11 @@ defmodule BlockScoutWeb.AddressForwardTransferController do
     with {:ok, address_hash} <- Chain.string_to_address_hash(address_hash_string),
          {:ok, address} <- Chain.hash_to_address(address_hash, address_options, false) do
       options =
-    @forward_transfer_necessity_by_association
+    @fee_payment_necessity_by_association
         |> Keyword.merge(paging_options(params))
         |> Keyword.merge(current_filter(params))
 
-      results_plus_one = Chain.address_to_forward_transfers(address_hash, options)
+      results_plus_one = Chain.address_to_fee_payments(address_hash, options)
       {results, next_page} = split_list_by_page(results_plus_one)
 
       next_page_url =
@@ -46,7 +44,7 @@ defmodule BlockScoutWeb.AddressForwardTransferController do
             nil
 
           next_page_params ->
-            address_forward_transfer_path(
+            address_fee_payment_path(
               conn,
               :index,
               address,
@@ -57,11 +55,10 @@ defmodule BlockScoutWeb.AddressForwardTransferController do
       items_json =
         Enum.map(results, fn result ->
             View.render_to_string(
-              ForwardTransferView,
+              FeePaymentView,
               "_tile.html",
-              conn: conn,
-              current_address: address,
-              forward_transfer: result
+              fee_payment: result,
+              conn: conn
             )
         end)
       json(conn, %{items: items_json, next_page_path: next_page_url})

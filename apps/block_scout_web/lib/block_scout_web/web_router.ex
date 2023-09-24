@@ -189,6 +189,13 @@ defmodule BlockScoutWeb.WebRouter do
       )
 
       resources(
+        "/fee-payments",
+        AddressFeePaymentController,
+        only: [:index],
+        as: :fee_payment
+      )
+
+      resources(
         "/validations",
         AddressValidationController,
         only: [:index],

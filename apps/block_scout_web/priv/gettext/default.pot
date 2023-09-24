@@ -673,6 +673,12 @@ msgstr ""
 msgid "Forward Transfers"
 msgstr ""
 
+#: lib/block_scout_web/templates/address/_tabs.html.eex:42
+#: lib/block_scout_web/views/address_view.ex:383
+#, elixir-autogen, elixir-format
+msgid "Fee Payments"
+msgstr ""
+
 #: lib/block_scout_web/templates/transaction/_decoded_input_body.html.eex:55
 #, elixir-autogen, elixir-format
 msgid "Collapse"

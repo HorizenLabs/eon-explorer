@@ -1,7 +1,7 @@
 
 <div
   class="tile tile-type-fee-payments"
-  data-identifier-hash="<%= @fee_payment.to_address_hash %>"
+  data-identifier="<%= identifier(@fee_payment)%>"
 >
   <div class="row tile-body" data-selector="token-transfers-toggle" data-test="chain_transaction">
     <div class="tile-transaction-type-block col-md-2 d-flex flex-row flex-md-column">
