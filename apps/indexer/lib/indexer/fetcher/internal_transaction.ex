@@ -94,7 +94,6 @@ defmodule Indexer.Fetcher.InternalTransaction do
               tracer: Tracer
             )
   def run(block_numbers, json_rpc_named_arguments) do
-    :timer.sleep(Keyword.get(defaults(), :wait_time))
     unique_numbers =
       block_numbers
       |> Enum.uniq()
