@@ -3,7 +3,7 @@ defmodule BlockScoutWeb.AddressForwardTransferController do
     Display all the Forward Transfers that terminate at this Address.
   """
 
-  require Logger;
+  require Logger
 
   use BlockScoutWeb, :controller
 
@@ -22,18 +22,18 @@ defmodule BlockScoutWeb.AddressForwardTransferController do
 
   @forward_transfer_necessity_by_association [
     necessity_by_association: %{
-      [to_address: :names] => :optional,
       :block => :optional,
-      [to_address: :smart_contract] => :optional
+      :to_address => :optional
     }
   ]
 
   def index(conn, %{"address_id" => address_hash_string, "type" => "JSON"} = params) do
     address_options = [necessity_by_association: %{:names => :optional, :smart_contract => :optional}]
+
     with {:ok, address_hash} <- Chain.string_to_address_hash(address_hash_string),
          {:ok, address} <- Chain.hash_to_address(address_hash, address_options, false) do
       options =
-    @forward_transfer_necessity_by_association
+        @forward_transfer_necessity_by_association
         |> Keyword.merge(paging_options(params))
         |> Keyword.merge(current_filter(params))
 
@@ -56,14 +56,15 @@ defmodule BlockScoutWeb.AddressForwardTransferController do
 
       items_json =
         Enum.map(results, fn result ->
-            View.render_to_string(
-              ForwardTransferView,
-              "_tile.html",
-              conn: conn,
-              current_address: address,
-              forward_transfer: result
-            )
+          View.render_to_string(
+            ForwardTransferView,
+            "_tile.html",
+            conn: conn,
+            current_address: address,
+            forward_transfer: result
+          )
         end)
+
       json(conn, %{items: items_json, next_page_path: next_page_url})
     else
       :error ->
@@ -87,7 +88,7 @@ defmodule BlockScoutWeb.AddressForwardTransferController do
     with {:ok, address_hash} <- Chain.string_to_address_hash(address_hash_string),
          {:ok, address} <- Chain.hash_to_address(address_hash),
          {:ok, false} <- AccessHelper.restricted_access?(address_hash_string, params) do
-        render(
+      render(
         conn,
         "index.html",
         address: address,
@@ -134,6 +135,4 @@ defmodule BlockScoutWeb.AddressForwardTransferController do
         end
     end
   end
-
-
 end

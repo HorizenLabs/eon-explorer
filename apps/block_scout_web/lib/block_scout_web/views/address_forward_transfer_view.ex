@@ -3,6 +3,4 @@ defmodule BlockScoutWeb.AddressForwardTransferView do
 
   alias BlockScoutWeb.AccessHelper
   alias Explorer.Chain.Address
-
-  
 end

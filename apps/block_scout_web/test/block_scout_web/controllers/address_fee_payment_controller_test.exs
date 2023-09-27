@@ -53,7 +53,8 @@ defmodule BlockScoutWeb.AddressFeePaymentControllerTest do
 
       fp = insert(:fee_payment, to_address_hash: address.hash, block_number: block.number, block_hash: block.hash)
 
-      another_fp = insert(:fee_payment, to_address_hash: address.hash, block_number: block.number, block_hash: block.hash, index: 1)
+      another_fp =
+        insert(:fee_payment, to_address_hash: address.hash, block_number: block.number, block_hash: block.hash, index: 1)
 
       conn = get(conn, address_fee_payment_path(conn, :index, Address.checksum(address), %{"type" => "JSON"}))
 
@@ -64,6 +65,7 @@ defmodule BlockScoutWeb.AddressFeePaymentControllerTest do
                Enum.any?(fee_payment_tiles, &String.contains?(&1, fee_payment_hash))
              end)
     end
+
     test "returns next page of results based on last seen transaction", %{conn: conn} do
       address = insert(:address)
 
@@ -72,17 +74,28 @@ defmodule BlockScoutWeb.AddressFeePaymentControllerTest do
         50
         |> insert_list(:block)
 
-
       second_page_fps =
-        Enum.map(blocks, & insert(:fee_payment, to_address_hash: address.hash, block_number: &1.number, block_hash: &1.hash, index: Enum.random(0..9)))
+        Enum.map(
+          blocks,
+          &insert(:fee_payment,
+            to_address_hash: address.hash,
+            block_number: &1.number,
+            block_hash: &1.hash,
+            index: Enum.random(0..9)
+          )
+        )
 
       # add one more, this will be the newest, 51st, we will pretend it page one's last entry
       last_pg1_block = insert(:block)
+
       %FeePayment{block_number: last_pg1_block_number, index: last_pg1_index} =
         :fee_payment
-        |> insert(to_address_hash: address.hash, block_number: last_pg1_block.number, block_hash: last_pg1_block.hash, index: Enum.random(0..9))
-
-
+        |> insert(
+          to_address_hash: address.hash,
+          block_number: last_pg1_block.number,
+          block_hash: last_pg1_block.hash,
+          index: Enum.random(0..9)
+        )
 
       conn =
         get(conn, address_fee_payment_path(BlockScoutWeb.Endpoint, :index, Address.checksum(address.hash)), %{
@@ -92,13 +105,14 @@ defmodule BlockScoutWeb.AddressFeePaymentControllerTest do
         })
 
       fee_payment_tiles = json_response(conn, 200)["items"]
-      second_page_fp_block_numbers = Enum.map(second_page_fps, fn second_page_fp -> to_string(second_page_fp.block_number) end)
 
+      second_page_fp_block_numbers =
+        Enum.map(second_page_fps, fn second_page_fp -> to_string(second_page_fp.block_number) end)
 
       # expect page two to be entries for second_page_blocks
       assert Enum.all?(second_page_fp_block_numbers, fn fee_payment_block_number ->
                Enum.any?(fee_payment_tiles, &String.contains?(&1, fee_payment_block_number))
              end)
     end
-end
+  end
 end

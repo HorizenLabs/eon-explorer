@@ -3,6 +3,4 @@ defmodule BlockScoutWeb.AddressFeePaymentView do
 
   alias BlockScoutWeb.AccessHelper
   alias Explorer.Chain.Address
-
-
 end
