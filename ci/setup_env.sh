@@ -4,12 +4,16 @@ set -eo pipefail
 IS_A_RELEASE="false"
 export PROD_RELEASE_BRANCH="${PROD_RELEASE_BRANCH:-master}"
 
+mix_version_tag="$(grep -oE 'version: "[0-9]+\.[0-9]+\.[0-9]+(-[0-9]+)?(-RC[0-9]+)?"' mix.exs | cut -d ' ' -f2 | tr -d '"')"
+
 if [ -z "${TRAVIS_TAG}" ]; then
   echo "TRAVIS_TAG:                     No TAG"
 else
   echo "TRAVIS_TAG:                     ${TRAVIS_TAG}"
 fi
 echo "Production release branch is:   ${PROD_RELEASE_BRANCH}"
+echo "Root mix.exs version:           ${mix_version_tag}"
+
 
 # Functions
 function import_gpg_keys() {
@@ -43,11 +47,29 @@ function check_signed_tag() {
   fi
 }
 
+function  check_versions_match () {
+  local versions_to_check=("$@")
+
+  if [ "${#versions_to_check[@]}" -eq 1 ]; then
+    echo "Warning: ${FUNCNAME[0]} requires more than one version to be able to compare with.  The build is not going to be released ..."
+    export IS_A_RELEASE="false" && return
+  fi
+
+  for (( i=0; i<((${#versions_to_check[@]}-1)); i++ )); do
+    [ "${versions_to_check[$i]}" != "${versions_to_check[(($i+1))]}" ] &&
+    { echo -e "Warning: one or more module(s) versions do NOT match. The build is not going to be released ... !!!\nThe versions are ${versions_to_check[*]}"; export IS_A_RELEASE="false" && return; }
+  done
+
+  export IS_A_RELEASE="true"
+}
+
 # empty key.asc file in case we're not signing
 touch "${HOME}/key.asc"
 
 # Checking if it a release build
 if [ -n "${TRAVIS_TAG}" ]; then
+
+  check_versions_match "${TRAVIS_TAG}" "${mix_version_tag}"
 
   if [ -z "${PROD_MAINTAINERS_KEYS:-}" ]; then
     echo "Warning: PROD_MAINTAINERS_KEYS variable is not set. Make sure to set it up for PROD|DEV release build !!!"
