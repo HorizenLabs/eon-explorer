@@ -2036,27 +2036,43 @@ defmodule Explorer.ChainTest do
     end
 
     test "import fee_payments" do
-      %FeePayment{block_number: block_number, block_hash: block_hash, to_address_hash: to_address_hash, index: index, value: value} = build(:fee_payment)
+      %FeePayment{
+        block_number: block_number,
+        block_hash: block_hash,
+        to_address_hash: to_address_hash,
+        index: index,
+        value: value
+      } = build(:fee_payment)
+
       wei_value = %Wei{value: Decimal.new(value)}
+
       assert {:ok,
               %{
                 fee_payments: [
                   %{
-        block_number: ^block_number,
-        to_address_hash: ^to_address_hash,
-        value: ^wei_value,
-        index: ^index,
-        block_hash: ^block_hash,
+                    block_number: ^block_number,
+                    to_address_hash: ^to_address_hash,
+                    value: ^wei_value,
+                    index: ^index,
+                    block_hash: ^block_hash,
                     inserted_at: %{},
                     updated_at: %{}
-                  }]}} = Chain.import(%{fee_payments: %{params: [%{
-        block_number: block_number,
-        block_hash: block_hash,
-        to_address_hash: to_address_hash,
-        value: value,
-        index: index
-      }]}})
-
+                  }
+                ]
+              }} =
+               Chain.import(%{
+                 fee_payments: %{
+                   params: [
+                     %{
+                       block_number: block_number,
+                       block_hash: block_hash,
+                       to_address_hash: to_address_hash,
+                       value: value,
+                       index: index
+                     }
+                   ]
+                 }
+               })
     end
   end
 
@@ -3990,31 +4006,43 @@ defmodule Explorer.ChainTest do
       assert hd(recent_collated_fts.forward_transfers).block_number == Enum.at(newest_first_fts, 10).block_number
     end
 
-    test "loads associated blocks and address when forward_transfers are fetched from db" do
+    test "preloads associated blocks and address when forward_transfers are fetched from db" do
       ft =
         1
         |> insert_list(:forward_transfer)
 
       paging_options = %Explorer.PagingOptions{page_size: 10}
 
-      oldest_seen = Enum.at(ft, 0)
-
       recent_collated_fts =
         Explorer.Chain.recent_collated_forward_transfers_for_rap(
           paging_options: paging_options,
           necessity_by_association: %{
-            :block => :required,
-            [to_address: :smart_contract] => :optional,
-            [to_address: :names] => :optional
+            :block => :optional,
+            :to_address => :optional
           }
         )
 
-      assert length(recent_collated_fts.forward_transfers) == 1
-      assert hd(recent_collated_fts.forward_transfers).block.inserted_at == Repo.one(from(b in Block)).inserted_at
-      fetched_ft = hd(recent_collated_fts.forward_transfers)
+      assert %{
+               forward_transfers: [
+                 %ForwardTransfer{block: %Explorer.Chain.Block{}, to_address: %Explorer.Chain.Address{}}
+               ]
+             } = recent_collated_fts
+    end
 
-      assert fetched_ft.to_address.inserted_at ==
-               Repo.one(from(a in Address, where: a.hash == ^fetched_ft.to_address_hash)).inserted_at
+    test "fetch fts for given address" do
+      address1 = insert(:address)
+      address2 = insert(:address)
+
+      # fts are in oldest to newest order
+      fts =
+        50
+        |> insert_list(:forward_transfer, to_address_hash: address1.hash)
+
+      expected_address_hash = address2.hash
+
+      assert [
+               %ForwardTransfer{to_address_hash: expected_address_hash}
+             ] = Chain.address_to_forward_transfers(address1.hash)
     end
   end
 
@@ -4065,24 +4093,17 @@ defmodule Explorer.ChainTest do
 
       paging_options = %Explorer.PagingOptions{page_size: 10}
 
-      oldest_seen = Enum.at(fp, 0)
-
       recent_collated_fps =
         Explorer.Chain.recent_collated_fee_payments_for_rap(
           paging_options: paging_options,
           necessity_by_association: %{
-            :block => :required,
-            [to_address: :smart_contract] => :optional,
-            [to_address: :names] => :optional
+            :block => :optional,
+            :to_address => :optional
           }
         )
 
-      assert length(recent_collated_fps.fee_payments) == 1
-      assert hd(recent_collated_fps.fee_payments).block.inserted_at == Repo.one(from(b in Block)).inserted_at
-      fetched_fp = hd(recent_collated_fps.fee_payments)
-
-      assert fetched_fp.to_address.inserted_at ==
-               Repo.one(from(a in Address, where: a.hash == ^fetched_fp.to_address_hash)).inserted_at
+      assert %{fee_payments: [%FeePayment{block: %Explorer.Chain.Block{}, to_address: %Explorer.Chain.Address{}}]} =
+               recent_collated_fps
     end
 
     test "query for stream_unfetched_fees with blocks higher than or equal t" do

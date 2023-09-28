@@ -18,9 +18,8 @@ defmodule BlockScoutWeb.FeePaymentController do
 
   @default_options [
     necessity_by_association: %{
-      :block => :required,
-      [to_address: :names] => :optional,
-      [to_address: :smart_contract] => :optional
+      :block => :optional,
+      :to_address => :optional
     }
   ]
 

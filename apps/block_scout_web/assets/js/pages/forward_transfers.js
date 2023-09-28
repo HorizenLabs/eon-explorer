@@ -89,7 +89,7 @@ if ($forwardTransfersListPage.length) {
     window.loading = true
   }
 
-  const store = createAsyncLoadStore(reducer, initialState, 'dataset.identifierHash')
+  const store = createAsyncLoadStore(reducer, initialState, 'dataset.identifier')
   connectElements({ store, elements })
 
   const forwardTransfersChannel = socket.channel('forward-transfers:new_transaction')
