@@ -650,7 +650,7 @@ config :indexer, Indexer.Fetcher.TokenInstance.Sanitize,
 config :indexer, Indexer.Fetcher.InternalTransaction,
   batch_size: ConfigHelper.parse_integer_env_var("INDEXER_INTERNAL_TRANSACTIONS_BATCH_SIZE", 1),
   concurrency: ConfigHelper.parse_integer_env_var("INDEXER_INTERNAL_TRANSACTIONS_CONCURRENCY", 1),
-  wait_time: ConfigHelper.parse_integer_env_var("INDEXER_INTERNAL_TRANSACTIONS_WAIT", 1000),
+  rpc_request_size: ConfigHelper.parse_integer_env_var("INDEXER_INTERNAL_TRANSACTIONS_RPC_REQUEST_SIZE", 5),
   indexing_finished_threshold:
     ConfigHelper.parse_integer_env_var("INDEXER_INTERNAL_TRANSACTIONS_INDEXING_FINISHED_THRESHOLD", 1000)
 
