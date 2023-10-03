@@ -3,6 +3,7 @@ defmodule Indexer.MixProject do
 
   def project do
     [
+      version: Mix.Project.config()[:version],
       aliases: aliases(),
       app: :indexer,
       build_path: "../../_build",
@@ -13,8 +14,7 @@ defmodule Indexer.MixProject do
       elixir: "~> 1.13",
       elixirc_paths: elixirc_paths(Mix.env()),
       lockfile: "../../mix.lock",
-      start_permanent: Mix.env() == :prod,
-      version: "5.2.1"
+      start_permanent: Mix.env() == :prod
     ]
   end
 
