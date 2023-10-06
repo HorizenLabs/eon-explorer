@@ -89,7 +89,7 @@ if ($feePaymentsListPage.length) {
     window.loading = true
   }
 
-  const store = createAsyncLoadStore(reducer, initialState, 'dataset.identifierHash')
+  const store = createAsyncLoadStore(reducer, initialState, 'dataset.identifier')
   connectElements({ store, elements })
 
   const feePaymentsChannel = socket.channel('fee-payments:new_transaction')

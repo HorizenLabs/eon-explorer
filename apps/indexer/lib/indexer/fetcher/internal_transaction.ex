@@ -24,7 +24,6 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
   @default_max_batch_size 1
   @default_max_concurrency 1
-  @default_wait_time 1000
 
   @doc """
   Asynchronously fetches internal transactions.
@@ -94,7 +93,6 @@ defmodule Indexer.Fetcher.InternalTransaction do
               tracer: Tracer
             )
   def run(block_numbers, json_rpc_named_arguments) do
-    :timer.sleep(Keyword.get(defaults(), :wait_time))
     unique_numbers =
       block_numbers
       |> Enum.uniq()
@@ -205,7 +203,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
           transactions ->
             try do
-              EthereumJSONRPC.fetch_internal_transactions(transactions, json_rpc_named_arguments)
+              chunk_and_reduce(transactions, json_rpc_named_arguments)
             catch
               :exit, error ->
                 {:error, error, __STACKTRACE__}
@@ -364,12 +362,21 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
   defp invalidate_block_from_error(_error_data), do: :ok
 
+  defp chunk_and_reduce(tx_list, json_rpc_named_arguments) do
+    chunk_size = Application.get_env(:indexer, __MODULE__)[:rpc_request_size]
+    list_of_chunks = Enum.chunk_every(tx_list, chunk_size)
+    acc = Enum.reduce(list_of_chunks, [], fn list, acc ->
+      {:ok, internal_tx_list} = EthereumJSONRPC.fetch_internal_transactions(list, json_rpc_named_arguments)
+      Enum.concat(acc, internal_tx_list)
+    end)
+    {:ok, acc}
+  end
+
   defp defaults do
     [
       flush_interval: :timer.seconds(3),
       max_concurrency: Application.get_env(:indexer, __MODULE__)[:concurrency] || @default_max_concurrency,
       max_batch_size: Application.get_env(:indexer, __MODULE__)[:batch_size] || @default_max_batch_size,
-      wait_time: Application.get_env(:indexer, __MODULE__)[:wait_time] || @default_wait_time,
       task_supervisor: Indexer.Fetcher.InternalTransaction.TaskSupervisor,
       metadata: [fetcher: :internal_transaction]
     ]

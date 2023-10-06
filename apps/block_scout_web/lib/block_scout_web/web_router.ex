@@ -182,6 +182,20 @@ defmodule BlockScoutWeb.WebRouter do
       )
 
       resources(
+        "/forward-transfers",
+        AddressForwardTransferController,
+        only: [:index],
+        as: :forward_transfer
+      )
+
+      resources(
+        "/fee-payments",
+        AddressFeePaymentController,
+        only: [:index],
+        as: :fee_payment
+      )
+
+      resources(
         "/validations",
         AddressValidationController,
         only: [:index],

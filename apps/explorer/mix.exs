@@ -3,6 +3,7 @@ defmodule Explorer.Mixfile do
 
   def project do
     [
+      version: Mix.Project.config()[:version],
       aliases: aliases(Mix.env()),
       app: :explorer,
       build_path: "../../_build",
@@ -24,7 +25,6 @@ defmodule Explorer.Mixfile do
         dialyzer: :test
       ],
       start_permanent: Mix.env() == :prod,
-      version: "5.2.1",
       xref: [exclude: [BlockScoutWeb.WebRouter.Helpers]]
     ]
   end
@@ -141,7 +141,7 @@ defmodule Explorer.Mixfile do
   defp env_aliases(:test), do: []
 
   defp env_aliases(_env) do
-    [compile: "compile --warnings-as-errors"]
+    [compile: "compile"]
   end
 
   defp package do

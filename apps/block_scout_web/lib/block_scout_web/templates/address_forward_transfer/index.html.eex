@@ -1,0 +1,45 @@
+<section class="container" >
+
+  <% is_proxy = BlockScoutWeb.AddressView.smart_contract_is_proxy?(@address) %>
+
+  <%= render BlockScoutWeb.AddressView, "overview.html", address: @address, is_proxy: is_proxy, conn: @conn, exchange_rate: @exchange_rate, coin_balance_status: @coin_balance_status, counters_path: @counters_path, tags: @tags %>
+
+  <section data-page="address-forward-transfers">
+    <div class="card">
+      <%= render BlockScoutWeb.AddressView, "_tabs.html", address: @address, is_proxy: is_proxy, conn: @conn %>
+      <div class="card-body" data-async-listing="<%= @current_path %>">
+        <%= render BlockScoutWeb.CommonComponentsView, "_channel_disconnected_message.html", text: gettext("Connection Lost, click to load newer forward transfers") %>
+        <div class="clearfix">
+          <h2 class="card-title float-left"><%= gettext "Forward Transfers" %></h2>
+          <div class="top-pagination-outer-container float-right">
+          <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", position: "top", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
+          </div>
+        </div>
+        <div data-selector="channel-batching-message" style="display: none;">
+          <div data-selector="reload-transactions-button" class="alert alert-info">
+            <a href="#" class="alert-link"><span data-selector="channel-batching-count"></span> <%= gettext "More transactions have come in" %></a>
+          </div>
+        </div>
+        <button data-error-message class="alert alert-danger col-12 text-left" style="display: none;">
+          <span href="#" class="alert-link"><%= gettext("Something went wrong, click to reload.") %></span>
+        </button>
+        
+        <div data-empty-response-message style="display: none;">
+          <div class="tile tile-muted text-center" data-selector="empty-transactions-list">
+            <%= gettext "There are no forward transfers for this address." %>
+          </div>
+        </div>
+
+        <div data-items>
+          <%= render BlockScoutWeb.CommonComponentsView, "_tile-loader.html" %>
+        </div>
+
+        <div class="transaction-bottom-panel">
+          <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", position: "bottom", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
+        </div>
+
+      </div>
+    </div>
+    <script defer data-cfasync="false" src="<%= static_path(@conn, "/js/address-forward-transfers.js") %>"></script>
+  </section>
+</section>

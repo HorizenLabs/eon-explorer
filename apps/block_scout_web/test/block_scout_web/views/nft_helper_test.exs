@@ -24,5 +24,20 @@ defmodule BlockScoutWeb.NFTHelperTest do
       assert "https://ipfs.io/ipfs/baFybeid4ed2ua7fwupv4nx2ziczr3edhygl7ws3yx6y2juon7xakgj6cfm/51.json" ==
                NFTHelper.compose_ipfs_url(url)
     end
+
+    test "transforms ipfs link with percentage character" do
+      url = "IpFs://baFybeid4ed2ua7fwupv4nx2ziczr3edhygl7ws3yx6y2juon7xakgj6cfm%2051.json"
+
+      assert "https://ipfs.io/ipfs/baFybeid4ed2ua7fwupv4nx2ziczr3edhygl7ws3yx6y2juon7xakgj6cfm%2051.json" ==
+               NFTHelper.retrieve_image(url)
+    end
+
+    test "transforms ipfs link with space" do
+      url = "IpFs://baFybeid4ed2ua7fwupv4nx2ziczr3edhygl7ws3yx6y2juon7xakgj6cfm 51.json"
+
+      assert "https://ipfs.io/ipfs/baFybeid4ed2ua7fwupv4nx2ziczr3edhygl7ws3yx6y2juon7xakgj6cfm%2051.json" ==
+               NFTHelper.retrieve_image(url)
+    end
+
   end
 end
