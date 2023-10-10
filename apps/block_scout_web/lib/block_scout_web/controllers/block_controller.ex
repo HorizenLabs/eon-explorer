@@ -83,11 +83,11 @@ defmodule BlockScoutWeb.BlockController do
             |> Map.delete("type")
             |> Map.put("block_type", block_type)
 
-          blocks_path(
-            conn,
-            :index,
-            params_with_block_type
-          )
+          if block_type == "Reorg" do
+            reorg_path(conn, :reorg, params_with_block_type)
+          else
+            blocks_path(conn, :index, params_with_block_type)
+          end
       end
 
     json(
