@@ -1983,7 +1983,7 @@ msgstr ""
 
 #: lib/block_scout_web/templates/address/overview.html.eex:185
 #, elixir-autogen, elixir-format
-msgid "Number of transactions related to this address."
+msgid "Number of transactions related to this address, excluding custom transactions (e.g., fee payments, forward transfers)."
 msgstr ""
 
 #: lib/block_scout_web/templates/tokens/overview/_details.html.eex:118
@@ -2627,7 +2627,7 @@ msgstr ""
 
 #: lib/block_scout_web/templates/block/overview.html.eex:79
 #, elixir-autogen, elixir-format
-msgid "The number of transactions in the block."
+msgid "Number of transactions in this block, excluding custom transactions (e.g., fee payments, forward transfers)."
 msgstr ""
 
 #: lib/block_scout_web/templates/smart_contract/_functions.html.eex:46
