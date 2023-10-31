@@ -182,7 +182,7 @@
           <dl class="row address-transactions-count-item">
             <dt class="col-sm-4 col-md-4 col-lg-3 text-muted">
               <%= render BlockScoutWeb.CommonComponentsView, "_i_tooltip_2.html",
-              text: gettext("Number of transactions related to this address.") %>
+              text: gettext("Number of transactions related to this address, excluding custom transactions (e.g., fee payments, forward transfers).") %>
               <%= gettext("Transactions") %>
             </dt>
             <dd class="col-sm-8 col-md-8 col-lg-9" data-test="address_transaction_count">
