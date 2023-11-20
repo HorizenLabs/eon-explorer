@@ -42,12 +42,9 @@ export class Transactions {
 
     async findTransactionByHash(hash: string): Promise<TransactionRow | null> {
         try {
-            const transactionCount = await this.container.locator(SELECTORS.TRANSACTION.BASE).count();
-            for (let i = 1; i <= transactionCount; i++) {
-                const row = new TransactionRow(this.page, hash);
-                if ((await row.getHash()) === hash) {
-                    return row;
-                }
+            const row = new TransactionRow(this.page, hash);
+            if ((await row.getHash()) === hash) {
+                return row;
             }
 
             return null;
@@ -146,7 +143,7 @@ export class TransactionRow {
     }
 
     async getToAddress(): Promise<string | null> {
-        return await this.toAddress.textContent();
+        return await this.toContractAddress.textContent();
     }
 
     async getValue(): Promise<string | null> {
