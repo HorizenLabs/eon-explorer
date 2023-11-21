@@ -1,0 +1,90 @@
+# Node.js dependencies
+node_modules/
+
+# Production build files
+/dist
+/build
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnp-debug.log*
+
+# TypeScript compiled files
+**/*.tsbuildinfo
+/out
+
+# Editor directories and files
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Dotenv environment variables files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Playwright's generated files
+/test-results/
+/pw-browsers/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Local development
+/local/
+
+# Optional: Exclude specific environment files if used
+/.env.*.local
+
+# Debug log from TypeScript
+*.log
+
+# Coverage directory used by tools like istanbul
+/coverage
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Compiled output
+/*.js
+!jest.config.js
+!postcss.config.js
+!tailwind.config.js
+!vite.config.js
+!*.d.ts
+
+# Storybook build output
+/storybook-static
+
+# Miscellaneous
+*.swp
+*.lock
+hs_err_pid*
+
+# Files that might appear in the root of a project
+npm-debug.log
+yarn-error.log
+
+# End-of-line conversions
+*.bat text eol=crlf
+
+# Dependency directories
+jspm_packages/
+
+# Typings
+typings/
+
+# Optional eslint cache
+.eslintcache
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Plug'n'Play compatibility
+.pnp.*
