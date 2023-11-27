@@ -68,11 +68,46 @@ defmodule Explorer.ExchangeRates.Source.CoinGecko do
     end)
   end
 
+  def add_token_address_for_platform(data, id, platform, value) do
+    Enum.map(data, fn entry ->
+      if entry["id"] == id do
+        %{
+          entry | "platforms" => Map.put(entry["platforms"], platform, value)
+        }
+      else
+        entry
+      end
+    end)
+  end
+
+  defp add_wrapped_zen(supported_coins) do
+    wrapped_zen = %{
+      "id" => "wrapped-zen",
+      "platforms" => %{
+        "horizen-eon" => "0xF5cB8652a84329A2016A386206761f455bCEDab6"
+      }
+    }
+    [wrapped_zen | supported_coins]
+  end
+
   @impl Source
   def format_data(supported_coins) when is_list(supported_coins) do
-    platform = platform()
 
-    supported_coins
+    #platform = platform()
+    platform = "horizen-eon"
+    supported_coins_updated = add_token_address_for_platform(supported_coins, "weth", "horizen-eon", "0x2c2E0B0c643aB9ad03adBe9140627A645E99E054")
+    supported_coins_updated = add_token_address_for_platform(supported_coins_updated, "wrapped-avax", "horizen-eon", "0x6318374DFb468113E06d3463ec5Ed0B6Ae0F0982")
+    supported_coins_updated = add_token_address_for_platform(supported_coins_updated, "usd-coin", "horizen-eon", "0xCc44eB064CD32AAfEEb2ebb2a47bE0B882383b53")
+    supported_coins_updated = add_token_address_for_platform(supported_coins_updated, "tether", "horizen-eon", "0xA167bcAb6791304EDa9B636C8beEC75b3D2829E6")
+    supported_coins_updated = add_token_address_for_platform(supported_coins_updated, "dai", "horizen-eon", "0x38C2a6953F86a7453622B1E7103b738239728754")
+    supported_coins_updated = add_token_address_for_platform(supported_coins_updated, "chainlink", "horizen-eon", "0xDF8DBA35962Aa0fAD7ade0Df07501c54Ec7c4A89")
+    supported_coins_updated = add_token_address_for_platform(supported_coins_updated, "wrapped-bitcoin", "horizen-eon", "0x1d7fb99AED3C365B4DEf061B7978CE5055Dfc1e7")
+
+
+    # Add the new entry for wrapped-zen
+    supported_coins_updated = add_wrapped_zen(supported_coins_updated)
+
+    supported_coins_updated
     |> Enum.reduce([], fn
       %{"platforms" => %{^platform => token_contract_hash_str}}, acc ->
         case Chain.Hash.Address.cast(token_contract_hash_str) do
@@ -115,9 +150,10 @@ defmodule Explorer.ExchangeRates.Source.CoinGecko do
 
   @impl Source
   def source_url(token_addresses) when is_list(token_addresses) do
-    joined_addresses = token_addresses |> Enum.map_join(",", &to_string/1)
+    platform = "avalanche"
+    joined_addresses = "0x49d5c2bdffac6ce2bfdb6640f4f80f226bc10bab,0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7,0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e,0x9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7,0xd586e7f844cea2f87f50152665bcbc2c279d8d70,0x5947bb275c521040051d82396192181b413227a3,0x50b7545627a5162f82a992c33b87adc75187b218"
 
-    "#{base_url()}/simple/token_price/#{platform()}?vs_currencies=#{currency()}&include_market_cap=true&contract_addresses=#{joined_addresses}"
+    "#{base_url()}/simple/token_price/#{platform}?vs_currencies=#{currency()}&include_market_cap=true&contract_addresses=#{joined_addresses}"
   end
 
   @impl Source
