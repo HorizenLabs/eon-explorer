@@ -90,19 +90,26 @@ defmodule Explorer.ExchangeRates.Source.CoinGecko do
     [wrapped_zen | supported_coins]
   end
 
+  @doc """
+  In the format_data method the wrapped token addresses will be added to the response of the coingecko api/v3/coins/list api (triggered by the token_exchange_rate module)
+  Moreover a new entry with id wrapped-zen is added since it is not present in the api response
+  These addresses will find match in the one currently present in the sidechain and they will put in the state variable tokens_to_fetch of the module token_exchange_rate
+  A tokens_to_fetch variable not empty will trigger a call to the coingecko v3/simple/token_price/<platform> to retrieve the wrapped token prices and market cap
+  """
   @impl Source
   def format_data(supported_coins) when is_list(supported_coins) do
 
     #platform = platform()
     platform = "horizen-eon"
-    supported_coins_updated = add_token_address_for_platform(supported_coins, "weth", "horizen-eon", "0x2c2E0B0c643aB9ad03adBe9140627A645E99E054")
-    supported_coins_updated = add_token_address_for_platform(supported_coins_updated, "wrapped-avax", "horizen-eon", "0x6318374DFb468113E06d3463ec5Ed0B6Ae0F0982")
-    supported_coins_updated = add_token_address_for_platform(supported_coins_updated, "usd-coin", "horizen-eon", "0xCc44eB064CD32AAfEEb2ebb2a47bE0B882383b53")
-    supported_coins_updated = add_token_address_for_platform(supported_coins_updated, "tether", "horizen-eon", "0xA167bcAb6791304EDa9B636C8beEC75b3D2829E6")
-    supported_coins_updated = add_token_address_for_platform(supported_coins_updated, "dai", "horizen-eon", "0x38C2a6953F86a7453622B1E7103b738239728754")
-    supported_coins_updated = add_token_address_for_platform(supported_coins_updated, "chainlink", "horizen-eon", "0xDF8DBA35962Aa0fAD7ade0Df07501c54Ec7c4A89")
-    supported_coins_updated = add_token_address_for_platform(supported_coins_updated, "wrapped-bitcoin", "horizen-eon", "0x1d7fb99AED3C365B4DEf061B7978CE5055Dfc1e7")
-
+    supported_coins_updated =
+      supported_coins
+      |> add_token_address_for_platform("weth", "horizen-eon", "0x2c2E0B0c643aB9ad03adBe9140627A645E99E054")
+      |> add_token_address_for_platform("wrapped-avax", "horizen-eon", "0x6318374DFb468113E06d3463ec5Ed0B6Ae0F0982")
+      |> add_token_address_for_platform("usd-coin", "horizen-eon", "0xCc44eB064CD32AAfEEb2ebb2a47bE0B882383b53")
+      |> add_token_address_for_platform("tether", "horizen-eon", "0xA167bcAb6791304EDa9B636C8beEC75b3D2829E6")
+      |> add_token_address_for_platform("dai", "horizen-eon", "0x38C2a6953F86a7453622B1E7103b738239728754")
+      |> add_token_address_for_platform("chainlink", "horizen-eon", "0xDF8DBA35962Aa0fAD7ade0Df07501c54Ec7c4A89")
+      |> add_token_address_for_platform("wrapped-bitcoin", "horizen-eon", "0x1d7fb99AED3C365B4DEf061B7978CE5055Dfc1e7")
 
     # Add the new entry for wrapped-zen
     supported_coins_updated = add_wrapped_zen(supported_coins_updated)
@@ -148,6 +155,10 @@ defmodule Explorer.ExchangeRates.Source.CoinGecko do
     "#{base_url()}/coins/list?include_platform=true"
   end
 
+  @doc """
+  The v3/simple/token_price/<platform> will be performed to the avalanche platform because it has all the wrapped tokens data required in the horizen-eon sidechain,
+  so the mothod sets the platform as avalanche for this call and passes all the avalanche wrapped token addresses present on the c-chain
+  """
   @impl Source
   def source_url(token_addresses) when is_list(token_addresses) do
     platform = "avalanche"

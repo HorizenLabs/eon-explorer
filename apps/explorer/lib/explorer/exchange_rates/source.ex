@@ -57,8 +57,16 @@ defmodule Explorer.ExchangeRates.Source do
     end
   end
 
+  @doc """
+  The wrapped ethereum and wrapped avax tokens have market cap value equal to zero from the coingecko api
+  To avoid displaying a circulating market cap we remove the usd_market_cap field from these addresses,
+  the circulating market cap displayed will be N/A
+  """
   defp remove_market_cap_if_certain_token(value, address) do
-    if address in ["0x49d5c2bdffac6ce2bfdb6640f4f80f226bc10bab", "0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7"] do
+    if address in [
+      "0x49d5c2bdffac6ce2bfdb6640f4f80f226bc10bab", # weth
+      "0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7"  # wrapped-avax
+    ] do
       Map.delete(value, "usd_market_cap")
     else
       value
@@ -82,8 +90,13 @@ defmodule Explorer.ExchangeRates.Source do
     ExchangeRates.lookup(symbol)
   end
 
+  @doc """
+  In the update_result_addresses method the addresses of the v3/simple/token_price/<platform> are swapped with their horizen-eon counterpart
+  Moreover the ZEN exchange rate is retrieved and an entry related to the wrapped-zen token is added to the result map
+  """
   defp update_result_addresses(result) do
 
+    # swap v3/simple/token_price/<platform> results addresses
     result
     |> swap_address("0x49d5c2bdffac6ce2bfdb6640f4f80f226bc10bab", "0x2c2E0B0c643aB9ad03adBe9140627A645E99E054") # weth
     |> swap_address("0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7", "0x6318374DFb468113E06d3463ec5Ed0B6Ae0F0982") # wrapped-avax
@@ -93,6 +106,7 @@ defmodule Explorer.ExchangeRates.Source do
     |> swap_address("0x5947bb275c521040051d82396192181b413227a3", "0xDF8DBA35962Aa0fAD7ade0Df07501c54Ec7c4A89") # chainlink
     |> swap_address("0x50b7545627a5162f82a992c33b87adc75187b218", "0x1d7fb99AED3C365B4DEf061B7978CE5055Dfc1e7") # wrapped-bitcoin
 
+    # retrieve ZEN exchange rate and map it to the result map
     zen_exchange_rate = get_exchange_rate("ZEN")
     zen_usd_value = case zen_exchange_rate do %Explorer.ExchangeRates.Token{usd_value: uv} -> uv; _ -> nil end
     zen_map = %{"0xF5cB8652a84329A2016A386206761f455bCEDab6" => %{"usd" => zen_usd_value}}
