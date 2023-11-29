@@ -57,61 +57,102 @@ defmodule Explorer.ExchangeRates.Source do
     end
   end
 
-  @doc """
-  The wrapped ethereum and wrapped avax tokens have market cap value equal to zero from the coingecko api
-  To avoid displaying a circulating market cap we remove the usd_market_cap field from these addresses,
-  the circulating market cap displayed will be N/A
-  """
-  defp remove_market_cap_if_certain_token(value, address) do
-    if address in [
-      "0x49d5c2bdffac6ce2bfdb6640f4f80f226bc10bab", # weth
-      "0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7"  # wrapped-avax
-    ] do
-      Map.delete(value, "usd_market_cap")
-    else
-      value
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  # retrieve from the pairs <external platform token address> - <eon token address> from the environment
+  @token_address_pairs "TOKEN_ADDRESS_PAIRS_EXT_PLATFORM_EON"
+  def fetch_token_address_pairs_for_swap do
+    token_list = System.fetch_env!(@token_address_pairs)
+    parse_token_list(token_list)
+  end
+
+  defp parse_token_list(token_list) do
+    token_pairs =
+      token_list
+      |> String.split(",")
+      |> Enum.map(&parse_token_pair/1)
+
+    Map.new(token_pairs)
+  end
+
+  defp parse_token_pair(token_pair) do
+    [name, address] = String.split(token_pair, "_")
+    {name, address}
+  end
+
+  # --------------------------------------------------------------------------------
+  # swap the addresses
+  defp swap_addresses(result_map, address_mapping) do
+    Enum.reduce(address_mapping, %{}, fn {old_address, new_address}, acc ->
+      swap_addresses(result_map, old_address, new_address, acc)
+    end)
+  end
+
+  defp swap_addresses(result_map, old_address, new_address, acc) do
+    old_value = Map.get(result_map, old_address)
+    updated_value = remove_zero_market_cap(old_value)
+    Map.put(acc, new_address, updated_value)
+  end
+
+  defp remove_zero_market_cap(map) do
+    case Map.get(map, "usd_market_cap") do
+      0.0 -> Map.delete(map, "usd_market_cap")
+      _ -> map
     end
   end
 
-  defp swap_address(result, original_address, new_address) do
-    case Map.has_key?(result, original_address) do
-      true ->
-        {value, remaining_result} = Map.pop(result, original_address)
-        value_updated = remove_market_cap_if_certain_token(value, original_address)
-        Map.put(remaining_result, new_address, value_updated)
-
-      false ->
-        result
-    end
-  end
-
+  # --------------------------------------------------------------------------------
+  # retrieve the ZEN exchange rate from the database
   @spec get_exchange_rate(String.t()) :: Token.t() | nil
   defp get_exchange_rate(symbol) do
     ExchangeRates.lookup(symbol)
   end
 
+  # --------------------------------------------------------------------------------
+  # add the wrapped-zen map with the exchange rate read from the database
+  @wrapped_zen_env_var "WRAPPED_ZEN_ADDRESS"
+  defp create_wrapped_zen_map do
+    zen_exchange_rate = get_exchange_rate(Explorer.coin())
+    zen_usd_value =
+      case zen_exchange_rate do
+        %Explorer.ExchangeRates.Token{usd_value: uv} -> uv
+        _ -> nil
+      end
+
+    %{System.get_env(@wrapped_zen_env_var) => %{"usd" => zen_usd_value}}
+  end
+
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+
   @doc """
-  In the update_result_addresses method the addresses of the v3/simple/token_price/<platform> are swapped with their horizen-eon counterpart
+  In the update_result_addresses method if the response processes id the one from the token_price api (v3/simple/token_price/<platform>) the addresses will
+  be swapped with their horizen-eon counterpart (using the TOKEN_ADDRESS_PAIRS_EXT_PLATFORM_EON environment variable)
   Moreover the ZEN exchange rate is retrieved and an entry related to the wrapped-zen token is added to the result map
   """
-  defp update_result_addresses(result) do
+  defp update_result_addresses(result, source_url) do
 
-    # swap v3/simple/token_price/<platform> results addresses
-    result
-    |> swap_address("0x49d5c2bdffac6ce2bfdb6640f4f80f226bc10bab", "0x2c2E0B0c643aB9ad03adBe9140627A645E99E054") # weth
-    |> swap_address("0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7", "0x6318374DFb468113E06d3463ec5Ed0B6Ae0F0982") # wrapped-avax
-    |> swap_address("0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e", "0xCc44eB064CD32AAfEEb2ebb2a47bE0B882383b53") # usd-coin
-    |> swap_address("0x9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7", "0xA167bcAb6791304EDa9B636C8beEC75b3D2829E6") # tether
-    |> swap_address("0xd586e7f844cea2f87f50152665bcbc2c279d8d70", "0x38C2a6953F86a7453622B1E7103b738239728754") # dai
-    |> swap_address("0x5947bb275c521040051d82396192181b413227a3", "0xDF8DBA35962Aa0fAD7ade0Df07501c54Ec7c4A89") # chainlink
-    |> swap_address("0x50b7545627a5162f82a992c33b87adc75187b218", "0x1d7fb99AED3C365B4DEf061B7978CE5055Dfc1e7") # wrapped-bitcoin
+    # check if the response is the one from the v3/simple/token_price/<platform> api
+    if String.contains?(source_url, "token_price") do
 
-    # retrieve ZEN exchange rate and map it to the result map
-    zen_exchange_rate = get_exchange_rate("ZEN")
-    zen_usd_value = case zen_exchange_rate do %Explorer.ExchangeRates.Token{usd_value: uv} -> uv; _ -> nil end
-    zen_map = %{"0xF5cB8652a84329A2016A386206761f455bCEDab6" => %{"usd" => zen_usd_value}}
-    merged_result = Map.merge(result, zen_map)
-    merged_result
+      # retrieve token address pairs between the external platform used and the eon sidechain
+      token_address_pairs_for_swap = fetch_token_address_pairs_for_swap()
+
+      # swap v3/simple/token_price/<platform> results addresses
+      swapped_result = swap_addresses(result, token_address_pairs_for_swap)
+
+      if System.get_env(@wrapped_zen_env_var) do
+        # retrieve ZEN exchange rate, associated it to the wrapped-zen token address and map it to the result map
+        wrapped_zen_map = create_wrapped_zen_map()
+        merged_result = Map.merge(swapped_result, wrapped_zen_map)
+        merged_result
+
+      else
+        swapped_result
+      end
+
+    else
+      # if the response id not from the v3/simple/token_price/<platform> api return the input result unchanged
+      result
+    end
 
   end
 
@@ -125,7 +166,7 @@ defmodule Explorer.ExchangeRates.Source do
 
         result_updated_and_formatted =
         result
-        |> update_result_addresses()
+        |> update_result_addresses(source_url)
         |> source.format_data()
         {:ok, result_updated_and_formatted}
 

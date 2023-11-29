@@ -68,50 +68,85 @@ defmodule Explorer.ExchangeRates.Source.CoinGecko do
     end)
   end
 
-  def add_token_address_for_platform(data, id, platform, value) do
-    Enum.map(data, fn entry ->
-      if entry["id"] == id do
-        %{
-          entry | "platforms" => Map.put(entry["platforms"], platform, value)
-        }
-      else
-        entry
-      end
-    end)
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  # retrieve the list of eon token addresses from the environment
+  @eon_token_list_env_var "HORIZEN_EON_TOKEN_LIST_TO_FETCH"
+  def fetch_eon_token_list do
+    token_list = System.fetch_env!(@eon_token_list_env_var)
+    parse_token_list(token_list)
   end
 
-  defp add_wrapped_zen(supported_coins) do
-    wrapped_zen = %{
-      "id" => "wrapped-zen",
-      "platforms" => %{
-        "horizen-eon" => "0xF5cB8652a84329A2016A386206761f455bCEDab6"
-      }
-    }
-    [wrapped_zen | supported_coins]
+  defp parse_token_list(token_list) do
+    token_pairs =
+      token_list
+      |> String.split(",")
+      |> Enum.map(&parse_token_pair_id_address/1)
+
+    Map.new(token_pairs)
   end
+
+  defp parse_token_pair_id_address(token_pair) do
+    [name, address] = String.split(token_pair, "_")
+    {name, address}
+  end
+
+  # --------------------------------------------------------------------------------
+  # update the response of the api/v3/coins/list api with the addresses of our sidechain
+  def update_supported_coins(supported_coins, token_list) do
+    Enum.map(supported_coins, &update_coin(&1, token_list))
+  end
+
+  defp update_coin(%{"id" => coin_id, "platforms" => platforms} = coin, token_list) do
+    case Map.get(token_list, coin_id) do
+      nil -> coin
+      token ->
+        updated_platforms = Map.put_new(platforms, "horizen-eon", token)
+        Map.put(coin, "platforms", updated_platforms)
+    end
+  end
+
+  # --------------------------------------------------------------------------------
+  # retrieve, if present, the wrapped-zen address from the environment
+  @wrapped_zen_env_var "WRAPPED_ZEN_ADDRESS"
+  defp add_wrapped_zen(supported_coins) do
+    wrapped_zen_address = System.get_env(@wrapped_zen_env_var)
+
+    case wrapped_zen_address do
+      nil ->
+        supported_coins
+      _ ->
+        wrapped_zen = %{
+          "id" => "wrapped-zen",
+          "platforms" => %{
+            "horizen-eon" => wrapped_zen_address
+          }
+        }
+        [wrapped_zen | supported_coins]
+    end
+  end
+
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @doc """
-  In the format_data method the wrapped token addresses will be added to the response of the coingecko api/v3/coins/list api (triggered by the token_exchange_rate module)
-  Moreover a new entry with id wrapped-zen is added since it is not present in the api response
-  These addresses will find match in the one currently present in the sidechain and they will put in the state variable tokens_to_fetch of the module token_exchange_rate
-  A tokens_to_fetch variable not empty will trigger a call to the coingecko v3/simple/token_price/<platform> to retrieve the wrapped token prices and market cap
+  In the format_data method the wrapped token addresses will be retrieved from the environemnt variable HORIZEN_EON_TOKEN_LIST_TO_FETCH, formatted and added
+  to the response of the coingecko api/v3/coins/list api (triggered by the token_exchange_rate module).
+  Moreover we retrieve from the environment the variable WRAPPED_ZEN_ADDRESS, if present it contains the address of the wrapped-zen token and a new entry
+  with id wrapped-zen is added since it is not present in the api response.
+  These addresses will find match in the one currently present in the sidechain and they will be put in the state variable tokens_to_fetch of the module
+  token_exchange_rate. A tokens_to_fetch variable not empty will trigger a call to the coingecko v3/simple/token_price/<platform> to retrieve the wrapped
+  token prices and market cap.
   """
   @impl Source
   def format_data(supported_coins) when is_list(supported_coins) do
 
-    #platform = platform()
-    platform = "horizen-eon"
-    supported_coins_updated =
-      supported_coins
-      |> add_token_address_for_platform("weth", "horizen-eon", "0x2c2E0B0c643aB9ad03adBe9140627A645E99E054")
-      |> add_token_address_for_platform("wrapped-avax", "horizen-eon", "0x6318374DFb468113E06d3463ec5Ed0B6Ae0F0982")
-      |> add_token_address_for_platform("usd-coin", "horizen-eon", "0xCc44eB064CD32AAfEEb2ebb2a47bE0B882383b53")
-      |> add_token_address_for_platform("tether", "horizen-eon", "0xA167bcAb6791304EDa9B636C8beEC75b3D2829E6")
-      |> add_token_address_for_platform("dai", "horizen-eon", "0x38C2a6953F86a7453622B1E7103b738239728754")
-      |> add_token_address_for_platform("chainlink", "horizen-eon", "0xDF8DBA35962Aa0fAD7ade0Df07501c54Ec7c4A89")
-      |> add_token_address_for_platform("wrapped-bitcoin", "horizen-eon", "0x1d7fb99AED3C365B4DEf061B7978CE5055Dfc1e7")
+    # token map is the one read from the environment
+    token_list = fetch_eon_token_list()
 
-    # Add the new entry for wrapped-zen
+    # update the supported_coins response
+    platform = "horizen-eon"
+    supported_coins_updated = update_supported_coins(supported_coins, token_list)
+
+    # add the new entry for wrapped-zen if present
     supported_coins_updated = add_wrapped_zen(supported_coins_updated)
 
     supported_coins_updated
@@ -155,14 +190,39 @@ defmodule Explorer.ExchangeRates.Source.CoinGecko do
     "#{base_url()}/coins/list?include_platform=true"
   end
 
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  # retrieve from the list of external platform token addresses from the environment
+  @token_address_pairs "TOKEN_ADDRESS_PAIRS_EXT_PLATFORM_EON"
+  @external_platform "EXT_PLATFORM_FOR_TOKEN_FETCH"
+
+  defp fetch_external_platform_token_addresses do
+    token_list = System.fetch_env!(@token_address_pairs)
+    parse_ext_platform_token_list(token_list)
+  end
+
+  defp parse_ext_platform_token_list(input) do
+    input
+    |> String.split(",")
+    |> Enum.map(&parse_left_element/1)
+    |> Enum.join(",")
+  end
+
+  defp parse_left_element(element) do
+    [left, _right] = String.split(element, "_")
+    left
+  end
+
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+
   @doc """
-  The v3/simple/token_price/<platform> will be performed to the avalanche platform because it has all the wrapped tokens data required in the horizen-eon sidechain,
-  so the mothod sets the platform as avalanche for this call and passes all the avalanche wrapped token addresses present on the c-chain
+  The v3/simple/token_price/<platform> will be performed to the external platform defined in the EXT_PLATFORM_FOR_TOKEN_FETCH environment variable and using
+  the list of token addresses of the external platform (read from the environment as well using the TOKEN_ADDRESS_PAIRS_EXT_PLATFORM_EON variable)
   """
   @impl Source
   def source_url(token_addresses) when is_list(token_addresses) do
-    platform = "avalanche"
-    joined_addresses = "0x49d5c2bdffac6ce2bfdb6640f4f80f226bc10bab,0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7,0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e,0x9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7,0xd586e7f844cea2f87f50152665bcbc2c279d8d70,0x5947bb275c521040051d82396192181b413227a3,0x50b7545627a5162f82a992c33b87adc75187b218"
+
+    platform = System.fetch_env!(@external_platform)
+    joined_addresses = fetch_external_platform_token_addresses()
 
     "#{base_url()}/simple/token_price/#{platform}?vs_currencies=#{currency()}&include_market_cap=true&contract_addresses=#{joined_addresses}"
   end
