@@ -152,7 +152,7 @@ defmodule Explorer.ExchangeRates.Source do
         end
 
       _ ->
-        # if the response id not from the v3/simple/token_price/<platform> api return the input result unchanged
+        # if the response is not from the v3/simple/token_price/<platform> api return the input result unchanged
         result
 
     end
