@@ -121,6 +121,9 @@ defmodule Explorer.ExchangeRates.Source do
     %{System.get_env(@wrapped_zen_env_var) => %{"usd" => zen_usd_value}}
   end
 
+  # --------------------------------------------------------------------------------
+  @external_platform "EXT_PLATFORM_FOR_TOKEN_FETCH"
+
   # --------------------------------------------------------------------------------------------------------------------------------------------------------
 
   @doc """
@@ -130,28 +133,28 @@ defmodule Explorer.ExchangeRates.Source do
   """
   defp update_result_addresses(result, source_url) do
 
-    # check if the response is the one from the v3/simple/token_price/<platform> api
-    if String.contains?(source_url, "token_price") do
+    case {System.get_env(@external_platform), String.contains?(source_url, "/simple/token_price/" <> System.get_env(@external_platform))} do
+      {_, true} ->
+        # retrieve token address pairs between the external platform used and the eon sidechain
+        token_address_pairs_for_swap = fetch_token_address_pairs_for_swap()
 
-      # retrieve token address pairs between the external platform used and the eon sidechain
-      token_address_pairs_for_swap = fetch_token_address_pairs_for_swap()
+        # swap v3/simple/token_price/<platform> results addresses
+        swapped_result = swap_addresses(result, token_address_pairs_for_swap)
 
-      # swap v3/simple/token_price/<platform> results addresses
-      swapped_result = swap_addresses(result, token_address_pairs_for_swap)
+        if System.get_env(@wrapped_zen_env_var) do
+          # retrieve ZEN exchange rate, associated it to the wrapped-zen token address and map it to the result map
+          wrapped_zen_map = create_wrapped_zen_map()
+          merged_result = Map.merge(swapped_result, wrapped_zen_map)
+          merged_result
 
-      if System.get_env(@wrapped_zen_env_var) do
-        # retrieve ZEN exchange rate, associated it to the wrapped-zen token address and map it to the result map
-        wrapped_zen_map = create_wrapped_zen_map()
-        merged_result = Map.merge(swapped_result, wrapped_zen_map)
-        merged_result
+        else
+          swapped_result
+        end
 
-      else
-        swapped_result
-      end
+      _ ->
+        # if the response id not from the v3/simple/token_price/<platform> api return the input result unchanged
+        result
 
-    else
-      # if the response id not from the v3/simple/token_price/<platform> api return the input result unchanged
-      result
     end
 
   end

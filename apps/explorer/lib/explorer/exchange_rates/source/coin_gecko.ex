@@ -69,11 +69,20 @@ defmodule Explorer.ExchangeRates.Source.CoinGecko do
   end
 
   # --------------------------------------------------------------------------------------------------------------------------------------------------------
-  # retrieve the list of eon token addresses from the environment
+  # retrieve, if present, the list of wrapped token addreses from the environment and update the response map
   @eon_token_list_env_var "HORIZEN_EON_TOKEN_LIST_TO_FETCH"
-  def fetch_eon_token_list do
-    token_list = System.fetch_env!(@eon_token_list_env_var)
-    parse_token_list(token_list)
+  defp add_wrapped_tokens(supported_coins) do
+    wrapped_tokens_list_var = System.get_env(@eon_token_list_env_var)
+
+    case wrapped_tokens_list_var do
+      nil ->
+        supported_coins
+      _ ->
+        # token map is the one read from the environment
+        wrapped_token_list = parse_token_list(wrapped_tokens_list_var)
+        # update the supported_coins response
+        update_supported_coins(supported_coins, wrapped_token_list)
+    end
   end
 
   defp parse_token_list(token_list) do
@@ -106,7 +115,7 @@ defmodule Explorer.ExchangeRates.Source.CoinGecko do
   end
 
   # --------------------------------------------------------------------------------
-  # retrieve, if present, the wrapped-zen address from the environment
+  # retrieve, if present, the wrapped-zen address from the environment and update the response map
   @wrapped_zen_env_var "WRAPPED_ZEN_ADDRESS"
   defp add_wrapped_zen(supported_coins) do
     wrapped_zen_address = System.get_env(@wrapped_zen_env_var)
@@ -139,17 +148,16 @@ defmodule Explorer.ExchangeRates.Source.CoinGecko do
   @impl Source
   def format_data(supported_coins) when is_list(supported_coins) do
 
-    # token map is the one read from the environment
-    token_list = fetch_eon_token_list()
-
-    # update the supported_coins response
+    # overwrite the platform used with horizen-eon
     platform = "horizen-eon"
-    supported_coins_updated = update_supported_coins(supported_coins, token_list)
+
+    # add the wrapped tokens if present, reading them from the HORIZEN_EON_TOKEN_LIST_TO_FETCH env variable
+    supported_coins = add_wrapped_tokens(supported_coins)
 
     # add the new entry for wrapped-zen if present
-    supported_coins_updated = add_wrapped_zen(supported_coins_updated)
+    supported_coins = add_wrapped_zen(supported_coins)
 
-    supported_coins_updated
+    supported_coins
     |> Enum.reduce([], fn
       %{"platforms" => %{^platform => token_contract_hash_str}}, acc ->
         case Chain.Hash.Address.cast(token_contract_hash_str) do
