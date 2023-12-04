@@ -152,13 +152,13 @@ defmodule BlockScoutWeb.AddressController do
         Chain.forward_transfers_count(address_hash_string) + Chain.fee_payments_count(address_hash_string)
 
       transactions_from_db = address.transactions_count || 0
-      txs_and_extra_transfers = extra_transfers_from_db + transactions_from_db
       token_transfers_from_db = address.token_transfers_count || 0
+      token_transfers_and_extra_transfers = token_transfers_from_db + extra_transfers_from_db
       address_gas_usage_from_db = address.gas_used || 0
 
       json(conn, %{
-        transaction_count: txs_and_extra_transfers,
-        token_transfer_count: token_transfers_from_db,
+        transaction_count: transactions_from_db,
+        token_transfer_count: token_transfers_and_extra_transfers,
         gas_usage_count: address_gas_usage_from_db,
         validation_count: validation_count
       })
