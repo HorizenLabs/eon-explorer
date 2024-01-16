@@ -109,6 +109,7 @@ defmodule Explorer.ExchangeRates.Source do
 
   # --------------------------------------------------------------------------------
   # add the wrapped-zen map with the exchange rate read from the database
+  # convert it to float (with 2 decimal places) before put it in the map
   @wrapped_zen_env_var "WRAPPED_ZEN_ADDRESS"
   defp create_wrapped_zen_map do
     zen_exchange_rate = get_exchange_rate(Explorer.coin())
@@ -117,8 +118,8 @@ defmodule Explorer.ExchangeRates.Source do
         %Explorer.ExchangeRates.Token{usd_value: uv} -> uv
         _ -> nil
       end
-
-    %{System.get_env(@wrapped_zen_env_var) => %{"usd" => zen_usd_value}}
+    zen_usd_value_float = Float.round(Decimal.to_float(zen_usd_value), 2)
+    %{System.get_env(@wrapped_zen_env_var) => %{"usd" => zen_usd_value_float}}
   end
 
   # --------------------------------------------------------------------------------
