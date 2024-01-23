@@ -327,10 +327,19 @@ defmodule Indexer.Block.Fetcher do
 
   def async_import_created_contract_codes(_), do: :ok
 
+  defp get_internal_transactions_fetching_async_timeout do
+    async_timeout =
+      case System.get_env("INTERNAL_TRANSACTION_FETCHING_ASYNC_TIMEOUT") do
+        nil -> "10000"
+        value -> value
+      end
+    String.to_integer(async_timeout)
+  end
+
   def async_import_internal_transactions(%{blocks: blocks}) do
     blocks
     |> Enum.map(fn %Block{number: block_number} -> block_number end)
-    |> InternalTransaction.async_fetch(10_000)
+    |> InternalTransaction.async_fetch(get_internal_transactions_fetching_async_timeout())
   end
 
   def async_import_internal_transactions(_), do: :ok
