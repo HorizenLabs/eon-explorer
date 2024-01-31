@@ -5,6 +5,7 @@
   <% circles_addresses_list = CustomContractsHelper.get_custom_addresses_list(:circles_addresses) %>
   <% current_address = "0x" <> Base.encode16(@address.hash.bytes, case: :lower) %>
   <% created_from_address_hash = if from_address_hash(@address), do: "0x" <> Base.encode16(from_address_hash(@address).bytes, case: :lower), else: nil %>
+  <% smart_contract_native = BlockScoutWeb.NativeContractUtils.smart_contract_native?(@address) %>
   <div class="row js-ad-dependant-mb-2 js-ad-dependant-mb-5-reverse">
     <!-- Address details -->
     <div class="col-md-12 js-ad-dependant-mb-2">
@@ -102,22 +103,26 @@
                 <%= gettext("Creator") %>
               </dt>
               <dd class="col-sm-8 col-md-8 col-lg-9" data-test="address_contract_creator">
-                <%= if from_address_hash do %>
-                  <%= link(
-                    trimmed_hash(from_address_hash(@address)),
-                    to: address_path(@conn, :show, from_address_hash(@address))
-                  ) %>
-
-                  <%= gettext "at" %>
-
-                  <%= link(
-                    trimmed_hash(transaction_hash(@address)),
-                    to: transaction_path(@conn, :show, transaction_hash(@address)),
-                    "data-test": "transaction_hash_link"
-                  ) %>
+                <%= if smart_contract_native do %>
+                  <%= gettext("Native Contract") %>
                 <% else %>
-                  <p class="alert alert-danger" role="alert"><%= render BlockScoutWeb.CommonComponentsView, "_i_tooltip_2.html",
-                text: gettext("Contract was precompiled and created at genesis or contract creation transaction is missing") %><%= gettext("Error: Could not determine contract creator.") %></p>
+                  <%= if from_address_hash do %>
+                    <%= link(
+                      trimmed_hash(from_address_hash(@address)),
+                      to: address_path(@conn, :show, from_address_hash(@address))
+                    ) %>
+
+                    <%= gettext "at" %>
+
+                    <%= link(
+                      trimmed_hash(transaction_hash(@address)),
+                      to: transaction_path(@conn, :show, transaction_hash(@address)),
+                      "data-test": "transaction_hash_link"
+                    ) %>
+                  <% else %>
+                    <p class="alert alert-danger" role="alert"><%= render BlockScoutWeb.CommonComponentsView, "_i_tooltip_2.html",
+                  text: gettext("Contract was precompiled and created at genesis or contract creation transaction is missing") %><%= gettext("Error: Could not determine contract creator.") %></p>
+                  <% end %>
                 <% end %>
               </dd>
             </dl>

@@ -1,6 +1,7 @@
 <% minimal_proxy_template = if assigns[:custom_abi], do: nil, else: Chain.get_minimal_proxy_template(@address.hash) %>
 <% metadata_for_verification = if assigns[:custom_abi], do: nil, else: minimal_proxy_template || Chain.get_address_verified_twin_contract(@address.hash).verified_contract %>
 <% smart_contract_verified = if assigns[:custom_abi], do: false, else: BlockScoutWeb.AddressView.smart_contract_verified?(@address) %>
+<% smart_contract_native = BlockScoutWeb.NativeContractUtils.smart_contract_native?(@address) %>
 <%= unless smart_contract_verified do %>
   <%= if metadata_for_verification do %>
     <%= if minimal_proxy_template do %>
@@ -18,7 +19,7 @@
     <% end %>
   <% end %>
 <% end %>
-<%= if smart_contract_verified do %>
+<%= if smart_contract_verified  && !smart_contract_native do %>
   <%= if @address.smart_contract.is_changed_bytecode do %>
     <%= render BlockScoutWeb.CommonComponentsView, "_changed_bytecode_warning.html" %>
   <% else %>
