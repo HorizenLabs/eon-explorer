@@ -1,7 +1,6 @@
 defmodule BlockScoutWeb.NativeContractUtils do
 
   alias Explorer.Utility.NativeContracts
-  require Logger
 
   defp match_in_list?(address, list) do
     Enum.member?(list, address)
@@ -9,7 +8,11 @@ defmodule BlockScoutWeb.NativeContractUtils do
 
   def smart_contract_native?(address) do
     all_contracts = NativeContracts.get_all_contracts()
-    contract_hashes = Enum.map(all_contracts, &(&1.hash))
-    match_in_list?(to_string(address), contract_hashes)
+    contract_hashes = Enum.map(all_contracts, &(Base.encode16(&1.address_hash)))
+    contract_hashes_with_prefix = Enum.map(contract_hashes, fn(element) ->
+      "0x" <> element
+    end)
+
+    match_in_list?(to_string(address), contract_hashes_with_prefix)
   end
 end
