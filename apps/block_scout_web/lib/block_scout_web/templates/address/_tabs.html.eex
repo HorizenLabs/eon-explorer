@@ -2,7 +2,6 @@
 <% dark_forest_addresses_list_0_5 = CustomContractsHelper.get_custom_addresses_list(:dark_forest_addresses_v_0_5) %>
 <% dark_forest_addresses_list = dark_forest_addresses_list_0_4 ++ dark_forest_addresses_list_0_5 %>
 <% current_address = "0x" <> Base.encode16(@address.hash.bytes, case: :lower) %>
-<% smart_contract_native = BlockScoutWeb.NativeContractUtils.smart_contract_native?(@address) %>
 <div id="address-tabs" class="card-tabs js-card-tabs">
   <%= link(
         gettext("Transactions"),
@@ -39,14 +38,12 @@
         "data-test": "internal_transactions_tab_link",
         to: AccessHelper.get_path(@conn, :address_internal_transaction_path, :index, @address.hash)
       ) %>
-  <%= if !smart_contract_native do %>
-    <%= link(
-          gettext("Coin Balance History"),
-          class: "card-tab #{tab_status("coin-balances", @conn.request_path)}",
-          "data-test": "coin_balance_tab_link",
-          to: AccessHelper.get_path(@conn, :address_coin_balance_path, :index, @address.hash)
-        ) %>
-  <% end %>
+  <%= link(
+        gettext("Coin Balance History"),
+        class: "card-tab #{tab_status("coin-balances", @conn.request_path)}",
+        "data-test": "coin_balance_tab_link",
+        to: AccessHelper.get_path(@conn, :address_coin_balance_path, :index, @address.hash)
+      ) %>
   <%= if Chain.check_if_forward_transfers_at_address(@address.hash) do %>
       <%= link(
         gettext("Forward Transfers"),

@@ -148,32 +148,30 @@
             </dl>
           <% end %>
           <!-- Balance -->
-          <%= if !smart_contract_native do %>
-            <dl class="row">
-              <dt class="col-sm-4 col-md-4 col-lg-3 text-muted">
-                <%= render BlockScoutWeb.CommonComponentsView, "_i_tooltip_2.html",
-                text: gettext("Address balance in") <> " " <> Explorer.coin_name() <> " " <> gettext("doesn't include ERC20, ERC721, ERC1155 tokens).") %>
-                <%= gettext("Balance") %>
-              </dt>
-              <dd data-selector="current-coin-balance" class="col-sm-8 col-md-8 col-lg-9" data-test="address_balance">
-                <%= balance(@address) %>
-                <%= if !match?({:pending, _}, @coin_balance_status) && !empty_exchange_rate?(@exchange_rate) do %>
-                  <% usd_value = to_string(@exchange_rate.usd_value) %>
-                  <span class="address-current-balance">
-                    (<span
-                      data-wei-value="<%= if @address.fetched_coin_balance, do: @address.fetched_coin_balance.value %>"
-                      data-usd-exchange-rate="<%= @exchange_rate.usd_value %>"
-                      data-placement="top"
-                      data-toggle="tooltip"
-                      data-html="true"
-                      title='<%= "@ " <> usd_value <> "/" <> Explorer.coin_name() %>'  
-                    >
-                    </span>)
-                  </span>
-                <% end %>
-              </dd>
-            </dl>
-          <% end %>
+          <dl class="row">
+            <dt class="col-sm-4 col-md-4 col-lg-3 text-muted">
+              <%= render BlockScoutWeb.CommonComponentsView, "_i_tooltip_2.html",
+              text: gettext("Address balance in") <> " " <> Explorer.coin_name() <> " " <> gettext("doesn't include ERC20, ERC721, ERC1155 tokens).") %>
+              <%= gettext("Balance") %>
+            </dt>
+            <dd data-selector="current-coin-balance" class="col-sm-8 col-md-8 col-lg-9" data-test="address_balance">
+              <%= balance(@address) %>
+              <%= if !match?({:pending, _}, @coin_balance_status) && !empty_exchange_rate?(@exchange_rate) do %>
+                <% usd_value = to_string(@exchange_rate.usd_value) %>
+                <span class="address-current-balance">
+                  (<span
+                    data-wei-value="<%= if @address.fetched_coin_balance, do: @address.fetched_coin_balance.value %>"
+                    data-usd-exchange-rate="<%= @exchange_rate.usd_value %>"
+                    data-placement="top"
+                    data-toggle="tooltip"
+                    data-html="true"
+                    title='<%= "@ " <> usd_value <> "/" <> Explorer.coin_name() %>'  
+                  >
+                  </span>)
+                </span>
+              <% end %>
+            </dd>
+          </dl>
           <!-- Tokens -->
           <%= if !smart_contract_native do %>
             <dl class="row" data-test="outside_of_dropdown">
@@ -261,25 +259,23 @@
             </dl>
           <% end %>
           <!-- Last balance update -->
-          <%= if !smart_contract_native do %>
-            <%= if @address.fetched_coin_balance_block_number do %>
-              <dl class="row">
-                <dt class="col-sm-4 col-md-4 col-lg-3 text-muted">
-                  <%= render BlockScoutWeb.CommonComponentsView, "_i_tooltip_2.html",
-                  text: gettext("Block number in which the address was updated.") %>
-                  <%= gettext("Last Balance Update") %>
-                </dt>
-                <dd data-selector="last-balance-update" class="col-sm-8 col-md-8 col-lg-9" data-test="address_last_balance_update">
-                  <%= link(
-                      @address.fetched_coin_balance_block_number,
-                      to: block_path(@conn, :show, @address.fetched_coin_balance_block_number),
-                      class: "tile-title-lg"
-                  ) %>
-                </dd>
-              </dl>
-            <% end %>
-            <div data-last-balance-update="<%= @address.fetched_coin_balance_block_number %>"></div>
+          <%= if @address.fetched_coin_balance_block_number do %>
+            <dl class="row">
+              <dt class="col-sm-4 col-md-4 col-lg-3 text-muted">
+                <%= render BlockScoutWeb.CommonComponentsView, "_i_tooltip_2.html",
+                text: gettext("Block number in which the address was updated.") %>
+                <%= gettext("Last Balance Update") %>
+              </dt>
+              <dd data-selector="last-balance-update" class="col-sm-8 col-md-8 col-lg-9" data-test="address_last_balance_update">
+                <%= link(
+                    @address.fetched_coin_balance_block_number,
+                    to: block_path(@conn, :show, @address.fetched_coin_balance_block_number),
+                    class: "tile-title-lg"
+                ) %>
+              </dd>
+            </dl>
           <% end %>
+          <div data-last-balance-update="<%= @address.fetched_coin_balance_block_number %>"></div>
           <!-- Blocks Validated -->
           <dl class="row address-validation-count-item" style="display: none;">
             <dt class="col-sm-4 col-md-4 col-lg-3 text-muted">
