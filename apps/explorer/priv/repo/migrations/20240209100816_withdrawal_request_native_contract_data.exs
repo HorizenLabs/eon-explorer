@@ -49,13 +49,13 @@ defmodule Explorer.Repo.Migrations.WithdrawalRequestNativeContractData do
       address_hash,
       inserted_at,
       updated_at,
-      contract_code_md5) \
+      contract_code_md5)
      VALUES (
       'Withdrawal Request',
       'native contract',
       false,
-      '/', \
-      '[{\"type\":\"function\",\"name\":\"getBackwardTransfers\",\"stateMutability\":\"view\",\"constant\":true,\"payable\":false,\"inputs\":[{\"type\":\"uint32\",\"name\":\"epochNum\"}],\"outputs\":[{\"type\":\"tuple[]\",\"components\":[{\"type\":\"bytes20\",\"name\":\"mcAddress\"},{\"type\":\"uint256\",\"name\":\"amount\"}]}]},{\"type\":\"function\",\"name\":\"‘backwardTransfer’\",\"stateMutability\":\"payable\",\"payable\":true,\"constant\":false,\"inputs\":[{\"type\":\"bytes20\",\"name\":\"mcAddress\"}],\"outputs\":[{\"type\":\"tuple\",\"components\":[{\"type\":\"bytes20\",\"name\":\"mcAddress\"},{\"type\":\"uint256\",\"name\":\"amount\"}]}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"AddWithdrawalRequest\",\"inputs\":[{\"name\":\"from\",\"type\":\"address\",\"indexed\":true},{\"name\":\"mcDest\",\"type\":\"bytes20\",\"indexed\":true},{\"name\":\"value\",\"type\":\"uint256\",\"indexed\":false},{\"name\":\"epochNumber\",\"type\":\"uint32\",\"indexed\":false}]}]',
+      '/',
+      '[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"bytes20\",\"name\":\"mcDest\",\"type\":\"bytes20\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint32\",\"name\":\"epochNumber\",\"type\":\"uint32\"}],\"name\":\"AddWithdrawalRequest\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"PubKeyHash\",\"name\":\"pubKeyHash\",\"type\":\"bytes20\"}],\"name\":\"backwardTransfer\",\"outputs\":[{\"components\":[{\"internalType\":\"PubKeyHash\",\"name\":\"pubKeyHash\",\"type\":\"bytes20\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"internalType\":\"struct WithdrawalRequests.WithdrawalRequest\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"withdrawalEpoch\",\"type\":\"uint32\"}],\"name\":\"getBackwardTransfers\",\"outputs\":[{\"components\":[{\"internalType\":\"PubKeyHash\",\"name\":\"pubKeyHash\",\"type\":\"bytes20\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"internalType\":\"struct WithdrawalRequests.WithdrawalRequest[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]',
       E'\\\\x0000000000000000000011111111111111111111',
       NOW(),
       NOW(),
