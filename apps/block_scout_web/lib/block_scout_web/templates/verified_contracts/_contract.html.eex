@@ -25,7 +25,7 @@
     <!-- Compiler -->
     <td class="stakes-td">
         <span>
-            <%= if BlockScoutWeb.NativeContractUtils.smart_contract_native?(@contract.address) do %>
+            <%= if BlockScoutWeb.ReservedAddressesUtils.smart_contract_native?(@contract.address) do %>
                 <%= gettext("Native") %>
             <% else %>
                 <%= if @contract.is_vyper_contract do %>

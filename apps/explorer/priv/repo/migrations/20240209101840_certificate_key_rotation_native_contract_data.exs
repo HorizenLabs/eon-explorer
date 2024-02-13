@@ -62,7 +62,7 @@ defmodule Explorer.Repo.Migrations.CertificateKeyRotationNativeContractData do
       );")
 
     execute("INSERT INTO address_names(address_hash, name, \"primary\", inserted_at, updated_at) VALUES (E'\\\\x0000000000000000000044444444444444444444', 'Certificate Key Rotation', true, NOW(), NOW())")
-    execute("INSERT INTO native_contracts (address_hash, name, inserted_at) VALUES (E'\\\\x0000000000000000000044444444444444444444', 'certificate key rotation', NOW())")
+    execute("INSERT INTO reserved_addresses(address_hash, name, is_contract, inserted_at) VALUES (E'\\\\x0000000000000000000044444444444444444444', 'certificate key rotation', true, NOW())")
 
   end
 

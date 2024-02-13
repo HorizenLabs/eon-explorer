@@ -5,7 +5,7 @@
   <% circles_addresses_list = CustomContractsHelper.get_custom_addresses_list(:circles_addresses) %>
   <% current_address = "0x" <> Base.encode16(@address.hash.bytes, case: :lower) %>
   <% created_from_address_hash = if from_address_hash(@address), do: "0x" <> Base.encode16(from_address_hash(@address).bytes, case: :lower), else: nil %>
-  <% smart_contract_native = BlockScoutWeb.NativeContractUtils.smart_contract_native?(@address) %>
+  <% smart_contract_native = BlockScoutWeb.ReservedAddressesUtils.smart_contract_native?(@address) %>
   <div class="row js-ad-dependant-mb-2 js-ad-dependant-mb-5-reverse">
     <!-- Address details -->
     <div class="col-md-12 js-ad-dependant-mb-2">

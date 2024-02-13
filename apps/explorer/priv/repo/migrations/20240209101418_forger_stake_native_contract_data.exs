@@ -63,7 +63,7 @@ defmodule Explorer.Repo.Migrations.ForgerStakeNativeContractData do
           );")
 
     execute("INSERT INTO address_names(address_hash, name, \"primary\", inserted_at, updated_at) VALUES (E'\\\\x0000000000000000000022222222222222222222', 'Forger Stake', true, NOW(), NOW())")
-    execute("INSERT INTO native_contracts (address_hash, name, inserted_at) VALUES (E'\\\\x0000000000000000000022222222222222222222', 'forger stake', NOW())")
+    execute("INSERT INTO reserved_addresses(address_hash, name, is_contract, inserted_at) VALUES (E'\\\\x0000000000000000000022222222222222222222', 'forger stake', true, NOW())")
 
   end
 
