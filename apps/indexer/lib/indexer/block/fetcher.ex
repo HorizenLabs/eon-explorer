@@ -333,6 +333,7 @@ defmodule Indexer.Block.Fetcher do
         nil -> "10000"
         value -> value
       end
+
     String.to_integer(async_timeout)
   end
 

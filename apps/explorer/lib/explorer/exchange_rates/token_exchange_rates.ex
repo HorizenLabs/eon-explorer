@@ -99,15 +99,13 @@ defmodule Explorer.ExchangeRates.TokenExchangeRates do
   defp update_token(%{contract_address_hash: contract_address_hash} = token, token_to_market_data) do
     case Map.get(token_to_market_data, contract_address_hash) do
       %{} = market_data ->
-
         # update the circulating market cap of the token retrieving:
         # - the total supply from the token
         # - the exchange rate from the coingecko response
         tokens = divide_decimals(token.total_supply, token.decimals)
         tokens_float = Float.round(Decimal.to_float(tokens), 2)
         market_cap_float = market_data.fiat_value * tokens_float
-        updated_market_data =
-          %{market_data | circulating_market_cap: market_cap_float}
+        updated_market_data = %{market_data | circulating_market_cap: market_cap_float}
 
         token
         |> Token.changeset(updated_market_data)
@@ -124,5 +122,4 @@ defmodule Explorer.ExchangeRates.TokenExchangeRates do
     |> Decimal.new(coef, exp - Decimal.to_integer(decimals))
     |> Decimal.normalize()
   end
-
 end

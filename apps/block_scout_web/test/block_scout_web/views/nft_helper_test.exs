@@ -38,6 +38,5 @@ defmodule BlockScoutWeb.NFTHelperTest do
       assert "https://ipfs.io/ipfs/baFybeid4ed2ua7fwupv4nx2ziczr3edhygl7ws3yx6y2juon7xakgj6cfm%2051.json" ==
                NFTHelper.retrieve_image(url)
     end
-
   end
 end

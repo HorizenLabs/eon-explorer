@@ -23,7 +23,7 @@ export function reducer (state, action) {
   switch (action.type) {
     case 'PAGE_LOAD':
     case 'ELEMENTS_LOAD': {
-      console.log("Elements Load")
+      console.log('Elements Load')
       return Object.assign({}, state, omit(action, 'type'))
     }
     case 'CHANNEL_DISCONNECTED': {
@@ -176,7 +176,7 @@ if ($('[data-page="address-transactions"]').length) {
 }
 
 function loadTransactions (store) {
-  console.log("load transactions")
+  console.log('load transactions')
   const path = $('[class="card-body"]')[0].dataset.asyncListing
   store.dispatch({ type: 'START_TRANSACTIONS_FETCH' })
   // @ts-ignore

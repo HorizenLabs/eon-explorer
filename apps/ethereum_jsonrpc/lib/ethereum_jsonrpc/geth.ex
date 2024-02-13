@@ -89,7 +89,6 @@ defmodule EthereumJSONRPC.Geth do
   @tracer File.read!(@tracer_path)
 
   defp debug_trace_transaction_request(%{id: id, hash_data: hash_data}) do
-
     tracer =
       case Application.get_env(:ethereum_jsonrpc, __MODULE__)[:tracer] do
         "js" ->

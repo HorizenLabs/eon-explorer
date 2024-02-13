@@ -365,10 +365,13 @@ defmodule Indexer.Fetcher.InternalTransaction do
   defp chunk_and_reduce(tx_list, json_rpc_named_arguments) do
     chunk_size = Application.get_env(:indexer, __MODULE__)[:rpc_request_size]
     list_of_chunks = Enum.chunk_every(tx_list, chunk_size)
-    acc = Enum.reduce(list_of_chunks, [], fn list, acc ->
-      {:ok, internal_tx_list} = EthereumJSONRPC.fetch_internal_transactions(list, json_rpc_named_arguments)
-      Enum.concat(acc, internal_tx_list)
-    end)
+
+    acc =
+      Enum.reduce(list_of_chunks, [], fn list, acc ->
+        {:ok, internal_tx_list} = EthereumJSONRPC.fetch_internal_transactions(list, json_rpc_named_arguments)
+        Enum.concat(acc, internal_tx_list)
+      end)
+
     {:ok, acc}
   end
 

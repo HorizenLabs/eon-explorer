@@ -77,6 +77,7 @@ defmodule Explorer.ExchangeRates.Source.CoinGecko do
     case wrapped_tokens_list_var do
       nil ->
         supported_coins
+
       _ ->
         # token map is the one read from the environment
         wrapped_token_list = parse_token_list(wrapped_tokens_list_var)
@@ -107,7 +108,9 @@ defmodule Explorer.ExchangeRates.Source.CoinGecko do
 
   defp update_coin(%{"id" => coin_id, "platforms" => platforms} = coin, token_list) do
     case Map.get(token_list, coin_id) do
-      nil -> coin
+      nil ->
+        coin
+
       token ->
         updated_platforms = Map.put_new(platforms, "horizen-eon", token)
         Map.put(coin, "platforms", updated_platforms)
@@ -123,6 +126,7 @@ defmodule Explorer.ExchangeRates.Source.CoinGecko do
     case wrapped_zen_address do
       nil ->
         supported_coins
+
       _ ->
         wrapped_zen = %{
           "id" => "wrapped-zen",
@@ -130,6 +134,7 @@ defmodule Explorer.ExchangeRates.Source.CoinGecko do
             "horizen-eon" => wrapped_zen_address
           }
         }
+
         [wrapped_zen | supported_coins]
     end
   end
@@ -147,7 +152,6 @@ defmodule Explorer.ExchangeRates.Source.CoinGecko do
   """
   @impl Source
   def format_data(supported_coins) when is_list(supported_coins) do
-
     # overwrite the platform used with horizen-eon
     platform = "horizen-eon"
 
@@ -228,7 +232,6 @@ defmodule Explorer.ExchangeRates.Source.CoinGecko do
   """
   @impl Source
   def source_url(token_addresses) when is_list(token_addresses) do
-
     platform = System.fetch_env!(@external_platform)
     joined_addresses = fetch_external_platform_token_addresses()
 

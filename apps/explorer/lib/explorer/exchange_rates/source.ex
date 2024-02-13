@@ -113,11 +113,13 @@ defmodule Explorer.ExchangeRates.Source do
   @wrapped_zen_env_var "WRAPPED_ZEN_ADDRESS"
   defp create_wrapped_zen_map do
     zen_exchange_rate = get_exchange_rate(Explorer.coin())
+
     zen_usd_value =
       case zen_exchange_rate do
         %Explorer.ExchangeRates.Token{usd_value: uv} -> uv
         _ -> nil
       end
+
     zen_usd_value_float = Float.round(Decimal.to_float(zen_usd_value), 2)
     %{System.get_env(@wrapped_zen_env_var) => %{"usd" => zen_usd_value_float}}
   end
@@ -133,8 +135,8 @@ defmodule Explorer.ExchangeRates.Source do
   Moreover the ZEN exchange rate is retrieved and an entry related to the wrapped-zen token is added to the result map
   """
   defp update_result_addresses(result, source_url) do
-
-    case {System.get_env(@external_platform), String.contains?(source_url, "/simple/token_price/" <> System.get_env(@external_platform))} do
+    case {System.get_env(@external_platform),
+          String.contains?(source_url, "/simple/token_price/" <> System.get_env(@external_platform))} do
       {_, true} ->
         # retrieve token address pairs between the external platform used and the eon sidechain
         token_address_pairs_for_swap = fetch_token_address_pairs_for_swap()
@@ -147,7 +149,6 @@ defmodule Explorer.ExchangeRates.Source do
           wrapped_zen_map = create_wrapped_zen_map()
           merged_result = Map.merge(swapped_result, wrapped_zen_map)
           merged_result
-
         else
           swapped_result
         end
@@ -155,11 +156,8 @@ defmodule Explorer.ExchangeRates.Source do
       _ ->
         # if the response is not from the v3/simple/token_price/<platform> api return the input result unchanged
         result
-
     end
-
   end
-
 
   defp fetch_exchange_rates_request(_source, source_url, _headers) when is_nil(source_url),
     do: {:error, "Source URL is nil"}
@@ -167,11 +165,11 @@ defmodule Explorer.ExchangeRates.Source do
   defp fetch_exchange_rates_request(source, source_url, headers) do
     case http_request(source_url, headers) do
       {:ok, result} when is_map(result) ->
-
         result_updated_and_formatted =
-        result
-        |> update_result_addresses(source_url)
-        |> source.format_data()
+          result
+          |> update_result_addresses(source_url)
+          |> source.format_data()
+
         {:ok, result_updated_and_formatted}
 
       resp ->

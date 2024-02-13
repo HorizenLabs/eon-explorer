@@ -4,7 +4,7 @@ defmodule Explorer.Repo.Migrations.AddIndexForwardTransfersToAddressHash do
   @disable_migration_lock true
 
   def change do
-     create_if_not_exists(
+    create_if_not_exists(
       index(
         :forward_transfers,
         [:to_address_hash, "block_number DESC", "index DESC"],
