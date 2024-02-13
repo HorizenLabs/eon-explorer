@@ -7,16 +7,7 @@ defmodule Explorer.Metrics do
   """
   
   alias Explorer.Chain.Cache.Block, as: BlockCache
-  alias Explorer.Chain.Cache.ThirtyDayActiveAccountCountList
-  alias Explorer.Chain.Cache.ThirtyDayActiveDevCountList
-  alias Explorer.Chain.Cache.ThirtyDayAverageTransactionFeeList
-  alias Explorer.Chain.Cache.ThirtyDayContractCountList
-  alias Explorer.Chain.Cache.ThirtyDayGasUsedList
-  alias Explorer.Chain.Cache.ThirtyDayTransactionCountList
-  alias Explorer.Chain.Cache.TotalAccounts
-  alias Explorer.Chain.Cache.TotalEntries
-  alias Explorer.Chain.Cache.TotalSmartContracts
-  alias Explorer.Chain.Cache.TotalValueLocked
+  alias Explorer.Chain.Cache.{ThirtyDayActiveAccountCountList, ThirtyDayActiveDevCountList, ThirtyDayAverageTransactionFeeList, ThirtyDayContractCountList, ThirtyDayGasUsedList, ThirtyDayTransactionCountList, TotalAccounts, TotalEntries, TotalSmartContracts, TotalValueLocked}
   alias Explorer.Chain.Cache.Transaction, as: TransactionCache
   alias Explorer.Counters.AverageBlockTime
 

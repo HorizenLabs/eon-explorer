@@ -69,10 +69,15 @@ defmodule Indexer.Fetcher.FeePaymentAsync do
               tracer: Tracer
             )
   def run(entries, json_rpc_named_arguments) do
-    Range.new(Enum.at(entries, 0), hd(Enum.take(entries, -1)))
+    start_entry = Enum.at(entries, 0)
+    end_entry = List.last(entries)
+    range = Range.new(start_entry, end_entry)
+
+    range
     |> EthereumJSONRPC.FeePayments.fetch(json_rpc_named_arguments)
     |> import_fee_payments(entries)
   end
+
 
   defp import_fee_payments(fee_payments, entries) do
     case Chain.import(%{fee_payments: %{params: fee_payments}, timeout: :infinity}) do
