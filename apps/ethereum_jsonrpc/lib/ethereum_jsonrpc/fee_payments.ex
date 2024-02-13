@@ -1,4 +1,20 @@
 defmodule EthereumJSONRPC.FeePayments do
+  @moduledoc """
+  Handles fetching and processing of fee payment data from the blockchain.
+
+  This module communicates with the Ethereum JSON RPC interface to retrieve data on fee payments for a specified range of block numbers. It processes this data into a structured Elixir format for further use within the application.
+
+  The main functionality includes constructing and sending JSON RPC requests to fetch fee payment data, followed by formatting and flattening the response into a structured list of fee payments.
+
+  ## Functions
+
+    - `fetch/2`: Fetches fee payment data for a specified range of block numbers.
+    - `format_and_flatten/2`: Processes the raw JSON RPC response, extracting and structuring fee payment data.
+    - `request/1`: Builds a single JSON RPC request for fee payment data for a specific block number.
+    - `requests/2`: Maps over a collection of block numbers to build and send multiple requests.
+    - `response_to_payments/1`: Extracts the fee payment data from the JSON RPC response.
+  """
+
   import EthereumJSONRPC, only: [integer_to_quantity: 1, quantity_to_integer: 1, json_rpc: 2, id_to_params: 1]
 
   alias EthereumJSONRPC

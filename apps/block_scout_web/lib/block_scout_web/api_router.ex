@@ -46,9 +46,9 @@ defmodule BlockScoutWeb.ApiRouter do
     plug(RateLimit)
   end
 
+  alias API.MetricsController
   alias BlockScoutWeb.Account.Api.V1.{AuthenticateController, EmailController, TagsController, UserController}
   alias BlockScoutWeb.API.V2
-  alias API.MetricsController
 
   scope "/metrics", BlockScoutWeb do
     pipe_through(:api)

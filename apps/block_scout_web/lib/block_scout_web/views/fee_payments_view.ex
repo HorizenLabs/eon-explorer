@@ -1,8 +1,8 @@
 defmodule BlockScoutWeb.FeePaymentView do
   use BlockScoutWeb, :view
 
+  alias BlockScoutWeb.BlockView
   alias Explorer.Chain.FeePayment
-  alias BlockScoutWeb.{BlockView}
 
   @dialyzer :no_match
 

@@ -10,11 +10,11 @@ defmodule BlockScoutWeb.ForwardTransferController do
       split_list_by_page: 2
     ]
 
-  alias BlockScoutWeb.{Controller}
+  alias BlockScoutWeb.Controller
 
   alias Phoenix.View
 
-  alias Explorer.{Chain}
+  alias Explorer.Chain
 
   @default_options [
     necessity_by_association: %{

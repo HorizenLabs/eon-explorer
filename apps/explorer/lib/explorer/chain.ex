@@ -50,6 +50,8 @@ defmodule Explorer.Chain do
     CurrencyHelper,
     Data,
     DecompiledSmartContract,
+    FeePayment,
+    ForwardTransfer,
     Hash,
     Import,
     InternalTransaction,
@@ -62,9 +64,7 @@ defmodule Explorer.Chain do
     TokenTransfer,
     Transaction,
     Wei,
-    Withdrawal,
-    ForwardTransfer,
-    FeePayment
+    Withdrawal
   }
 
   alias Explorer.Chain.Block.{EmissionReward, Reward}
@@ -3782,7 +3782,7 @@ defmodule Explorer.Chain do
     |> Repo.all()
   end
 
-  def fee_payments_count() do
+  def fee_payments_count do
     FeePayment
     |> Repo.aggregate(:count)
   end
@@ -5362,7 +5362,7 @@ defmodule Explorer.Chain do
     Repo.stream_reduce(missing_extra_transfers_blocks_query, initial, reducer)
   end
 
-  def unfetched_extra_transfers_query() do
+  def unfetched_extra_transfers_query do
     extra_transfer_type = Enum.at(LastFetchedCounter.last_fetched_counter_types(), 0)
 
     from(

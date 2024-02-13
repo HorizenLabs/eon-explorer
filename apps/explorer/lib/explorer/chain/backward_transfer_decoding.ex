@@ -1,4 +1,18 @@
 defmodule BackwardTransfersDecoding do
+  @moduledoc """
+  Decodes backward transfers from blockchain transactions.
+
+  This module is responsible for handling the decoding of backward transfers, including the conversion of public key hashes to addresses and the interaction with the blockchain's native contract for backward transfers. It utilizes predefined ABI for the smart contract interactions and processes transactions to determine the correct address format based on the network's mainnet or testnet configuration.
+
+  ## Functionality
+
+  - `pub_key_hash_to_addr/1`: Converts a public key hash into a blockchain address, prepending the appropriate network prefix.
+  - `backward_transfer_contract_address/0`: Returns the predefined address for the backward transfer contract.
+  - `backward_transfer_abi/0`: Provides the ABI for interacting with the backward transfer native contract.
+
+  The module leverages environment variables to determine network settings (mainnet or testnet) and applies specific logic based on these settings for address conversion.
+  """
+
   @backward_transfer_contract_address <<
     0,
     0,
@@ -35,7 +49,7 @@ defmodule BackwardTransfersDecoding do
     end
   end
 
-  @backward_transfer_ABI [
+  @backward_transfer_abi [
     %{
       "type" => "function",
       "name" => "backwardTransfer",
@@ -81,5 +95,5 @@ defmodule BackwardTransfersDecoding do
   end
 
   def backward_transfer_contract_address, do: @backward_transfer_contract_address
-  def backward_transfer_ABI, do: @backward_transfer_ABI
+  def backward_transfer_abi, do: @backward_transfer_abi
 end

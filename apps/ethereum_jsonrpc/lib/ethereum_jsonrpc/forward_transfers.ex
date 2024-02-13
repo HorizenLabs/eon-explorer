@@ -1,4 +1,18 @@
 defmodule EthereumJSONRPC.ForwardTransfers do
+  @moduledoc """
+  Handles fetching and processing of forward transfers from the blockchain.
+
+  This module is responsible for fetching forward transfer data for a given range of block numbers and processing that data into a structured format. It makes use of the Ethereum JSON RPC interface to query for forward transfers and then formats the raw data into a more usable Elixir data structure.
+
+  ## Functions
+
+    - `fetch/2`: Fetches forward transfer data for a given range of block numbers.
+    - `format_and_flatten/2`: Formats and flattens the response from the Ethereum JSON RPC into a list of forward transfers.
+    - `request/1`: Constructs a request for forward transfer data for a given block number.
+    - `requests/2`: Maps over a collection of block numbers to construct multiple requests.
+    - `elixir_to_params/1` and `to_elixir/1`: Convert data between raw and processed formats.
+  """
+
   import EthereumJSONRPC, only: [integer_to_quantity: 1, quantity_to_integer: 1, json_rpc: 2, id_to_params: 1]
 
   alias EthereumJSONRPC

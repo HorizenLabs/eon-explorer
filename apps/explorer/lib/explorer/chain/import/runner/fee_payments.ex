@@ -6,7 +6,7 @@ defmodule Explorer.Chain.Import.Runner.FeePayments do
   require Ecto.Query
 
   alias Ecto.{Multi, Repo}
-  alias Explorer.Chain.{Hash, Import, FeePayment}
+  alias Explorer.Chain.{FeePayment, Hash, Import}
   alias Explorer.Prometheus.Instrumenter
 
   @behaviour Import.Runner

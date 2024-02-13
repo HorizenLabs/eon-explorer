@@ -1,4 +1,15 @@
 defmodule Explorer.Counters.AverageBlockTime do
+  @moduledoc """
+  A GenServer responsible for calculating the average block time.
+
+  This module periodically queries the blockchain data to compute the average time between blocks.  The calculation can include or exclude uncle blocks based on application configuration.
+
+  ## Functions
+    - `start_link/1`: Starts the GenServer process.
+    - `average_block_time/0`: Returns the current average block time if the feature is enabled.
+    - `refresh/0`: Triggers an immediate refresh of the average block time calculation.
+  """
+
   use GenServer
 
   import Ecto.Query, only: [from: 2, where: 2]

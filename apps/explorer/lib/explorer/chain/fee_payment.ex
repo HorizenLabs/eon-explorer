@@ -4,10 +4,10 @@ defmodule Explorer.Chain.FeePayment do
   use Explorer.Schema
 
   alias Explorer.Chain.{
+    Address,
     Block,
-    Wei,
     Hash,
-    Address
+    Wei
   }
 
   @required_attrs ~w(block_number block_hash to_address_hash value index)a

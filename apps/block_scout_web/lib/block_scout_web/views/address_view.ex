@@ -9,6 +9,8 @@ defmodule BlockScoutWeb.AddressView do
 
   alias Explorer.Chain.{
     Address,
+    FeePayment,
+    ForwardTransfer,
     Hash,
     InternalTransaction,
     Log,
@@ -16,9 +18,7 @@ defmodule BlockScoutWeb.AddressView do
     Token,
     TokenTransfer,
     Transaction,
-    Wei,
-    FeePayment,
-    ForwardTransfer
+    Wei
   }
 
   alias Explorer.Chain.Block.Reward

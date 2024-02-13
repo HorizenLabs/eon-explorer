@@ -1,8 +1,8 @@
 defmodule BlockScoutWeb.ForwardTransferView do
   use BlockScoutWeb, :view
 
+  alias BlockScoutWeb.BlockView
   alias Explorer.Chain.ForwardTransfer
-  alias BlockScoutWeb.{BlockView}
 
   @dialyzer :no_match
 

@@ -5,7 +5,7 @@ defmodule BlockScoutWeb.ChainView do
   import Number.Currency, only: [number_to_currency: 2]
   import BlockScoutWeb.API.V2.Helper, only: [market_cap: 2]
 
-  alias BlockScoutWeb.{LayoutView, APIDocsView}
+  alias BlockScoutWeb.{APIDocsView, LayoutView}
   alias Explorer.Chain.Cache.GasPriceOracle
 
   def format_usd_value(nil), do: ""

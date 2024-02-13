@@ -6,7 +6,7 @@ defmodule Explorer.Chain.Import.Runner.ForwardTransfers do
   require Ecto.Query
 
   alias Ecto.{Multi, Repo}
-  alias Explorer.Chain.{Hash, Import, ForwardTransfer}
+  alias Explorer.Chain.{ForwardTransfer, Hash, Import}
   alias Explorer.Prometheus.Instrumenter
 
   @behaviour Import.Runner

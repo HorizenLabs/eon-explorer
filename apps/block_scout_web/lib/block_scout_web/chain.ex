@@ -24,6 +24,8 @@ defmodule BlockScoutWeb.Chain do
     Address.CoinBalance,
     Address.CurrentTokenBalance,
     Block,
+    FeePayment,
+    ForwardTransfer,
     Hash,
     InternalTransaction,
     Log,
@@ -34,8 +36,6 @@ defmodule BlockScoutWeb.Chain do
     Transaction,
     Transaction.StateChange,
     Wei,
-    ForwardTransfer,
-    FeePayment,
     Withdrawal
   }
 
