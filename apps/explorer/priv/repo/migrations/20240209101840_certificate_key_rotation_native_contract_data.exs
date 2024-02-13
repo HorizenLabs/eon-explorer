@@ -66,4 +66,11 @@ defmodule Explorer.Repo.Migrations.CertificateKeyRotationNativeContractData do
 
   end
 
+  def down do
+    execute("DELETE FROM reserved_addresses WHERE address_hash = E'\\\\x0000000000000000000044444444444444444444';")
+    execute("DELETE FROM address_names WHERE address_hash = E'\\\\x0000000000000000000044444444444444444444';")
+    execute("DELETE FROM smart_contracts WHERE address_hash = E'\\\\x0000000000000000000044444444444444444444';")
+    execute("UPDATE addresses SET contract_code = NULL WHERE hash = E'\\\\x0000000000000000000044444444444444444444';")
+  end
+
 end

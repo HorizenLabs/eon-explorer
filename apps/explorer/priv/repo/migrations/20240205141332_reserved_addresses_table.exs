@@ -16,4 +16,9 @@ defmodule Explorer.Repo.Migrations.ReservedAddressesTable do
     create(unique_index(:reserved_addresses, :address_hash))
   end
 
+  def down do
+    drop(unique_index(:reserved_addresses, :address_hash))
+    drop(table(:reserved_addresses))
+  end
+
 end

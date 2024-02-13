@@ -65,7 +65,13 @@ defmodule Explorer.Repo.Migrations.WithdrawalRequestNativeContractData do
     execute("INSERT INTO address_names(address_hash, name, \"primary\", inserted_at, updated_at) VALUES (E'\\\\x0000000000000000000011111111111111111111', 'Withdrawal Request', true, NOW(), NOW())")
     execute("INSERT INTO reserved_addresses(address_hash, name, is_contract, inserted_at) VALUES (E'\\\\x0000000000000000000011111111111111111111', 'withdrawal request', true, NOW())")
 
+  end
 
+  def down do
+    execute("DELETE FROM reserved_addresses WHERE address_hash = E'\\\\x0000000000000000000011111111111111111111';")
+    execute("DELETE FROM address_names WHERE address_hash = E'\\\\x0000000000000000000011111111111111111111';")
+    execute("DELETE FROM smart_contracts WHERE address_hash = E'\\\\x0000000000000000000011111111111111111111';")
+    execute("UPDATE addresses SET contract_code = NULL WHERE hash = E'\\\\x0000000000000000000011111111111111111111';")
   end
 
 end

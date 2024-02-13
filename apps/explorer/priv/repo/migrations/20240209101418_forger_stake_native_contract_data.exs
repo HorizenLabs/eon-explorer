@@ -67,4 +67,11 @@ defmodule Explorer.Repo.Migrations.ForgerStakeNativeContractData do
 
   end
 
+  def down do
+    execute("DELETE FROM reserved_addresses WHERE address_hash = E'\\\\x0000000000000000000022222222222222222222';")
+    execute("DELETE FROM address_names WHERE address_hash = E'\\\\x0000000000000000000022222222222222222222';")
+    execute("DELETE FROM smart_contracts WHERE address_hash = E'\\\\x0000000000000000000022222222222222222222';")
+    execute("UPDATE addresses SET contract_code = NULL WHERE hash = E'\\\\x0000000000000000000022222222222222222222';")
+  end
+
 end

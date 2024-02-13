@@ -66,4 +66,11 @@ defmodule Explorer.Repo.Migrations.MainchainAddressOwnershipNativeContractData d
 
   end
 
+  def down do
+    execute("DELETE FROM reserved_addresses WHERE address_hash = E'\\\\x0000000000000000000088888888888888888888';")
+    execute("DELETE FROM address_names WHERE address_hash = E'\\\\x0000000000000000000088888888888888888888';")
+    execute("DELETE FROM smart_contracts WHERE address_hash = E'\\\\x0000000000000000000088888888888888888888';")
+    execute("UPDATE addresses SET contract_code = NULL WHERE hash = E'\\\\x0000000000000000000088888888888888888888';")
+  end
+
 end
