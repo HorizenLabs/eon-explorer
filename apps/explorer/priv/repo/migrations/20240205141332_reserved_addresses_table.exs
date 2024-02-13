@@ -3,7 +3,7 @@ defmodule Explorer.Repo.Migrations.ReservedAddressesTable do
   @disable_ddl_transaction true
   @disable_migration_lock true
 
-  def change do
+  def up do
 
     create table(:reserved_addresses) do
       add(:address_hash, references(:addresses, column: :hash, on_delete: :delete_all, type: :bytea), null: false)

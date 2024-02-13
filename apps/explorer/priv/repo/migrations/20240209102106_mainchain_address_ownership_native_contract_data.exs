@@ -3,7 +3,7 @@ defmodule Explorer.Repo.Migrations.MainchainAddressOwnershipNativeContractData d
   @disable_ddl_transaction true
   @disable_migration_lock true
 
-  def change do
+  def up do
     execute(
       "DO $$
        BEGIN

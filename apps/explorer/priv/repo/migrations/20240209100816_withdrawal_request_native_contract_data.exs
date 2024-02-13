@@ -3,7 +3,7 @@ defmodule Explorer.Repo.Migrations.WithdrawalRequestNativeContractData do
   @disable_ddl_transaction true
   @disable_migration_lock true
 
-  def change do
+  def up do
     execute(
       "DO $$
        BEGIN
