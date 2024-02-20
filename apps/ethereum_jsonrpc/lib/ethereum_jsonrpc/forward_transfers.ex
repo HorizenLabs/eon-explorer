@@ -40,12 +40,15 @@ defmodule EthereumJSONRPC.ForwardTransfers do
     |> Enum.map(fn response ->
       response.result["forwardTransfers"]
       |> Enum.reduce([], fn ft, acc ->
-        [%{
-          to_address_hash: ft["to"],
-          block_number: id_to_params[response.id].number,
-          value: quantity_to_integer(ft["value"]),
-          index: Enum.count(acc)
-        } | acc]
+        [
+          %{
+            to_address_hash: ft["to"],
+            block_number: id_to_params[response.id].number,
+            value: quantity_to_integer(ft["value"]),
+            index: Enum.count(acc)
+          }
+          | acc
+        ]
       end)
       |> Enum.reverse()
     end)

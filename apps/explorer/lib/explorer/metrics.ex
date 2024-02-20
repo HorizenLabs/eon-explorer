@@ -5,9 +5,22 @@ defmodule Explorer.Metrics do
   This includes functionalities for retrieving total counts of accounts, blocks, transactions,
   smart contracts, and other metrics like average block time and thirty-day activity lists.
   """
-  
+
   alias Explorer.Chain.Cache.Block, as: BlockCache
-  alias Explorer.Chain.Cache.{ThirtyDayActiveAccountCountList, ThirtyDayActiveDevCountList, ThirtyDayAverageTransactionFeeList, ThirtyDayContractCountList, ThirtyDayGasUsedList, ThirtyDayTransactionCountList, TotalAccounts, TotalEntries, TotalSmartContracts, TotalValueLocked}
+
+  alias Explorer.Chain.Cache.{
+    ThirtyDayActiveAccountCountList,
+    ThirtyDayActiveDevCountList,
+    ThirtyDayAverageTransactionFeeList,
+    ThirtyDayContractCountList,
+    ThirtyDayGasUsedList,
+    ThirtyDayTransactionCountList,
+    TotalAccounts,
+    TotalEntries,
+    TotalSmartContracts,
+    TotalValueLocked
+  }
+
   alias Explorer.Chain.Cache.Transaction, as: TransactionCache
   alias Explorer.Counters.AverageBlockTime
 

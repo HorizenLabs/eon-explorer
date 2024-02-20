@@ -672,7 +672,7 @@ defmodule Explorer.Chain.Transaction do
   end
 
   defp do_decoded_input_data_bw(data, hash) do
-    with {:ok, {selector, values}} <- find_and_decode(backward_transfer_ABI(), data, hash),
+    with {:ok, {selector, values}} <- find_and_decode(backward_transfer_abi(), data, hash),
          {:ok, mapping} <- selector_mapping(selector, values, hash),
          identifier <- Base.encode16(selector.method_id, case: :lower),
          text <- function_call(selector.function, mapping),

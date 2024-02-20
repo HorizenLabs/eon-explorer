@@ -86,14 +86,12 @@ defmodule BackwardTransfersDecoding do
     env_pub_key_hash_prefix = pub_key_hash_prefix()
     prepended_key = env_pub_key_hash_prefix <> pub_key_hash
 
-    hash_result =
-      :crypto.hash(:sha256, :crypto.hash(:sha256, prepended_key))
+    hash_result = :crypto.hash(:sha256, :crypto.hash(:sha256, prepended_key))
 
     checksum = extract_binary_part(hash_result)
 
     payload_with_checksum = <<prepended_key::binary, checksum::binary>>
     Base58.encode(payload_with_checksum)
-    
   end
 
   defp extract_binary_part(binary_data) do

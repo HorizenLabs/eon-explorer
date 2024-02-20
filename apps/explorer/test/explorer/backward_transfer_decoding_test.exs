@@ -52,7 +52,7 @@ defmodule BackwardTransfersDecodingTest do
       }
     ]
 
-    assert backward_transfer_ABI() == expected_abi
+    assert backward_transfer_abi() == expected_abi
   end
 
   test "decoded_input_data returns expected output" do

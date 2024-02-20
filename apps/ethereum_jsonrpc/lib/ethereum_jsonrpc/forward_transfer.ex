@@ -1,20 +1,20 @@
 defmodule EthereumJSONRPC.ForwardTransfer do
-@moduledoc """
-Provides functionality for converting forward transfer data between different formats.
+  @moduledoc """
+  Provides functionality for converting forward transfer data between different formats.
 
-This module is responsible for transforming forward transfer data from the raw format provided by the Ethereum JSON RPC into a more structured Elixir format, and vice versa. It defines types and specifications for the data involved in forward transfers, including the transaction block number, recipient address, and transfer value.
+  This module is responsible for transforming forward transfer data from the raw format provided by the Ethereum JSON RPC into a more structured Elixir format, and vice versa. It defines types and specifications for the data involved in forward transfers, including the transaction block number, recipient address, and transfer value.
 
-## Types
+  ## Types
 
-  - `t`: Represents the raw data structure for a forward transfer as received from the Ethereum JSON RPC.
-  - `elixir`: A more structured Elixir representation of the forward transfer data.
-  - `params`: A simplified Elixir map used for processing or storing forward transfer data.
+    - `t`: Represents the raw data structure for a forward transfer as received from the Ethereum JSON RPC.
+    - `elixir`: A more structured Elixir representation of the forward transfer data.
+    - `params`: A simplified Elixir map used for processing or storing forward transfer data.
 
-## Functions
+  ## Functions
 
-  - `elixir_to_params/1`: Converts data from the `elixir` format to `params` format, suitable for further processing or storage.
-  - `to_elixir/1`: Converts data from the raw `t` format to the structured `elixir` format.
-"""
+    - `elixir_to_params/1`: Converts data from the `elixir` format to `params` format, suitable for further processing or storage.
+    - `to_elixir/1`: Converts data from the raw `t` format to the structured `elixir` format.
+  """
 
   require Logger
 

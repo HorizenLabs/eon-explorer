@@ -78,7 +78,6 @@ defmodule Indexer.Fetcher.FeePaymentAsync do
     |> import_fee_payments(entries)
   end
 
-
   defp import_fee_payments(fee_payments, entries) do
     case Chain.import(%{fee_payments: %{params: fee_payments}, timeout: :infinity}) do
       {:ok, _imported} ->
