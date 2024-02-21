@@ -39,30 +39,52 @@ defmodule Explorer.Repo.Migrations.ForgerStakeNativeContractData do
        END $$"
     )
 
-    execute("
-      INSERT INTO smart_contracts (
-            name,
-            compiler_version,
-            optimization,
-            contract_source_code,
-            abi,
-            address_hash,
-            inserted_at,
-            updated_at,
-            contract_code_md5)
-          VALUES (
-            'Forger Stake',
-            '-',
-            false,
-            '/',
-            '[{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"publicKey\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"vrf1\",\"type\":\"bytes32\"},{\"internalType\":\"bytes1\",\"name\":\"vrf2\",\"type\":\"bytes1\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"delegate\",\"outputs\":[{\"internalType\":\"StakeID\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getAllForgersStakes\",\"outputs\":[{\"components\":[{\"internalType\":\"StakeID\",\"name\":\"stakeId\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"stakedAmount\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"publicKey\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"vrf1\",\"type\":\"bytes32\"},{\"internalType\":\"bytes1\",\"name\":\"vrf2\",\"type\":\"bytes1\"}],\"internalType\":\"struct ForgerStakes.StakeInfo[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"forgerIndex\",\"type\":\"uint32\"},{\"internalType\":\"bytes32\",\"name\":\"signature1\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"signature2\",\"type\":\"bytes32\"}],\"name\":\"openStakeForgerList\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"StakeID\",\"name\":\"stakeId\",\"type\":\"bytes32\"},{\"internalType\":\"bytes1\",\"name\":\"signatureV\",\"type\":\"bytes1\"},{\"internalType\":\"bytes32\",\"name\":\"signatureR\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"signatureS\",\"type\":\"bytes32\"}],\"name\":\"withdraw\",\"outputs\":[{\"internalType\":\"StakeID\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]',
-            E'\\\\x0000000000000000000022222222222222222222',
-            NOW(),
-            NOW(),
-            '6666cd76f96956469e7be39d750cc7d9'
-          );")
+    execute(
+      "DO $$
+       BEGIN
 
-    execute("INSERT INTO address_names(address_hash, name, \"primary\", inserted_at, updated_at) VALUES (E'\\\\x0000000000000000000022222222222222222222', 'Forger Stake', true, NOW(), NOW())")
+         -- Check if the record with the specified hash exists
+         IF NOT EXISTS (SELECT 1 FROM smart_contracts WHERE address_hash = E'\\\\x0000000000000000000022222222222222222222') THEN
+
+          INSERT INTO smart_contracts (
+              name,
+              compiler_version,
+              optimization,
+              contract_source_code,
+              abi,
+              address_hash,
+              inserted_at,
+              updated_at,
+              contract_code_md5)
+            VALUES (
+              'Forger Stake',
+              '-',
+              false,
+              '/',
+              '[{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"publicKey\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"vrf1\",\"type\":\"bytes32\"},{\"internalType\":\"bytes1\",\"name\":\"vrf2\",\"type\":\"bytes1\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"delegate\",\"outputs\":[{\"internalType\":\"StakeID\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getAllForgersStakes\",\"outputs\":[{\"components\":[{\"internalType\":\"StakeID\",\"name\":\"stakeId\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"stakedAmount\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"publicKey\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"vrf1\",\"type\":\"bytes32\"},{\"internalType\":\"bytes1\",\"name\":\"vrf2\",\"type\":\"bytes1\"}],\"internalType\":\"struct ForgerStakes.StakeInfo[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"forgerIndex\",\"type\":\"uint32\"},{\"internalType\":\"bytes32\",\"name\":\"signature1\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"signature2\",\"type\":\"bytes32\"}],\"name\":\"openStakeForgerList\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"StakeID\",\"name\":\"stakeId\",\"type\":\"bytes32\"},{\"internalType\":\"bytes1\",\"name\":\"signatureV\",\"type\":\"bytes1\"},{\"internalType\":\"bytes32\",\"name\":\"signatureR\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"signatureS\",\"type\":\"bytes32\"}],\"name\":\"withdraw\",\"outputs\":[{\"internalType\":\"StakeID\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]',
+              E'\\\\x0000000000000000000022222222222222222222',
+              NOW(),
+              NOW(),
+              '6666cd76f96956469e7be39d750cc7d9'
+            );
+
+         END IF;
+       END $$"
+    )
+
+    execute(
+      "DO $$
+       BEGIN
+
+         -- Check if the record with the specified hash exists
+         IF NOT EXISTS (SELECT 1 FROM address_names WHERE address_hash = E'\\\\x0000000000000000000022222222222222222222') THEN
+
+          INSERT INTO address_names(address_hash, name, \"primary\", inserted_at, updated_at) VALUES (E'\\\\x0000000000000000000022222222222222222222', 'Forger Stake', true, NOW(), NOW());
+
+         END IF;
+       END $$"
+    )
+
     execute("INSERT INTO reserved_addresses(address_hash, name, is_contract, inserted_at) VALUES (E'\\\\x0000000000000000000022222222222222222222', 'forger stake', true, NOW())")
 
   end
