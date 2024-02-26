@@ -9,6 +9,8 @@ defmodule BlockScoutWeb.RealtimeEventHandler do
   alias Explorer.Chain.Events.Subscriber
   alias Explorer.Counters.Helper
 
+  require Logger
+
   def start_link(_) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
@@ -40,6 +42,7 @@ defmodule BlockScoutWeb.RealtimeEventHandler do
   @impl true
   def handle_info(event, state) do
     Notifier.handle_event(event)
+    Logger.info("BlockScoutWeb.RealtimeEventHandler received event #{event}")
     {:noreply, state}
   end
 end

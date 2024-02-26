@@ -24,6 +24,8 @@ defmodule BlockScoutWeb.Notifier do
   alias Explorer.SmartContract.{CompilerVersion, Solidity.CodeCompiler}
   alias Phoenix.View
 
+  require Logger
+
   @check_broadcast_sequence_period 500
 
   def handle_event({:chain_event, :addresses, type, addresses}) when type in [:realtime, :on_demand] do
@@ -59,6 +61,7 @@ defmodule BlockScoutWeb.Notifier do
         result: contract_verification_result
       }
     )
+    Logger.info("BlockScoutWeb.Notifier broadcast event 'verification_result' to addresses:#{address_hash} with result #{contract_verification_result}")
   end
 
   def handle_event(
@@ -95,6 +98,7 @@ defmodule BlockScoutWeb.Notifier do
         result: contract_verification_result
       }
     )
+    Logger.info("BlockScoutWeb.Notifier broadcast event 'verification_result' to addresses:#{address_hash} with result #{contract_verification_result}")
   end
 
   def handle_event({:chain_event, :block_rewards, :realtime, rewards}) do

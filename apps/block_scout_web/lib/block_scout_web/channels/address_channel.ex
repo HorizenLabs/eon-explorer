@@ -20,6 +20,8 @@ defmodule BlockScoutWeb.AddressChannel do
   alias Explorer.Chain.Hash.Address, as: AddressHash
   alias Phoenix.View
 
+  require Logger
+
   intercept([
     "balance_update",
     "coin_balance",
@@ -101,6 +103,7 @@ defmodule BlockScoutWeb.AddressChannel do
     case result do
       {:ok, _contract} ->
         push(socket, "verification_result", %{status: "success"})
+        Logger.info("BlockScoutWeb.AddressChannel sent message 'verification_result' with {status: 'success'}")
         {:noreply, socket}
 
       {:error, changeset} ->
@@ -108,7 +111,7 @@ defmodule BlockScoutWeb.AddressChannel do
           status: "error",
           errors: SmartContractViewAPI.render("changeset_errors.json", %{changeset: changeset})
         })
-
+        Logger.info("BlockScoutWeb.AddressChannel sent message 'verification_result' with {status: 'error'}")
         {:noreply, socket}
     end
   end
@@ -117,6 +120,7 @@ defmodule BlockScoutWeb.AddressChannel do
     case result[:result] do
       {:ok, _contract} ->
         push(socket, "verification", %{verification_result: :ok})
+        Logger.info("BlockScoutWeb.AddressChannel sent message 'verification' with {verification_result: 'ok'}")
         {:noreply, socket}
 
       {:error, %Ecto.Changeset{}} ->
@@ -124,6 +128,7 @@ defmodule BlockScoutWeb.AddressChannel do
 
       {:error, result} ->
         push(socket, "verification", %{verification_result: result})
+        Logger.info("BlockScoutWeb.AddressChannel sent message 'verification' with {verification_result: #{result}}")
         {:noreply, socket}
     end
   end

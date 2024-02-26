@@ -37,6 +37,9 @@ See the [project documentation](https://docs.blockscout.com/) for instructions:
 - [ENV variables](https://docs.blockscout.com/for-developers/information-and-settings/env-variables)
 - [Configuration options](https://docs.blockscout.com/for-developers/configuration-options)
 
+## Build Local Image
+To build a Docker image, run `docker build -f dockerfiles/Dockerfile .` from the root of the project
+
 ## Acknowledgements
 
 We would like to thank the [EthPrize foundation](http://ethprize.io/) for their funding support.
