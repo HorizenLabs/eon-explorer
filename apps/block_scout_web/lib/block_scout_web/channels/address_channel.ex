@@ -128,7 +128,7 @@ defmodule BlockScoutWeb.AddressChannel do
 
       {:error, result} ->
         push(socket, "verification", %{verification_result: result})
-        Logger.info("BlockScoutWeb.AddressChannel sent message 'verification' with {verification_result: #{result}}")
+        Logger.info("BlockScoutWeb.AddressChannel sent message 'verification' with an error")
         {:noreply, socket}
     end
   end

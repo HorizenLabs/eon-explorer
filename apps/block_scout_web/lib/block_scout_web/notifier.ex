@@ -61,7 +61,7 @@ defmodule BlockScoutWeb.Notifier do
         result: contract_verification_result
       }
     )
-    Logger.info("BlockScoutWeb.Notifier broadcast event 'verification_result' to addresses:#{address_hash} with result #{contract_verification_result}")
+    Logger.info("BlockScoutWeb.Notifier broadcast event 'verification_result' to addresses:#{address_hash}")
   end
 
   def handle_event(
@@ -98,7 +98,7 @@ defmodule BlockScoutWeb.Notifier do
         result: contract_verification_result
       }
     )
-    Logger.info("BlockScoutWeb.Notifier broadcast event 'verification_result' to addresses:#{address_hash} with result #{contract_verification_result}")
+    Logger.info("BlockScoutWeb.Notifier broadcast event 'verification_result' to addresses:#{address_hash}")
   end
 
   def handle_event({:chain_event, :block_rewards, :realtime, rewards}) do
