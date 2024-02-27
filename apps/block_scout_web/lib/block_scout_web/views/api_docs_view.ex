@@ -31,7 +31,7 @@ defmodule BlockScoutWeb.APIDocsView do
 
   defp required_params(action) do
     Enum.map(action.required_params, fn param ->
-      "&#{param.key}=" <> "{<strong>#{param.placeholder}</strong>}"
+      "&amp;#{param.key}=" <> "{<strong>#{param.placeholder}</strong>}"
     end)
   end
 
