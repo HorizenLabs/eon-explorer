@@ -60,7 +60,7 @@
             </div>
             <% end %>
           <% end %>
-          <%= render BlockScoutWeb.ChainView, "gas_price_oracle_legend_item.html", gas_price: @gas_price %>
+          <%= render BlockScoutWeb.ChainView, "gas_price_legend_item.html", gas_price: @gas_price %>
           <%= if Map.has_key?(@chart_config, :transactions) do %>
 
             <% transaction_chart_config = @chart_config.transactions%>
