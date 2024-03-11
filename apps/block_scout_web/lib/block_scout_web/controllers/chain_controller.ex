@@ -41,6 +41,8 @@ defmodule BlockScoutWeb.ChainController do
 
     chart_config = Application.get_env(:block_scout_web, :chart)[:chart_config]
 
+    gas_price = ChainView.gas_price() || Application.get_env(:block_scout_web, :gas_price)
+
     render(
       conn,
       "show.html",
@@ -56,7 +58,7 @@ defmodule BlockScoutWeb.ChainController do
       transactions_path: recent_transactions_path(conn, :index),
       transaction_stats: transaction_stats,
       block_count: block_count,
-      gas_price: Application.get_env(:block_scout_web, :gas_price)
+      gas_price: gas_price
     )
   end
 

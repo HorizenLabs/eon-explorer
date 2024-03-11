@@ -57,7 +57,7 @@ defmodule BlockScoutWeb.ChainView do
     "#{number_to_currency(value, unit: symbol, precision: 0)}"
   end
 
-  defp gas_price do
+  def gas_price do
     case GasPrice.get_gas_price_from_rpc() do
       {:ok, gas_price} ->
         gas_price
