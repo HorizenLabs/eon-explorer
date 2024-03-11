@@ -1,0 +1,14 @@
+<div class="dashboard-banner-chart-legend-item gas-price-from_rpc">
+    <span class="dashboard-banner-chart-legend-label">
+    <%= gettext "Gas tracker" %>
+    </span>
+    <div class="dashboard-banner-chart-legend-value-container">
+        <%= if @gas_price do %>
+        <span class="dashboard-banner-chart-legend-value inline">
+            <div class="d-flex flex-row" style="height: 20px; line-height: 20px;">
+                <div class="flex-column"><%= "#{@gas_price}" <> " " %><%= gettext "Gwei" %></div>
+            </div>
+        </span>
+        <% end %>
+    </div>
+</div>

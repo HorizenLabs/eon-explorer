@@ -6,7 +6,7 @@ defmodule BlockScoutWeb.ChainView do
   import BlockScoutWeb.API.V2.Helper, only: [market_cap: 2]
 
   alias BlockScoutWeb.{LayoutView, APIDocsView}
-  alias Explorer.Chain.Cache.GasPriceOracle
+  alias Explorer.Chain.GasPrice.GasPrice
 
   def format_usd_value(nil), do: ""
 
@@ -57,10 +57,10 @@ defmodule BlockScoutWeb.ChainView do
     "#{number_to_currency(value, unit: symbol, precision: 0)}"
   end
 
-  defp gas_prices do
-    case GasPriceOracle.get_gas_prices() do
-      {:ok, gas_prices} ->
-        gas_prices
+  def gas_price do
+    case GasPrice.get_gas_price_from_rpc() do
+      {:ok, gas_price} ->
+        gas_price
 
       nil ->
         nil

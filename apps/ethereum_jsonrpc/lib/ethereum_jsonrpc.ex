@@ -297,6 +297,19 @@ defmodule EthereumJSONRPC do
     end
   end
 
+  @spec fetch_gas_price(json_rpc_named_arguments) :: {:ok, non_neg_integer()} | {:error, reason :: term}
+  def fetch_gas_price(json_rpc_named_arguments) do
+    result =
+      %{id: 0, method: "eth_gasPrice", params: []}
+      |> request()
+      |> json_rpc(json_rpc_named_arguments)
+
+    case result do
+      {:ok, gas_price} -> {:ok, quantity_to_integer(gas_price)}
+      other -> other
+    end
+  end
+
   @doc """
   Fetches block number by `t:tag/0`.
 
