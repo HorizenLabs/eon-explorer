@@ -9,16 +9,6 @@
                 <div class="flex-column"><%= "#{@gas_price}" <> " " %><%= gettext "Gwei" %></div>
             </div>
         </span>
-        <% else %>
-        <%= if @gas_price do %>
-        <span class="dashboard-banner-chart-legend-value inline ml-2">
-            <span class="gas-price-icon">
-                <%= render BlockScoutWeb.IconsView, "_gas_price_icon.html" %>
-            </span>
-            <%= @gas_price <> " " %>
-            <%= gettext "Gwei" %>
-        </span>
-        <% end %>
         <% end %>
     </div>
 </div>
