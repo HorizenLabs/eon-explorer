@@ -5,13 +5,18 @@ defmodule BlockScoutWeb.API.RPC.BlockController do
   alias Explorer.Chain
   alias Explorer.Chain.Cache.BlockNumber
 
+  require Logger
+
   def getblockreward(conn, params) do
     with {:block_param, {:ok, unsafe_block_number}} <- {:block_param, Map.fetch(params, "blockno")},
          {:ok, block_number} <- ChainWeb.param_to_block_number(unsafe_block_number),
          {:ok, block} <- Chain.number_to_block(block_number) do
-      reward = Chain.block_reward(block_number)
-
-      render(conn, :block_reward, block: block, reward: reward)
+      case Chain.block_reward(block_number) do
+        nil ->
+          render(conn, :error, error: "No block reward data related to this block")
+        reward ->
+          render(conn, :block_reward, block: block, reward: reward)
+      end
     else
       {:block_param, :error} ->
         render(conn, :error, error: "Query parameter 'blockno' is required")
