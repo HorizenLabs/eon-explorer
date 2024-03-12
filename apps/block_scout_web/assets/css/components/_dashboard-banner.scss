@@ -137,7 +137,7 @@ $dashboard-banner-chart-axis-font-color-alt: #333;
       }
     }
 
-    &.gas-price-oracle {
+    &.gas-price-from_rpc {
       &::before {
         background-color: $dashboard-line-color-price;
       }

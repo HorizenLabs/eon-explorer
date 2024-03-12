@@ -113,6 +113,8 @@ verification_max_libraries =
     _ -> verification_max_libraries_default
   end
 
+gas_price_default = 24 # default gas price 24 Gwei
+
 config :block_scout_web,
   link_to_other_explorers: System.get_env("LINK_TO_OTHER_EXPLORERS") == "true",
   other_explorers: System.get_env("OTHER_EXPLORERS"),
@@ -121,7 +123,7 @@ config :block_scout_web,
   api_url: System.get_env("API_URL"),
   apps_menu: if(System.get_env("APPS_MENU", "false") == "true", do: true, else: false),
   apps: System.get_env("APPS") || System.get_env("EXTERNAL_APPS"),
-  gas_price: System.get_env("GAS_PRICE", nil),
+  gas_price: ConfigHelper.parse_integer_env_var("GAS_PRICE", gas_price_default),
   dark_forest_addresses: System.get_env("CUSTOM_CONTRACT_ADDRESSES_DARK_FOREST"),
   dark_forest_addresses_v_0_5: System.get_env("CUSTOM_CONTRACT_ADDRESSES_DARK_FOREST_V_0_5"),
   circles_addresses: System.get_env("CUSTOM_CONTRACT_ADDRESSES_CIRCLES"),
