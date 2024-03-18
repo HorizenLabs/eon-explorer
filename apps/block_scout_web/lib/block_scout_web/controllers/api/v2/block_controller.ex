@@ -146,7 +146,7 @@ defmodule BlockScoutWeb.API.V2.BlockController do
         |> Keyword.merge(paging_options(params))
         |> Keyword.merge(current_filter(params))
 
-      forward_transfers_plus_one = Chain.block_to_forward_transfers(block.hash, full_options)
+      forward_transfers_plus_one = Chain.get_forward_transfers(nil, block.hash, full_options)
       {forward_transfers, next_page} = split_list_by_page(forward_transfers_plus_one)
 
       next_page_params = next_page |> next_page_params(forward_transfers, params) |> delete_parameters_from_next_page_params()

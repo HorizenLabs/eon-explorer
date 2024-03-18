@@ -32,8 +32,7 @@ defmodule BlockScoutWeb.API.V2.ForwardTransferController do
       |> Keyword.merge(paging_options(params))
       |> Keyword.merge(current_filter(params))
 
-    results = Chain.all_forward_transfers(options)
-
+    results = Chain.get_forward_transfers(nil, nil, options)
     {forward_transfers, next_page} = split_list_by_page(results)
 
     next_page_params =

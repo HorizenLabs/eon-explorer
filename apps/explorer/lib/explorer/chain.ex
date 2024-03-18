@@ -3738,41 +3738,27 @@ defmodule Explorer.Chain do
     |> Repo.all()
   end
 
-  def all_forward_transfers(options \\ []) when is_list(options) do
+  def get_forward_transfers(address_hash \\ nil, block_hash \\ nil, options \\ []) when is_list(options) do
     necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
     paging_options = Keyword.get(options, :paging_options, @default_paging_options)
 
     ForwardTransfer
+    |> forward_transfers_filter_address_hash(address_hash)
+    |> forward_transfers_filter_block_hash(block_hash)
     |> order_by([forward_transfer], desc: [forward_transfer.block_number, forward_transfer.index])
     |> handle_forward_transfers_paging_options(paging_options)
     |> join_associations(necessity_by_association)
     |> Repo.all()
   end
 
-  def address_to_forward_transfers(address_hash, options \\ []) when is_list(options) do
-    necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
-    paging_options = Keyword.get(options, :paging_options, @default_paging_options)
-
-    ForwardTransfer
-    |> where([ft], ft.to_address_hash == ^address_hash)
-    |> order_by([forward_transfer], desc: [forward_transfer.block_number, forward_transfer.index])
-    |> handle_paging_options(paging_options)
-    |> limit(^paging_options.page_size)
-    |> join_associations(necessity_by_association)
-    |> Repo.all()
+  defp forward_transfers_filter_address_hash(query, nil), do: query
+  defp forward_transfers_filter_address_hash(query, address_hash) do
+    query |> where([ft], ft.to_address_hash == ^address_hash)
   end
 
-  def block_to_forward_transfers(block_hash, options \\ []) when is_list(options) do
-    necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
-    paging_options = Keyword.get(options, :paging_options, @default_paging_options)
-
-    ForwardTransfer
-    |> where([ft], ft.block_hash == ^block_hash)
-    |> order_by([forward_transfer], desc: [forward_transfer.block_number, forward_transfer.index])
-    |> handle_paging_options(paging_options)
-    |> limit(^paging_options.page_size)
-    |> join_associations(necessity_by_association)
-    |> Repo.all()
+  defp forward_transfers_filter_block_hash(query, nil), do: query
+  defp forward_transfers_filter_block_hash(query, block_hash) do
+    query |> where([ft], ft.block_hash == ^block_hash)
   end
 
   def forward_transfers_count do
