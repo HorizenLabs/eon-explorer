@@ -169,6 +169,7 @@ defmodule BlockScoutWeb.ApiRouter do
       get("/:block_hash_or_number", V2.BlockController, :block)
       get("/:block_hash_or_number/transactions", V2.BlockController, :transactions)
       get("/:block_hash_or_number/withdrawals", V2.BlockController, :withdrawals)
+      get("/:block_hash_or_number/forward-transfers", V2.BlockController, :forward_transfers)
     end
 
     scope "/addresses" do
@@ -185,6 +186,11 @@ defmodule BlockScoutWeb.ApiRouter do
       get("/:address_hash/coin-balance-history", V2.AddressController, :coin_balance_history)
       get("/:address_hash/coin-balance-history-by-day", V2.AddressController, :coin_balance_history_by_day)
       get("/:address_hash/withdrawals", V2.AddressController, :withdrawals)
+      get("/:address_hash/forward-transfers", V2.AddressController, :forward_transfers)
+    end
+
+    scope "/forward-transfers" do
+      get("/", V2.ForwardTransferController, :forward_transfers)
     end
 
     scope "/tokens" do

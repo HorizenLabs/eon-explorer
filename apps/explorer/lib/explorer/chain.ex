@@ -3738,12 +3738,36 @@ defmodule Explorer.Chain do
     |> Repo.all()
   end
 
+  def all_forward_transfers(options \\ []) when is_list(options) do
+    necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
+    paging_options = Keyword.get(options, :paging_options, @default_paging_options)
+
+    ForwardTransfer
+    |> order_by([forward_transfer], desc: [forward_transfer.block_number, forward_transfer.index])
+    |> handle_forward_transfers_paging_options(paging_options)
+    |> join_associations(necessity_by_association)
+    |> Repo.all()
+  end
+
   def address_to_forward_transfers(address_hash, options \\ []) when is_list(options) do
     necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
     paging_options = Keyword.get(options, :paging_options, @default_paging_options)
 
     ForwardTransfer
     |> where([ft], ft.to_address_hash == ^address_hash)
+    |> order_by([forward_transfer], desc: [forward_transfer.block_number, forward_transfer.index])
+    |> handle_paging_options(paging_options)
+    |> limit(^paging_options.page_size)
+    |> join_associations(necessity_by_association)
+    |> Repo.all()
+  end
+
+  def block_to_forward_transfers(block_hash, options \\ []) when is_list(options) do
+    necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
+    paging_options = Keyword.get(options, :paging_options, @default_paging_options)
+
+    ForwardTransfer
+    |> where([ft], ft.block_hash == ^block_hash)
     |> order_by([forward_transfer], desc: [forward_transfer.block_number, forward_transfer.index])
     |> handle_paging_options(paging_options)
     |> limit(^paging_options.page_size)
@@ -4859,6 +4883,16 @@ defmodule Explorer.Chain do
     |> limit(^paging_options.page_size)
   end
 
+  defp handle_forward_transfers_paging_options(query, nil), do: query
+
+  defp handle_forward_transfers_paging_options(query, %PagingOptions{key: nil, page_size: nil}), do: query
+
+  defp handle_forward_transfers_paging_options(query, paging_options) do
+    query
+    |> page_forward_transfers(paging_options)
+    |> limit(^paging_options.page_size)
+  end
+
   defp handle_verified_contracts_paging_options(query, nil), do: query
 
   defp handle_verified_contracts_paging_options(query, paging_options) do
@@ -5100,6 +5134,17 @@ defmodule Explorer.Chain do
 
   defp page_transaction(query, %PagingOptions{key: {index}}) do
     where(query, [transaction], transaction.index < ^index)
+  end
+
+  defp page_forward_transfers(query, %PagingOptions{key: nil}), do: query
+
+  defp page_forward_transfers(query, %PagingOptions{key: {block_number}}) do
+    where(
+      query,
+      [forward_transfers],
+      forward_transfers.block_number < ^block_number or
+        (forward_transfers.block_number == ^block_number)
+    )
   end
 
   defp page_block_transactions(query, %PagingOptions{key: nil}), do: query
