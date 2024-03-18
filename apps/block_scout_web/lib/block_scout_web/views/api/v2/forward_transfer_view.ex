@@ -1,15 +1,6 @@
 defmodule BlockScoutWeb.API.V2.ForwardTransferView do
   use BlockScoutWeb, :view
 
-  import BlockScoutWeb.Account.AuthController, only: [current_user: 1]
-
-  alias BlockScoutWeb.AddressView
-  alias BlockScoutWeb.API.V2.{ApiView, Helper, TokenView}
-  alias BlockScoutWeb.API.V2.Helper
-  alias Explorer.{Chain, Market}
-  alias Explorer.Chain.{Address, SmartContract}
-  require Logger
-
   def render("message.json", assigns) do
     ApiView.render("message.json", assigns)
   end
