@@ -3813,6 +3813,29 @@ defmodule Explorer.Chain do
     |> Repo.all()
   end
 
+  def get_fee_payments(address_hash \\ nil, block_hash \\ nil, options \\ []) when is_list(options) do
+    necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
+    paging_options = Keyword.get(options, :paging_options, @default_paging_options)
+
+    FeePayment
+    |> fee_payments_filter_address_hash(address_hash)
+    |> fee_payments_filter_block_hash(block_hash)
+    |> order_by([fee_payment], desc: [fee_payment.block_number, fee_payment.index])
+    |> handle_fee_payments_paging_options(paging_options)
+    |> join_associations(necessity_by_association)
+    |> Repo.all()
+  end
+
+  defp fee_payments_filter_address_hash(query, nil), do: query
+  defp fee_payments_filter_address_hash(query, address_hash) do
+    query |> where([fp], fp.to_address_hash == ^address_hash)
+  end
+
+  defp fee_payments_filter_block_hash(query, nil), do: query
+  defp fee_payments_filter_block_hash(query, block_hash) do
+    query |> where([fp], fp.block_hash == ^block_hash)
+  end
+
   def fee_payments_count() do
     FeePayment
     |> Repo.aggregate(:count)
@@ -4879,6 +4902,16 @@ defmodule Explorer.Chain do
     |> limit(^paging_options.page_size)
   end
 
+  defp handle_fee_payments_paging_options(query, nil), do: query
+
+  defp handle_fee_payments_paging_options(query, %PagingOptions{key: nil, page_size: nil}), do: query
+
+  defp handle_fee_payments_paging_options(query, paging_options) do
+    query
+    |> page_fee_payments(paging_options)
+    |> limit(^paging_options.page_size)
+  end
+
   defp handle_verified_contracts_paging_options(query, nil), do: query
 
   defp handle_verified_contracts_paging_options(query, paging_options) do
@@ -5130,6 +5163,17 @@ defmodule Explorer.Chain do
       [forward_transfers],
       forward_transfers.block_number < ^block_number or
         (forward_transfers.block_number == ^block_number)
+    )
+  end
+
+  defp page_fee_payments(query, %PagingOptions{key: nil}), do: query
+
+  defp page_fee_payments(query, %PagingOptions{key: {block_number}}) do
+    where(
+      query,
+      [fee_payments],
+      fee_payments.block_number < ^block_number or
+        (fee_payments.block_number == ^block_number)
     )
   end
 
