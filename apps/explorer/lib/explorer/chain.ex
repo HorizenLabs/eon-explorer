@@ -5166,6 +5166,15 @@ defmodule Explorer.Chain do
     )
   end
 
+  defp page_forward_transfers(query, %PagingOptions{key: {block_number, index}}) do
+    where(
+      query,
+      [forward_transfers],
+      forward_transfers.block_number < ^block_number or
+        (forward_transfers.block_number == ^block_number and forward_transfers.index < ^index)
+    )
+  end
+
   defp page_fee_payments(query, %PagingOptions{key: nil}), do: query
 
   defp page_fee_payments(query, %PagingOptions{key: {block_number}}) do
@@ -5174,6 +5183,15 @@ defmodule Explorer.Chain do
       [fee_payments],
       fee_payments.block_number < ^block_number or
         (fee_payments.block_number == ^block_number)
+    )
+  end
+
+  defp page_fee_payments(query, %PagingOptions{key: {block_number, index}}) do
+    where(
+      query,
+      [fee_payments],
+      fee_payments.block_number < ^block_number or
+        (fee_payments.block_number == ^block_number and fee_payments.index < ^index)
     )
   end
 

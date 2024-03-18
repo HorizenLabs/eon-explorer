@@ -12,10 +12,11 @@ defmodule BlockScoutWeb.API.V2.FeePaymentView do
   def prepare_fee_payments(fee_payments, _conn) do
 
     %{
+      "to_address" => fee_payments.to_address_hash,
+      "value" => fee_payments.value,
       "block_number" => fee_payments.block_number,
       "block_hash" => fee_payments.block_hash,
-      "to_address" => fee_payments.to_address_hash,
-      "value" => fee_payments.value
+      "index" => fee_payments.index
     }
   end
 

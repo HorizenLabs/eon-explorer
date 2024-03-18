@@ -12,10 +12,11 @@ defmodule BlockScoutWeb.API.V2.ForwardTransferView do
   def prepare_forward_transfers(forward_transfer, _conn) do
 
     %{
+      "to_address" => forward_transfer.to_address_hash,
+      "value" => forward_transfer.value,
       "block_number" => forward_transfer.block_number,
       "block_hash" => forward_transfer.block_hash,
-      "to_address" => forward_transfer.to_address_hash,
-      "value" => forward_transfer.value
+      "index" => forward_transfer.index
     }
   end
 
