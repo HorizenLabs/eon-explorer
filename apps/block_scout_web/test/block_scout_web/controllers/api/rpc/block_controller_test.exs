@@ -4,8 +4,6 @@ defmodule BlockScoutWeb.API.RPC.BlockControllerTest do
   alias Explorer.Chain.{Hash, Wei}
   alias BlockScoutWeb.Chain
 
-  require Logger
-
   describe "getblockreward" do
     test "with missing block number", %{conn: conn} do
       response =
