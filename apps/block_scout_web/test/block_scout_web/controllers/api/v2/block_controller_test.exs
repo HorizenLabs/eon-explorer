@@ -1,7 +1,7 @@
 defmodule BlockScoutWeb.API.V2.BlockControllerTest do
   use BlockScoutWeb.ConnCase
 
-  alias Explorer.Chain.{Address, Block, Transaction, Withdrawal}
+  alias Explorer.Chain.{Address, Block, Transaction, Withdrawal, ForwardTransfer, FeePayment}
 
   setup do
     Supervisor.terminate_child(Explorer.Supervisor, Explorer.Chain.Cache.Blocks.child_id())
@@ -382,6 +382,106 @@ defmodule BlockScoutWeb.API.V2.BlockControllerTest do
     end
   end
 
+  describe "/blocks/{block_hash_or_number}/forward-transfers" do
+    test "return 422 on invalid parameter", %{conn: conn} do
+      request_1 = get(conn, "/api/v2/blocks/0x123123/forward-transfers")
+      assert %{"message" => "Invalid hash"} = json_response(request_1, 422)
+
+      request_2 = get(conn, "/api/v2/blocks/123qwe/forward-transfers")
+      assert %{"message" => "Invalid number"} = json_response(request_2, 422)
+    end
+
+    test "return 404 on non existing block", %{conn: conn} do
+      block = build(:block)
+
+      request_1 = get(conn, "/api/v2/blocks/#{block.number}/forward-transfers")
+      assert %{"message" => "Not found"} = json_response(request_1, 404)
+
+      request_2 = get(conn, "/api/v2/blocks/#{block.hash}/forward-transfers")
+      assert %{"message" => "Not found"} = json_response(request_2, 404)
+    end
+
+    test "get empty list", %{conn: conn} do
+      block = insert(:block)
+
+      request = get(conn, "/api/v2/blocks/#{block.number}/forward-transfers")
+      assert response = json_response(request, 200)
+      assert response["items"] == []
+      assert response["next_page_params"] == nil
+
+      request = get(conn, "/api/v2/blocks/#{block.hash}/forward-transfers")
+      assert response = json_response(request, 200)
+      assert response["items"] == []
+      assert response["next_page_params"] == nil
+    end
+
+    test "get forward tranfers", %{conn: conn} do
+
+      forward_transfer = insert(:forward_transfer)
+
+      request = get(conn, "/api/v2/blocks/#{forward_transfer.block_number}/forward-transfers")
+      assert response = json_response(request, 200)
+      assert Enum.count(response["items"]) == 1
+      assert response["next_page_params"] == nil
+      compare_item(forward_transfer, Enum.at(response["items"], 0))
+
+      request = get(conn, "/api/v2/blocks/#{forward_transfer.block_hash}/forward-transfers")
+      assert response_1 = json_response(request, 200)
+      assert response_1 == response
+    end
+
+  end
+
+  describe "/blocks/{block_hash_or_number}/fee-payments" do
+    test "return 422 on invalid parameter", %{conn: conn} do
+      request_1 = get(conn, "/api/v2/blocks/0x123123/fee-payments")
+      assert %{"message" => "Invalid hash"} = json_response(request_1, 422)
+
+      request_2 = get(conn, "/api/v2/blocks/123qwe/fee-payments")
+      assert %{"message" => "Invalid number"} = json_response(request_2, 422)
+    end
+
+    test "return 404 on non existing block", %{conn: conn} do
+      block = build(:block)
+
+      request_1 = get(conn, "/api/v2/blocks/#{block.number}/fee-payments")
+      assert %{"message" => "Not found"} = json_response(request_1, 404)
+
+      request_2 = get(conn, "/api/v2/blocks/#{block.hash}/fee-payments")
+      assert %{"message" => "Not found"} = json_response(request_2, 404)
+    end
+
+    test "get empty list", %{conn: conn} do
+      block = insert(:block)
+
+      request = get(conn, "/api/v2/blocks/#{block.number}/fee-payments")
+      assert response = json_response(request, 200)
+      assert response["items"] == []
+      assert response["next_page_params"] == nil
+
+      request = get(conn, "/api/v2/blocks/#{block.hash}/fee-payments")
+      assert response = json_response(request, 200)
+      assert response["items"] == []
+      assert response["next_page_params"] == nil
+    end
+
+    test "get fee payments", %{conn: conn} do
+
+      fee_payment = insert(:fee_payment)
+
+      request = get(conn, "/api/v2/blocks/#{fee_payment.block_number}/fee-payments")
+      assert response = json_response(request, 200)
+      assert Enum.count(response["items"]) == 1
+      assert response["next_page_params"] == nil
+      compare_item(fee_payment, Enum.at(response["items"], 0))
+
+      request = get(conn, "/api/v2/blocks/#{fee_payment.block_hash}/fee-payments")
+      assert response_1 = json_response(request, 200)
+      assert response_1 == response
+    end
+
+  end
+
   defp compare_item(%Block{} = block, json) do
     assert to_string(block.hash) == json["hash"]
     assert block.number == json["height"]
@@ -397,6 +497,22 @@ defmodule BlockScoutWeb.API.V2.BlockControllerTest do
 
   defp compare_item(%Withdrawal{} = withdrawal, json) do
     assert withdrawal.index == json["index"]
+  end
+
+  defp compare_item(%ForwardTransfer{} = forward_transfer, json) do
+    assert forward_transfer.index == json["index"]
+    assert Address.checksum(forward_transfer.to_address_hash) == json["to_address"]
+    assert forward_transfer.block_number == json["block_number"]
+    assert to_string(forward_transfer.block_hash) == json["block_hash"]
+    assert 0 == json["index"]
+  end
+
+  defp compare_item(%FeePayment{} = forward_transfer, json) do
+    assert forward_transfer.index == json["index"]
+    assert Address.checksum(forward_transfer.to_address_hash) == json["to_address"]
+    assert forward_transfer.block_number == json["block_number"]
+    assert to_string(forward_transfer.block_hash) == json["block_hash"]
+    assert 0 == json["index"]
   end
 
   defp check_paginated_response(first_page_resp, second_page_resp, list) do

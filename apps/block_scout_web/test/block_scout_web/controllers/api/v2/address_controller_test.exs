@@ -13,7 +13,9 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
     Token,
     TokenTransfer,
     Transaction,
-    Withdrawal
+    Withdrawal,
+    ForwardTransfer,
+    FeePayment
   }
 
   alias Explorer.Account.WatchlistAddress
@@ -1621,6 +1623,60 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
     end
   end
 
+  describe "/addresses/{address_hash}/forward-transfers" do
+    test "get empty list on non existing address", %{conn: conn} do
+      address = build(:address)
+
+      request = get(conn, "/api/v2/addresses/#{address.hash}/forward-transfers")
+
+      assert %{"message" => "Not found"} = json_response(request, 404)
+    end
+
+    test "get 422 on invalid address", %{conn: conn} do
+      request = get(conn, "/api/v2/addresses/0x/forward-transfers")
+
+      assert %{"message" => "Invalid parameter(s)"} = json_response(request, 422)
+    end
+
+    test "get forward transfer", %{conn: conn} do
+
+      forward_transfer = insert(:forward_transfer)
+
+      request = get(conn, "/api/v2/addresses/#{forward_transfer.to_address_hash}/fee-payments")
+      assert response = json_response(request, 200)
+      assert Enum.count(response["items"]) == 1
+      assert response["next_page_params"] == nil
+      compare_item(forward_transfer, Enum.at(response["items"], 0))
+    end
+  end
+
+  describe "/addresses/{address_hash}/fee-payments" do
+    test "get empty list on non existing address", %{conn: conn} do
+      address = build(:address)
+
+      request = get(conn, "/api/v2/addresses/#{address.hash}/fee-payments")
+
+      assert %{"message" => "Not found"} = json_response(request, 404)
+    end
+
+    test "get 422 on invalid address", %{conn: conn} do
+      request = get(conn, "/api/v2/addresses/0x/fee-payments")
+
+      assert %{"message" => "Invalid parameter(s)"} = json_response(request, 422)
+    end
+
+    test "get fee payment", %{conn: conn} do
+
+      fee_payment = insert(:fee_payment)
+
+      request = get(conn, "/api/v2/addresses/#{fee_payment.to_address_hash}/fee-payments")
+      assert response = json_response(request, 200)
+      assert Enum.count(response["items"]) == 1
+      assert response["next_page_params"] == nil
+      compare_item(fee_payment, Enum.at(response["items"], 0))
+    end
+  end
+
   describe "/addresses" do
     test "get empty list", %{conn: conn} do
       request = get(conn, "/api/v2/addresses")
@@ -1734,6 +1790,22 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
 
   defp compare_item(%Withdrawal{} = withdrawal, json) do
     assert withdrawal.index == json["index"]
+  end
+
+  defp compare_item(%ForwardTransfer{} = forward_transfer, json) do
+    assert forward_transfer.index == json["index"]
+    assert Address.checksum(forward_transfer.to_address_hash) == json["to_address"]
+    assert forward_transfer.block_number == json["block_number"]
+    assert to_string(forward_transfer.block_hash) == json["block_hash"]
+    assert 0 == json["index"]
+  end
+
+  defp compare_item(%FeePayment{} = forward_transfer, json) do
+    assert forward_transfer.index == json["index"]
+    assert Address.checksum(forward_transfer.to_address_hash) == json["to_address"]
+    assert forward_transfer.block_number == json["block_number"]
+    assert to_string(forward_transfer.block_hash) == json["block_hash"]
+    assert 0 == json["index"]
   end
 
   defp check_paginated_response(first_page_resp, second_page_resp, list) do
