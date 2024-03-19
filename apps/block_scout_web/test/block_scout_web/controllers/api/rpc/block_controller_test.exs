@@ -4,6 +4,8 @@ defmodule BlockScoutWeb.API.RPC.BlockControllerTest do
   alias Explorer.Chain.{Hash, Wei}
   alias BlockScoutWeb.Chain
 
+  require Logger
+
   describe "getblockreward" do
     test "with missing block number", %{conn: conn} do
       response =
@@ -40,6 +42,23 @@ defmodule BlockScoutWeb.API.RPC.BlockControllerTest do
         |> json_response(200)
 
       assert response["message"] =~ "Block does not exist"
+      assert response["status"] == "0"
+      assert Map.has_key?(response, "result")
+      refute response["result"]
+      schema = resolve_schema()
+      assert :ok = ExJsonSchema.Validator.validate(schema, response)
+    end
+
+    test "with a block that exist but with no record in block_reward table", %{conn: conn} do
+
+      block = insert(:block) # insert a block but no reward in block_reward table related to it
+
+      response =
+        conn
+        |> get("/api", %{"module" => "block", "action" => "getblockreward", "blockno" => block.number})
+        |> json_response(200)
+
+      assert response["message"] =~ "No block reward data related to this block"
       assert response["status"] == "0"
       assert Map.has_key?(response, "result")
       refute response["result"]
