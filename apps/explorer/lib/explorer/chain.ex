@@ -804,44 +804,49 @@ defmodule Explorer.Chain do
 
   Uncles are not currently accounted for.
   """
-  @spec block_reward(Block.block_number()) :: Wei.t()
-  def block_reward(block_number) do
-    block_hash =
-      Block
-      |> where([block], block.number == ^block_number and block.consensus == true)
-      |> select([block], block.hash)
-      |> Repo.one!()
+  @spec block_reward(Block.block_number()) :: Wei.t() | nil
+def block_reward(block_number) do
+  # Retrieve block hash
+  block_hash =
+    Block
+    |> where([block], block.number == ^block_number and block.consensus == true)
+    |> select([block], block.hash)
+    |> Repo.one()
 
-    case Repo.one!(
-           from(reward in Reward,
-             where: reward.block_hash == ^block_hash,
-             select: %Wei{
-               value: coalesce(sum(reward.reward), 0)
-             }
-           )
-         ) do
-      %Wei{
-        value: %Decimal{coef: 0}
-      } ->
-        Repo.one!(
-          from(block in Block,
-            left_join: transaction in assoc(block, :transactions),
-            inner_join: emission_reward in EmissionReward,
-            on: fragment("? <@ ?", block.number, emission_reward.block_range),
-            where: block.number == ^block_number and block.consensus == true,
-            group_by: [emission_reward.reward, block.hash],
-            select: %Wei{
-              value:
-                coalesce(sum(transaction.gas_used * transaction.gas_price), 0) +
-                  emission_reward.reward
-            }
+  case block_hash do
+    nil ->
+      # Return nil if no block reward data is found
+      nil
+    _ ->
+      # Retrieve reward associated with the block hash
+      case Repo.one(
+             from(reward in Reward,
+               where: reward.block_hash == ^block_hash,
+               select: %Wei{
+                 value: coalesce(sum(reward.reward), 0)
+               }
+             )
+           ) do
+        %Wei{value: %Decimal{coef: 0}} ->
+          Repo.one(
+            from(block in Block,
+              left_join: transaction in assoc(block, :transactions),
+              inner_join: emission_reward in EmissionReward,
+              on: fragment("? <@ ?", block.number, emission_reward.block_range),
+              where: block.number == ^block_number and block.consensus == true,
+              group_by: [emission_reward.reward, block.hash],
+              select: %Wei{
+                value:
+                  coalesce(sum(transaction.gas_used * transaction.gas_price), 0) +
+                    emission_reward.reward
+              }
+            )
           )
-        )
-
-      other_value ->
-        other_value
-    end
+        other_value ->
+          other_value
+      end
   end
+end
 
   def txn_fees(transactions) do
     Enum.reduce(transactions, Decimal.new(0), fn %{gas_used: gas_used, gas_price: gas_price},
