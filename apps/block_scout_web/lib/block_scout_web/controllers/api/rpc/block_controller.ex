@@ -5,8 +5,6 @@ defmodule BlockScoutWeb.API.RPC.BlockController do
   alias Explorer.Chain
   alias Explorer.Chain.Cache.BlockNumber
 
-  require Logger
-
   def getblockreward(conn, params) do
     with {:block_param, {:ok, unsafe_block_number}} <- {:block_param, Map.fetch(params, "blockno")},
          {:ok, block_number} <- ChainWeb.param_to_block_number(unsafe_block_number),
