@@ -416,18 +416,41 @@ defmodule BlockScoutWeb.API.V2.BlockControllerTest do
     end
 
     test "get forward tranfers", %{conn: conn} do
+      block = insert(:block)
+      forward_transfers = insert_list(3, :forward_transfer_same_block, block: block)
+      [forward_transfer | _] = Enum.reverse(forward_transfers)
 
-      forward_transfer = insert(:forward_transfer)
-
-      request = get(conn, "/api/v2/blocks/#{forward_transfer.block_number}/forward-transfers")
+      request = get(conn, "/api/v2/blocks/#{block.number}/forward-transfers")
       assert response = json_response(request, 200)
-      assert Enum.count(response["items"]) == 1
+      assert Enum.count(response["items"]) == 3
       assert response["next_page_params"] == nil
       compare_item(forward_transfer, Enum.at(response["items"], 0))
 
-      request = get(conn, "/api/v2/blocks/#{forward_transfer.block_hash}/forward-transfers")
+      request = get(conn, "/api/v2/blocks/#{block.hash}/forward-transfers")
       assert response_1 = json_response(request, 200)
       assert response_1 == response
+    end
+
+    test "get forward tranfers with working next_page_params", %{conn: conn} do
+      block = insert(:block)
+      forward_transfers = insert_list(51, :forward_transfer_same_block, block: block)
+
+      request = get(conn, "/api/v2/blocks/#{block.number}/forward-transfers")
+      assert response = json_response(request, 200)
+
+      request_2nd_page = get(conn, "/api/v2/blocks/#{block.number}/forward-transfers", response["next_page_params"])
+      assert response_2nd_page = json_response(request_2nd_page, 200)
+
+      check_paginated_response(response, response_2nd_page, forward_transfers)
+
+      request_1 = get(conn, "/api/v2/blocks/#{block.hash}/forward-transfers")
+      assert response_1 = json_response(request_1, 200)
+
+      assert response_1 == response
+
+      request_2 = get(conn, "/api/v2/blocks/#{block.hash}/forward-transfers", response_1["next_page_params"])
+      assert response_2 = json_response(request_2, 200)
+      assert response_2 == response_2nd_page
     end
 
   end
@@ -466,18 +489,42 @@ defmodule BlockScoutWeb.API.V2.BlockControllerTest do
     end
 
     test "get fee payments", %{conn: conn} do
+      block = insert(:block)
+      fee_payments = insert_list(3, :fee_payment_same_block, block: block)
+      [fee_payment | _] = Enum.reverse(fee_payments)
 
-      fee_payment = insert(:fee_payment)
-
-      request = get(conn, "/api/v2/blocks/#{fee_payment.block_number}/fee-payments")
+      request = get(conn, "/api/v2/blocks/#{block.number}/fee-payments")
       assert response = json_response(request, 200)
-      assert Enum.count(response["items"]) == 1
+      assert Enum.count(response["items"]) == 3
       assert response["next_page_params"] == nil
       compare_item(fee_payment, Enum.at(response["items"], 0))
 
-      request = get(conn, "/api/v2/blocks/#{fee_payment.block_hash}/fee-payments")
+      request = get(conn, "/api/v2/blocks/#{block.hash}/fee-payments")
       assert response_1 = json_response(request, 200)
       assert response_1 == response
+    end
+
+    test "get fee payments with working next_page_params", %{conn: conn} do
+
+      block = insert(:block)
+      fee_payments = insert_list(51, :fee_payment_same_block, block: block)
+
+      request = get(conn, "/api/v2/blocks/#{block.number}/fee-payments")
+      assert response = json_response(request, 200)
+
+      request_2nd_page = get(conn, "/api/v2/blocks/#{block.number}/fee-payments", response["next_page_params"])
+      assert response_2nd_page = json_response(request_2nd_page, 200)
+
+      check_paginated_response(response, response_2nd_page, fee_payments)
+
+      request_1 = get(conn, "/api/v2/blocks/#{block.hash}/fee-payments")
+      assert response_1 = json_response(request_1, 200)
+
+      assert response_1 == response
+
+      request_2 = get(conn, "/api/v2/blocks/#{block.hash}/fee-payments", response_1["next_page_params"])
+      assert response_2 = json_response(request_2, 200)
+      assert response_2 == response_2nd_page
     end
 
   end

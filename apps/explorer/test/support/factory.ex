@@ -776,6 +776,30 @@ defmodule Explorer.Factory do
     }
   end
 
+  def forward_transfer_same_block_factory do
+    address = insert(:address)
+
+    %ForwardTransfer{
+      block: build(:block),
+      block_number: build(:block).number,
+      to_address_hash: address.hash,
+      value: Enum.random(1..100_000),
+      index: 0
+    }
+  end
+
+  def forward_transfer_same_address_factory do
+    block = insert(:block)
+
+    %ForwardTransfer{
+      block_number: block.number,
+      block_hash: block.hash,
+      to_address: build(:address),
+      value: Enum.random(1..100_000),
+      index: 0
+    }
+  end
+
   def fee_payment_factory do
     block = insert(:block)
     address = insert(:address)
@@ -784,6 +808,30 @@ defmodule Explorer.Factory do
       block_number: block.number,
       block_hash: block.hash,
       to_address_hash: address.hash,
+      value: Enum.random(1..100_000),
+      index: 0
+    }
+  end
+
+  def fee_payment_same_block_factory do
+    address = insert(:address)
+
+    %FeePayment{
+      block: build(:block),
+      block_number: build(:block).number,
+      to_address_hash: address.hash,
+      value: Enum.random(1..100_000),
+      index: 0
+    }
+  end
+
+  def fee_payment_same_address_factory do
+    block = insert(:block)
+
+    %FeePayment{
+      block_number: block.number,
+      block_hash: block.hash,
+      to_address: build(:address),
       value: Enum.random(1..100_000),
       index: 0
     }
