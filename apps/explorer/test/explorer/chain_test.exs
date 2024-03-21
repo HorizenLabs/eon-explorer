@@ -4042,7 +4042,7 @@ defmodule Explorer.ChainTest do
 
       assert [
                %ForwardTransfer{to_address_hash: expected_address_hash}
-             ] = Chain.address_to_forward_transfers(address1.hash)
+             ] = Chain.get_forward_transfers(address1.hash, nil, nil)
     end
   end
 
