@@ -1,8 +1,6 @@
 defmodule BlockScoutWeb.API.V2.FeePaymentsController do
   use BlockScoutWeb, :controller
 
-  require Logger
-
   import BlockScoutWeb.Chain,
     only: [
       next_page_params: 3,
