@@ -15,7 +15,8 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
     Transaction,
     Withdrawal,
     ForwardTransfer,
-    FeePayment
+    FeePayment,
+    Wei
   }
 
   alias Explorer.Account.WatchlistAddress
@@ -1853,15 +1854,15 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
     assert Address.checksum(forward_transfer.to_address_hash) == json["to_address"]
     assert forward_transfer.block_number == json["block_number"]
     assert to_string(forward_transfer.block_hash) == json["block_hash"]
-    assert 0 == json["index"]
+    assert Wei.cast(json["value"]) == {:ok, forward_transfer.value}
   end
 
-  defp compare_item(%FeePayment{} = forward_transfer, json) do
-    assert forward_transfer.index == json["index"]
-    assert Address.checksum(forward_transfer.to_address_hash) == json["to_address"]
-    assert forward_transfer.block_number == json["block_number"]
-    assert to_string(forward_transfer.block_hash) == json["block_hash"]
-    assert 0 == json["index"]
+  defp compare_item(%FeePayment{} = fee_payment, json) do
+    assert fee_payment.index == json["index"]
+    assert Address.checksum(fee_payment.to_address_hash) == json["to_address"]
+    assert fee_payment.block_number == json["block_number"]
+    assert to_string(fee_payment.block_hash) == json["block_hash"]
+    assert Wei.cast(json["value"]) == {:ok, fee_payment.value}
   end
 
   defp check_paginated_response(first_page_resp, second_page_resp, list) do

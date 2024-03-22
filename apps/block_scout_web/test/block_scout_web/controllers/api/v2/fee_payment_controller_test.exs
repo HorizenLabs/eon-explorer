@@ -1,7 +1,7 @@
 defmodule BlockScoutWeb.API.V2.FeePaymentControllerTest do
   use BlockScoutWeb.ConnCase
 
-  alias Explorer.Chain.{Address, FeePayment}
+  alias Explorer.Chain.{Address, FeePayment, Wei}
 
   describe "/fee-payment" do
 
@@ -55,7 +55,7 @@ defmodule BlockScoutWeb.API.V2.FeePaymentControllerTest do
     assert Address.checksum(fee_payment.to_address_hash) == json["to_address"]
     assert fee_payment.block_number == json["block_number"]
     assert to_string(fee_payment.block_hash) == json["block_hash"]
-    assert 0 == json["index"]
+    assert Wei.cast(json["value"]) == {:ok, fee_payment.value}
   end
 
   defp check_paginated_response(first_page_resp, second_page_resp, list) do
