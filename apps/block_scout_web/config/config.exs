@@ -8,6 +8,8 @@ import Config
 # General application configuration
 config :block_scout_web,
   namespace: BlockScoutWeb,
+  backend_version: Mix.Project.config()[:version],
+  json_rpc_url: System.get_env("ETHEREUM_JSONRPC_HTTP_URL"),
   ecto_repos: [Explorer.Repo, Explorer.Repo.Account],
   cookie_domain: System.get_env("SESSION_COOKIE_DOMAIN"),
   # 604800 seconds, 1 week
