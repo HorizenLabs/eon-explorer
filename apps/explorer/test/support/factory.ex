@@ -772,8 +772,36 @@ defmodule Explorer.Factory do
       block_hash: block.hash,
       to_address_hash: address.hash,
       value: Enum.random(1..100_000),
-      index: 0
+      index: forward_transfer_index()
     }
+  end
+
+  def forward_transfer_same_block_factory do
+    address = insert(:address)
+
+    %ForwardTransfer{
+      block: build(:block),
+      block_number: build(:block).number,
+      to_address_hash: address.hash,
+      value: Enum.random(1..100_000),
+      index: forward_transfer_index()
+    }
+  end
+
+  def forward_transfer_same_address_factory do
+    block = insert(:block)
+
+    %ForwardTransfer{
+      block_number: block.number,
+      block_hash: block.hash,
+      to_address: build(:address),
+      value: Enum.random(1..100_000),
+      index: forward_transfer_index()
+    }
+  end
+
+  def forward_transfer_index do
+    sequence("forward_transfer_index", & &1)
   end
 
   def fee_payment_factory do
@@ -785,8 +813,36 @@ defmodule Explorer.Factory do
       block_hash: block.hash,
       to_address_hash: address.hash,
       value: Enum.random(1..100_000),
-      index: 0
+      index: fee_payment_index()
     }
+  end
+
+  def fee_payment_same_block_factory do
+    address = insert(:address)
+
+    %FeePayment{
+      block: build(:block),
+      block_number: build(:block).number,
+      to_address_hash: address.hash,
+      value: Enum.random(1..100_000),
+      index: fee_payment_index()
+    }
+  end
+
+  def fee_payment_same_address_factory do
+    block = insert(:block)
+
+    %FeePayment{
+      block_number: block.number,
+      block_hash: block.hash,
+      to_address: build(:address),
+      value: Enum.random(1..100_000),
+      index: fee_payment_index()
+    }
+  end
+
+  def fee_payment_index do
+    sequence("fee_payment_index", & &1)
   end
 
   def transaction_factory do

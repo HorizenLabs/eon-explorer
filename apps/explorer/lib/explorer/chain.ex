@@ -3743,17 +3743,27 @@ end
     |> Repo.all()
   end
 
-  def address_to_forward_transfers(address_hash, options \\ []) when is_list(options) do
+  def get_forward_transfers(address_hash \\ nil, block_hash \\ nil, options \\ []) when is_list(options) do
     necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
     paging_options = Keyword.get(options, :paging_options, @default_paging_options)
 
     ForwardTransfer
-    |> where([ft], ft.to_address_hash == ^address_hash)
+    |> forward_transfers_filter_address_hash(address_hash)
+    |> forward_transfers_filter_block_hash(block_hash)
     |> order_by([forward_transfer], desc: [forward_transfer.block_number, forward_transfer.index])
-    |> handle_paging_options(paging_options)
-    |> limit(^paging_options.page_size)
+    |> handle_forward_transfers_paging_options(paging_options)
     |> join_associations(necessity_by_association)
     |> Repo.all()
+  end
+
+  defp forward_transfers_filter_address_hash(query, nil), do: query
+  defp forward_transfers_filter_address_hash(query, address_hash) do
+    query |> where([ft], ft.to_address_hash == ^address_hash)
+  end
+
+  defp forward_transfers_filter_block_hash(query, nil), do: query
+  defp forward_transfers_filter_block_hash(query, block_hash) do
+    query |> where([ft], ft.block_hash == ^block_hash)
   end
 
   def forward_transfers_count do
@@ -3806,6 +3816,29 @@ end
     |> limit(^paging_options.page_size)
     |> join_associations(necessity_by_association)
     |> Repo.all()
+  end
+
+  def get_fee_payments(address_hash \\ nil, block_hash \\ nil, options \\ []) when is_list(options) do
+    necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
+    paging_options = Keyword.get(options, :paging_options, @default_paging_options)
+
+    FeePayment
+    |> fee_payments_filter_address_hash(address_hash)
+    |> fee_payments_filter_block_hash(block_hash)
+    |> order_by([fee_payment], desc: [fee_payment.block_number, fee_payment.index])
+    |> handle_fee_payments_paging_options(paging_options)
+    |> join_associations(necessity_by_association)
+    |> Repo.all()
+  end
+
+  defp fee_payments_filter_address_hash(query, nil), do: query
+  defp fee_payments_filter_address_hash(query, address_hash) do
+    query |> where([fp], fp.to_address_hash == ^address_hash)
+  end
+
+  defp fee_payments_filter_block_hash(query, nil), do: query
+  defp fee_payments_filter_block_hash(query, block_hash) do
+    query |> where([fp], fp.block_hash == ^block_hash)
   end
 
   def fee_payments_count() do
@@ -4864,6 +4897,26 @@ end
     |> limit(^paging_options.page_size)
   end
 
+  defp handle_forward_transfers_paging_options(query, nil), do: query
+
+  defp handle_forward_transfers_paging_options(query, %PagingOptions{key: nil, page_size: nil}), do: query
+
+  defp handle_forward_transfers_paging_options(query, paging_options) do
+    query
+    |> page_forward_transfers(paging_options)
+    |> limit(^paging_options.page_size)
+  end
+
+  defp handle_fee_payments_paging_options(query, nil), do: query
+
+  defp handle_fee_payments_paging_options(query, %PagingOptions{key: nil, page_size: nil}), do: query
+
+  defp handle_fee_payments_paging_options(query, paging_options) do
+    query
+    |> page_fee_payments(paging_options)
+    |> limit(^paging_options.page_size)
+  end
+
   defp handle_verified_contracts_paging_options(query, nil), do: query
 
   defp handle_verified_contracts_paging_options(query, paging_options) do
@@ -5105,6 +5158,46 @@ end
 
   defp page_transaction(query, %PagingOptions{key: {index}}) do
     where(query, [transaction], transaction.index < ^index)
+  end
+
+  defp page_forward_transfers(query, %PagingOptions{key: nil}), do: query
+
+  defp page_forward_transfers(query, %PagingOptions{key: {block_number}}) do
+    where(
+      query,
+      [forward_transfers],
+      forward_transfers.block_number < ^block_number or
+        (forward_transfers.block_number == ^block_number)
+    )
+  end
+
+  defp page_forward_transfers(query, %PagingOptions{key: {block_number, index}}) do
+    where(
+      query,
+      [forward_transfers],
+      forward_transfers.block_number < ^block_number or
+        (forward_transfers.block_number == ^block_number and forward_transfers.index < ^index)
+    )
+  end
+
+  defp page_fee_payments(query, %PagingOptions{key: nil}), do: query
+
+  defp page_fee_payments(query, %PagingOptions{key: {block_number}}) do
+    where(
+      query,
+      [fee_payments],
+      fee_payments.block_number < ^block_number or
+        (fee_payments.block_number == ^block_number)
+    )
+  end
+
+  defp page_fee_payments(query, %PagingOptions{key: {block_number, index}}) do
+    where(
+      query,
+      [fee_payments],
+      fee_payments.block_number < ^block_number or
+        (fee_payments.block_number == ^block_number and fee_payments.index < ^index)
+    )
   end
 
   defp page_block_transactions(query, %PagingOptions{key: nil}), do: query
