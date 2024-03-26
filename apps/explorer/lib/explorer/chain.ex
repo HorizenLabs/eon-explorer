@@ -6812,6 +6812,18 @@ end
     end
   end
 
+  @spec get_token_icon_url_from_db(Hash.Address.t()) :: String.t() | nil
+  def get_token_icon_url_from_db(hash) do
+    query =
+      from(
+        token in Token,
+        where: token.contract_address_hash == ^hash,
+        select: token.icon_url
+      )
+
+    Repo.one(query)
+  end
+
   @spec get_token_icon_url_by(String.t(), String.t()) :: String.t() | nil
   def get_token_icon_url_by(chain_id, address_hash) do
     chain_name =
@@ -6825,14 +6837,21 @@ end
         "100" ->
           "xdai"
 
+        "1663" ->
+          "horizen-eon"
+
         _ ->
           nil
       end
 
     if chain_name do
       try_url =
-        "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/#{chain_name}/assets/#{address_hash}/logo.png"
-
+        case chain_name do
+          "horizen-eon" ->
+            Chain.get_token_icon_url_from_db(address_hash)
+          _ ->
+            "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/#{chain_name}/assets/#{address_hash}/logo.png"
+        end
       try_url
     else
       nil

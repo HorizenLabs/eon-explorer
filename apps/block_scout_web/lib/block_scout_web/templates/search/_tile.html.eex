@@ -3,23 +3,16 @@
   <%= render BlockScoutWeb.SearchView, "_empty_td.html" %>
   <%= case @result.type do %>
         <% "token" -> %>
-            <td class="token-icon">
-                <span
-                    class="token-icon mr-1"
-                    data-address-hash="<%= @result.address_hash %>"
-                >
-                <%= if Application.get_env(:block_scout_web, :display_token_icons) do %>
-                    <% chain_id_for_token_icon = Application.get_env(:block_scout_web, :chain_id) %>
-                    <% address_hash = @result.address_hash %>
-                    <%=
-                        render BlockScoutWeb.TokensView,
-                        "_token_icon.html",
-                        chain_id: chain_id_for_token_icon,
-                        address: address_hash
-                    %>
-                <% end %>
-                </span>
-            </td>
+            <%= if Application.get_env(:block_scout_web, :display_token_icons) do %>
+                <% chain_id_for_token_icon = Application.get_env(:block_scout_web, :chain_id) %>
+                <% address_hash = Address.checksum(@result.address_hash) %>
+                <%=
+                    render BlockScoutWeb.TokensView,
+                    "_token_icon.html",
+                    chain_id: chain_id_for_token_icon,
+                    address: address_hash
+                %>
+            <% end %>
             <td class="stakes-td">
                 <% res = @result.name <> " (" <> @result.symbol <> ")" %>
                 <a href="<%= token_path(@conn, :show, @result.address_hash) %>">
