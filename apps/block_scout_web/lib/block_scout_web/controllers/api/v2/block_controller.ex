@@ -7,12 +7,13 @@ defmodule BlockScoutWeb.API.V2.BlockController do
       paging_options: 1,
       put_key_value_to_paging_options: 3,
       split_list_by_page: 1,
-      parse_block_hash_or_number_param: 1
+      parse_block_hash_or_number_param: 1,
+      current_filter: 1
     ]
 
   import BlockScoutWeb.PagingHelper, only: [delete_parameters_from_next_page_params: 1, select_block_type: 1]
 
-  alias BlockScoutWeb.API.V2.{TransactionView, WithdrawalView}
+  alias BlockScoutWeb.API.V2.{TransactionView, WithdrawalView, ForwardTransferView, FeePaymentView}
   alias Explorer.Chain
 
   @transaction_necessity_by_association [
@@ -24,6 +25,20 @@ defmodule BlockScoutWeb.API.V2.BlockController do
       [created_contract_address: :smart_contract] => :optional,
       [from_address: :smart_contract] => :optional,
       [to_address: :smart_contract] => :optional
+    }
+  ]
+
+  @forward_transfer_necessity_by_association [
+    necessity_by_association: %{
+      :block => :optional,
+      :to_address => :optional
+    }
+  ]
+
+  @fee_payments_necessity_by_association [
+    necessity_by_association: %{
+      :block => :optional,
+      :to_address => :optional
     }
   ]
 
@@ -126,4 +141,47 @@ defmodule BlockScoutWeb.API.V2.BlockController do
       |> render(:withdrawals, %{withdrawals: withdrawals, next_page_params: next_page_params})
     end
   end
+
+  def forward_transfers(conn, %{"block_hash_or_number" => block_hash_or_number} = params) do
+    with {:ok, type, value} <- parse_block_hash_or_number_param(block_hash_or_number),
+         {:ok, block} <- fetch_block(type, value, @api_true) do
+
+      full_options =
+        @forward_transfer_necessity_by_association
+        |> Keyword.merge(paging_options(params))
+        |> Keyword.merge(current_filter(params))
+
+      result = Chain.get_forward_transfers(nil, block.hash, full_options)
+      {forward_transfers, next_page} = split_list_by_page(result)
+
+      next_page_params = next_page |> next_page_params(forward_transfers, params) |> delete_parameters_from_next_page_params()
+
+      conn
+      |> put_status(200)
+      |> put_view(ForwardTransferView)
+      |> render(:forward_transfers, %{forward_transfers: forward_transfers, next_page_params: next_page_params})
+    end
+  end
+
+  def fee_payments(conn, %{"block_hash_or_number" => block_hash_or_number} = params) do
+    with {:ok, type, value} <- parse_block_hash_or_number_param(block_hash_or_number),
+         {:ok, block} <- fetch_block(type, value, @api_true) do
+
+      full_options =
+        @fee_payments_necessity_by_association
+        |> Keyword.merge(paging_options(params))
+        |> Keyword.merge(current_filter(params))
+
+      result = Chain.get_fee_payments(nil, block.hash, full_options)
+      {fee_payments, next_page} = split_list_by_page(result)
+
+      next_page_params = next_page |> next_page_params(fee_payments, params) |> delete_parameters_from_next_page_params()
+
+      conn
+      |> put_status(200)
+      |> put_view(FeePaymentView)
+      |> render(:fee_payments, %{fee_payments: fee_payments, next_page_params: next_page_params})
+    end
+  end
+
 end

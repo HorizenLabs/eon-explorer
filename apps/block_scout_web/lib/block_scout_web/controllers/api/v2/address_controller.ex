@@ -15,7 +15,7 @@ defmodule BlockScoutWeb.API.V2.AddressController do
     only: [delete_parameters_from_next_page_params: 1, token_transfers_types_options: 1]
 
   alias BlockScoutWeb.AccessHelper
-  alias BlockScoutWeb.API.V2.{BlockView, TransactionView, WithdrawalView}
+  alias BlockScoutWeb.API.V2.{BlockView, TransactionView, WithdrawalView, ForwardTransferView, FeePaymentView}
   alias Explorer.{Chain, Market}
   alias Indexer.Fetcher.{CoinBalanceOnDemand, TokenBalanceOnDemand}
 
@@ -40,6 +40,20 @@ defmodule BlockScoutWeb.API.V2.AddressController do
       :transaction => :optional
     },
     api?: true
+  ]
+
+  @forward_transfer_necessity_by_association [
+    necessity_by_association: %{
+      :block => :optional,
+      :to_address => :optional
+    }
+  ]
+
+  @fee_payments_necessity_by_association [
+    necessity_by_association: %{
+      :block => :optional,
+      :to_address => :optional
+    }
   ]
 
   @address_options [
@@ -389,6 +403,52 @@ defmodule BlockScoutWeb.API.V2.AddressController do
       |> put_status(200)
       |> put_view(WithdrawalView)
       |> render(:withdrawals, %{withdrawals: withdrawals, next_page_params: next_page_params})
+    end
+  end
+
+  def forward_transfers(conn, %{"address_hash" => address_hash_string} = params) do
+    with {:format, {:ok, address_hash}} <- {:format, Chain.string_to_address_hash(address_hash_string)},
+         {:ok, false} <- AccessHelper.restricted_access?(address_hash_string, params),
+         {:not_found, {:ok, _address}} <- {:not_found, Chain.hash_to_address(address_hash, @api_true, false)} do
+
+      options =
+      @forward_transfer_necessity_by_association
+      |> Keyword.merge(paging_options(params))
+      |> Keyword.merge(current_filter(params))
+
+      results = Chain.get_forward_transfers(address_hash, nil, options)
+      {forward_transfers, next_page} = split_list_by_page(results)
+
+      next_page_params =
+        next_page |> next_page_params(forward_transfers, params) |> delete_parameters_from_next_page_params()
+
+      conn
+      |> put_status(200)
+      |> put_view(ForwardTransferView)
+      |> render(:forward_transfers, %{forward_transfers: forward_transfers, next_page_params: next_page_params})
+    end
+  end
+
+  def fee_payments(conn, %{"address_hash" => address_hash_string} = params) do
+    with {:format, {:ok, address_hash}} <- {:format, Chain.string_to_address_hash(address_hash_string)},
+         {:ok, false} <- AccessHelper.restricted_access?(address_hash_string, params),
+         {:not_found, {:ok, _address}} <- {:not_found, Chain.hash_to_address(address_hash, @api_true, false)} do
+
+      options =
+      @fee_payments_necessity_by_association
+      |> Keyword.merge(paging_options(params))
+      |> Keyword.merge(current_filter(params))
+
+      results = Chain.get_fee_payments(address_hash, nil, options)
+      {fee_payments, next_page} = split_list_by_page(results)
+
+      next_page_params =
+        next_page |> next_page_params(fee_payments, params) |> delete_parameters_from_next_page_params()
+
+      conn
+      |> put_status(200)
+      |> put_view(FeePaymentView)
+      |> render(:fee_payments, %{fee_payments: fee_payments, next_page_params: next_page_params})
     end
   end
 

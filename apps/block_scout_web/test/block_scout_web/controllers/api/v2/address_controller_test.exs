@@ -13,7 +13,10 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
     Token,
     TokenTransfer,
     Transaction,
-    Withdrawal
+    Withdrawal,
+    ForwardTransfer,
+    FeePayment,
+    Wei
   }
 
   alias Explorer.Account.WatchlistAddress
@@ -1621,6 +1624,116 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
     end
   end
 
+  describe "/addresses/{address_hash}/forward-transfers" do
+    test "get empty list on non existing address", %{conn: conn} do
+      address = build(:address)
+
+      request = get(conn, "/api/v2/addresses/#{address.hash}/forward-transfers")
+
+      assert %{"message" => "Not found"} = json_response(request, 404)
+    end
+
+    test "get 422 on invalid address", %{conn: conn} do
+      request = get(conn, "/api/v2/addresses/0x/forward-transfers")
+
+      assert %{"message" => "Invalid parameter(s)"} = json_response(request, 422)
+    end
+
+    test "get forward transfers", %{conn: conn} do
+      address = insert(:address)
+      forward_transfers = insert_list(3, :forward_transfer_same_address, to_address: address)
+      [forward_transfer | _] = Enum.reverse(forward_transfers)
+
+      request = get(conn, "/api/v2/addresses/#{address.hash}/forward-transfers")
+      assert response = json_response(request, 200)
+      assert Enum.count(response["items"]) == 3
+      assert response["next_page_params"] == nil
+      compare_item(forward_transfer, Enum.at(response["items"], 0))
+
+      request = get(conn, "/api/v2/addresses/#{address.hash}/forward-transfers")
+      assert response_1 = json_response(request, 200)
+      assert response_1 == response
+    end
+
+    test "get forward tranfers with working next_page_params", %{conn: conn} do
+      address = insert(:address)
+      forward_transfers = insert_list(51, :forward_transfer_same_address, to_address: address)
+
+      request = get(conn, "/api/v2/addresses/#{address.hash}/forward-transfers")
+      assert response = json_response(request, 200)
+
+      request_2nd_page = get(conn, "/api/v2/addresses/#{address.hash}/forward-transfers", response["next_page_params"])
+      assert response_2nd_page = json_response(request_2nd_page, 200)
+
+      check_paginated_response(response, response_2nd_page, forward_transfers)
+
+      request_1 = get(conn, "/api/v2/addresses/#{address.hash}/forward-transfers")
+      assert response_1 = json_response(request_1, 200)
+
+      assert response_1 == response
+
+      request_2 = get(conn, "/api/v2/addresses/#{address.hash}/forward-transfers", response_1["next_page_params"])
+      assert response_2 = json_response(request_2, 200)
+      assert response_2 == response_2nd_page
+    end
+
+  end
+
+  describe "/addresses/{address_hash}/fee-payments" do
+    test "get empty list on non existing address", %{conn: conn} do
+      address = build(:address)
+
+      request = get(conn, "/api/v2/addresses/#{address.hash}/fee-payments")
+
+      assert %{"message" => "Not found"} = json_response(request, 404)
+    end
+
+    test "get 422 on invalid address", %{conn: conn} do
+      request = get(conn, "/api/v2/addresses/0x/fee-payments")
+
+      assert %{"message" => "Invalid parameter(s)"} = json_response(request, 422)
+    end
+
+    test "get fee payments", %{conn: conn} do
+      address = insert(:address)
+      fee_payments = insert_list(3, :fee_payment_same_address, to_address: address)
+      [fee_payment | _] = Enum.reverse(fee_payments)
+
+      request = get(conn, "/api/v2/addresses/#{address.hash}/fee-payments")
+      assert response = json_response(request, 200)
+      assert Enum.count(response["items"]) == 3
+      assert response["next_page_params"] == nil
+      compare_item(fee_payment, Enum.at(response["items"], 0))
+
+      request = get(conn, "/api/v2/addresses/#{address.hash}/fee-payments")
+      assert response_1 = json_response(request, 200)
+      assert response_1 == response
+    end
+
+    test "get fee payments with working next_page_params", %{conn: conn} do
+      address = insert(:address)
+      fee_payments = insert_list(51, :fee_payment_same_address, to_address: address)
+
+      request = get(conn, "/api/v2/addresses/#{address.hash}/fee-payments")
+      assert response = json_response(request, 200)
+
+      request_2nd_page = get(conn, "/api/v2/addresses/#{address.hash}/fee-payments", response["next_page_params"])
+      assert response_2nd_page = json_response(request_2nd_page, 200)
+
+      check_paginated_response(response, response_2nd_page, fee_payments)
+
+      request_1 = get(conn, "/api/v2/addresses/#{address.hash}/fee-payments")
+      assert response_1 = json_response(request_1, 200)
+
+      assert response_1 == response
+
+      request_2 = get(conn, "/api/v2/addresses/#{address.hash}/fee-payments", response_1["next_page_params"])
+      assert response_2 = json_response(request_2, 200)
+      assert response_2 == response_2nd_page
+    end
+
+  end
+
   describe "/addresses" do
     test "get empty list", %{conn: conn} do
       request = get(conn, "/api/v2/addresses")
@@ -1734,6 +1847,22 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
 
   defp compare_item(%Withdrawal{} = withdrawal, json) do
     assert withdrawal.index == json["index"]
+  end
+
+  defp compare_item(%ForwardTransfer{} = forward_transfer, json) do
+    assert forward_transfer.index == json["index"]
+    assert Address.checksum(forward_transfer.to_address_hash) == json["to_address"]
+    assert forward_transfer.block_number == json["block_number"]
+    assert to_string(forward_transfer.block_hash) == json["block_hash"]
+    assert Wei.cast(json["value"]) == {:ok, forward_transfer.value}
+  end
+
+  defp compare_item(%FeePayment{} = fee_payment, json) do
+    assert fee_payment.index == json["index"]
+    assert Address.checksum(fee_payment.to_address_hash) == json["to_address"]
+    assert fee_payment.block_number == json["block_number"]
+    assert to_string(fee_payment.block_hash) == json["block_hash"]
+    assert Wei.cast(json["value"]) == {:ok, fee_payment.value}
   end
 
   defp check_paginated_response(first_page_resp, second_page_resp, list) do
