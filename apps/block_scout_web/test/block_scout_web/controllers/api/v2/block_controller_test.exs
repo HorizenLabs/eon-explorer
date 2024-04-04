@@ -2,6 +2,7 @@ defmodule BlockScoutWeb.API.V2.BlockControllerTest do
   use BlockScoutWeb.ConnCase
 
   alias Explorer.Chain.{Address, Block, Transaction, Withdrawal, ForwardTransfer, FeePayment, Wei}
+  alias Explorer.Repo
 
   setup do
     Supervisor.terminate_child(Explorer.Supervisor, Explorer.Chain.Cache.Blocks.child_id())
@@ -552,6 +553,7 @@ defmodule BlockScoutWeb.API.V2.BlockControllerTest do
     assert forward_transfer.block_number == json["block_number"]
     assert to_string(forward_transfer.block_hash) == json["block_hash"]
     assert Wei.cast(json["value"]) == {:ok, forward_transfer.value}
+    assert Jason.encode!(Repo.get_by(Block, hash: forward_transfer.block_hash).timestamp) =~ String.replace(json["timestamp"], "Z", "")
   end
 
   defp compare_item(%FeePayment{} = fee_payment, json) do
@@ -560,6 +562,7 @@ defmodule BlockScoutWeb.API.V2.BlockControllerTest do
     assert fee_payment.block_number == json["block_number"]
     assert to_string(fee_payment.block_hash) == json["block_hash"]
     assert Wei.cast(json["value"]) == {:ok, fee_payment.value}
+    assert Jason.encode!(Repo.get_by(Block, hash: fee_payment.block_hash).timestamp) =~ String.replace(json["timestamp"], "Z", "")
   end
 
   defp check_paginated_response(first_page_resp, second_page_resp, list) do
