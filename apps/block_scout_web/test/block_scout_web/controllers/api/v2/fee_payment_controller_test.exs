@@ -1,7 +1,8 @@
 defmodule BlockScoutWeb.API.V2.FeePaymentControllerTest do
   use BlockScoutWeb.ConnCase
 
-  alias Explorer.Chain.{Address, FeePayment, Wei}
+  alias Explorer.Chain.{Address, Block, FeePayment, Wei}
+  alias Explorer.Repo
 
   describe "/fee-payment" do
 
@@ -56,6 +57,7 @@ defmodule BlockScoutWeb.API.V2.FeePaymentControllerTest do
     assert fee_payment.block_number == json["block_number"]
     assert to_string(fee_payment.block_hash) == json["block_hash"]
     assert Wei.cast(json["value"]) == {:ok, fee_payment.value}
+    assert Jason.encode!(Repo.get_by(Block, hash: fee_payment.block_hash).timestamp) =~ String.replace(json["timestamp"], "Z", "")
   end
 
   defp check_paginated_response(first_page_resp, second_page_resp, list) do
