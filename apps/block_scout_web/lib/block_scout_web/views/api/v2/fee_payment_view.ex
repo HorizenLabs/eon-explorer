@@ -13,7 +13,8 @@ defmodule BlockScoutWeb.API.V2.FeePaymentView do
       "value" => fee_payment.value,
       "block_number" => fee_payment.block_number,
       "block_hash" => fee_payment.block_hash,
-      "index" => fee_payment.index
+      "index" => fee_payment.index,
+      "timestamp" => fee_payment.block.timestamp
     }
   end
 
