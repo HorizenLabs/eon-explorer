@@ -1,10 +1,16 @@
 defmodule BlockScoutWeb.API.V2.StatsControllerTest do
   use BlockScoutWeb.ConnCase
 
+  import Mox
   alias Explorer.Counters.{AddressesCounter, AverageBlockTime}
 
   describe "/stats" do
     setup do
+      mocked_json_rpc_named_arguments = [
+        transport: EthereumJSONRPC.Mox,
+        transport_options: []
+      ]
+
       start_supervised!(AddressesCounter)
       start_supervised!(AverageBlockTime)
 
@@ -18,6 +24,12 @@ defmodule BlockScoutWeb.API.V2.StatsControllerTest do
     end
 
     test "get all fields", %{conn: conn} do
+
+      EthereumJSONRPC.Mox
+      |> expect(:json_rpc, fn %{id: _id, method: "eth_gasPrice", params: []}, _options ->
+        {:ok, "0x4a817c800"} # 20 Gwei
+      end)
+
       request = get(conn, "/api/v2/stats")
       assert response = json_response(request, 200)
 
@@ -30,6 +42,7 @@ defmodule BlockScoutWeb.API.V2.StatsControllerTest do
       assert Map.has_key?(response, "transactions_today")
       assert Map.has_key?(response, "gas_used_today")
       assert Map.has_key?(response, "gas_prices")
+      assert Map.has_key?(response, "gas_price_rpc")
       assert Map.has_key?(response, "static_gas_price")
       assert Map.has_key?(response, "market_cap")
       assert Map.has_key?(response, "network_utilization_percentage")
