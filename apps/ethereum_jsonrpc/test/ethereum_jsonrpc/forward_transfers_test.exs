@@ -78,6 +78,19 @@ defmodule EthereumJSONRPC.ForwardTransfersTest do
       value_string_1 = "0x713e24c43730000"
       value_string_2 = "0x713e24c43730001"
 
+      response = [
+        %{
+          block_number: 346_087,
+          to_address_hash: "0x5302c1375912f56a78e15802f30c693c4eae80b5",
+          value: 510_000_000_000_000_000
+        },
+        %{
+          block_number: 346_088,
+          to_address_hash: "0x5302c1375912f56a78e15802f30c693c4eae80b5",
+          value: 510_000_000_000_000_001
+        }
+      ]
+
       [
         %{
           block_number: block_number_1,
@@ -91,19 +104,8 @@ defmodule EthereumJSONRPC.ForwardTransfersTest do
         }
       ] =
         case Keyword.fetch!(json_rpc_named_arguments, :variant) do
-          EthereumJSONRPC.Geth ->
-            [
-              %{
-                block_number: 346_087,
-                to_address_hash: "0x5302c1375912f56a78e15802f30c693c4eae80b5",
-                value: 510_000_000_000_000_000
-              },
-              %{
-                block_number: 346_088,
-                to_address_hash: "0x5302c1375912f56a78e15802f30c693c4eae80b5",
-                value: 510_000_000_000_000_001
-              }
-            ]
+          EthereumJSONRPC.Geth -> response
+          EthereumJSONRPC.Nethermind -> response
         end
 
       if json_rpc_named_arguments[:transport] == EthereumJSONRPC.Mox do
