@@ -1,7 +1,8 @@
 defmodule BlockScoutWeb.API.V2.ForwardTransferControllerTest do
   use BlockScoutWeb.ConnCase
 
-  alias Explorer.Chain.{Address, ForwardTransfer, Wei}
+  alias Explorer.Chain.{Address, Block, ForwardTransfer, Wei}
+  alias Explorer.Repo
 
   describe "/forward-transfers" do
 
@@ -56,6 +57,7 @@ defmodule BlockScoutWeb.API.V2.ForwardTransferControllerTest do
     assert forward_transfer.block_number == json["block_number"]
     assert to_string(forward_transfer.block_hash) == json["block_hash"]
     assert Wei.cast(json["value"]) == {:ok, forward_transfer.value}
+    assert Jason.encode!(Repo.get_by(Block, hash: forward_transfer.block_hash).timestamp) =~ String.replace(json["timestamp"], "Z", "")
   end
 
   defp check_paginated_response(first_page_resp, second_page_resp, list) do

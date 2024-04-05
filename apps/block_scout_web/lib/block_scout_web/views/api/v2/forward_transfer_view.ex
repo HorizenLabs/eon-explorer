@@ -13,7 +13,8 @@ defmodule BlockScoutWeb.API.V2.ForwardTransferView do
       "value" => forward_transfer.value,
       "block_number" => forward_transfer.block_number,
       "block_hash" => forward_transfer.block_hash,
-      "index" => forward_transfer.index
+      "index" => forward_transfer.index,
+      "timestamp" => forward_transfer.block.timestamp
     }
   end
 

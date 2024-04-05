@@ -6,6 +6,7 @@ defmodule BlockScoutWeb.API.V2.StatsController do
   alias Explorer.{Chain, Market}
   alias Explorer.Chain.Cache.Block, as: BlockCache
   alias Explorer.Chain.Cache.{GasPriceOracle, GasUsage}
+  alias Explorer.Chain.GasPrice.GasPrice
   alias Explorer.Chain.Cache.Transaction, as: TransactionCache
   alias Explorer.Chain.Supply.RSK
   alias Explorer.Chain.Transaction.History.TransactionStats
@@ -37,6 +38,15 @@ defmodule BlockScoutWeb.API.V2.StatsController do
           nil
       end
 
+    gas_price_rpc =
+      case GasPrice.get_gas_price_from_rpc() do
+        {:ok, gas_price} ->
+          gas_price
+
+        nil ->
+          nil
+      end
+
     gas_price = Application.get_env(:block_scout_web, :gas_price)
 
     json(
@@ -51,6 +61,7 @@ defmodule BlockScoutWeb.API.V2.StatsController do
         "transactions_today" => Enum.at(transaction_stats, 0).number_of_transactions |> to_string(),
         "gas_used_today" => Enum.at(transaction_stats, 0).gas_used,
         "gas_prices" => gas_prices,
+        "gas_price_rpc" => gas_price_rpc,
         "static_gas_price" => gas_price,
         "market_cap" => Helper.market_cap(market_cap_type, exchange_rate),
         "network_utilization_percentage" => network_utilization_percentage()
