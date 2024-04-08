@@ -3,7 +3,7 @@ defmodule Explorer.Mixfile do
 
   def project do
     [
-      version: Mix.Project.config()[:version],
+      version: "3.5.0",
       aliases: aliases(Mix.env()),
       app: :explorer,
       build_path: "../../_build",

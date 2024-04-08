@@ -3,7 +3,7 @@ defmodule Indexer.MixProject do
 
   def project do
     [
-      version: Mix.Project.config()[:version],
+      version: "3.5.0",
       aliases: aliases(),
       app: :indexer,
       build_path: "../../_build",
