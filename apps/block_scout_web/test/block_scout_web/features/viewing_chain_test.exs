@@ -5,9 +5,12 @@ defmodule BlockScoutWeb.ViewingChainTest do
     # MUST Be false because ETS tables for Counters are shared
     async: false
 
+  import Mox
   alias BlockScoutWeb.{AddressPage, BlockPage, ChainPage, TransactionPage}
   alias Explorer.Chain.Block
   alias Explorer.Counters.AddressesCounter
+
+  setup :set_mox_global
 
   setup do
     Supervisor.terminate_child(Explorer.Supervisor, Explorer.Chain.Cache.Blocks.child_id())
@@ -59,6 +62,11 @@ defmodule BlockScoutWeb.ViewingChainTest do
     end
 
     test "blocks list", %{session: session} do
+      EthereumJSONRPC.Mox
+      |> expect(:json_rpc, fn %{id: _id, method: "eth_gasPrice", params: []}, _options ->
+        {:ok, "0x4a817c800"}
+      end)
+
       start_supervised!(AddressesCounter)
       AddressesCounter.consolidate()
 
@@ -68,6 +76,11 @@ defmodule BlockScoutWeb.ViewingChainTest do
     end
 
     test "inserts place holder blocks on render for out of order blocks", %{session: session} do
+      EthereumJSONRPC.Mox
+      |> expect(:json_rpc, fn %{id: _id, method: "eth_gasPrice", params: []}, _options ->
+        {:ok, "0x4a817c800"}
+      end)
+
       insert(:block, number: 409)
 
       start_supervised!(AddressesCounter)
@@ -98,6 +111,11 @@ defmodule BlockScoutWeb.ViewingChainTest do
     end
 
     test "transactions list", %{session: session} do
+      EthereumJSONRPC.Mox
+      |> expect(:json_rpc, fn %{id: _id, method: "eth_gasPrice", params: []}, _options ->
+        {:ok, "0x4a817c800"}
+      end)
+
       start_supervised!(AddressesCounter)
       AddressesCounter.consolidate()
 
@@ -107,6 +125,11 @@ defmodule BlockScoutWeb.ViewingChainTest do
     end
 
     test "contract creation is shown for to_address", %{session: session, block: block} do
+      EthereumJSONRPC.Mox
+      |> expect(:json_rpc, fn %{id: _id, method: "eth_gasPrice", params: []}, _options ->
+        {:ok, "0x4a817c800"}
+      end)
+
       contract_address = insert(:contract_address)
 
       transaction =
@@ -127,6 +150,11 @@ defmodule BlockScoutWeb.ViewingChainTest do
       block: block,
       session: session
     } do
+      EthereumJSONRPC.Mox
+      |> expect(:json_rpc, fn %{id: _id, method: "eth_gasPrice", params: []}, _options ->
+        {:ok, "0x4a817c800"}
+      end)
+
       contract_token_address = insert(:contract_address)
       insert(:token, contract_address: contract_token_address)
 

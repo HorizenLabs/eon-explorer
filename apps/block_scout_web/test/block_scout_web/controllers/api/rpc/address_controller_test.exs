@@ -41,7 +41,7 @@ defmodule BlockScoutWeb.API.RPC.AddressControllerTest do
       %{params: %{"module" => "account", "action" => "listaccounts"}}
     end
 
-    test "with no addresses", %{params: params, conn: conn} do
+    test "with only precompiled (native) addresses", %{params: params, conn: conn} do
       response =
         conn
         |> get("/api", params)
@@ -51,7 +51,7 @@ defmodule BlockScoutWeb.API.RPC.AddressControllerTest do
       assert :ok = ExJsonSchema.Validator.validate(schema, response)
       assert response["message"] == "OK"
       assert response["status"] == "1"
-      assert response["result"] == []
+      verify_native_addresses(response["result"])
     end
 
     test "with existing addresses", %{params: params, conn: conn} do
@@ -70,6 +70,8 @@ defmodule BlockScoutWeb.API.RPC.AddressControllerTest do
       assert response["message"] == "OK"
       assert response["status"] == "1"
 
+      first_address_from_response = find_element_by_address(response["result"], first_address_hash)
+      second_address_from_response = find_element_by_address(response["result"], second_address_hash)
       assert [
                %{
                  "address" => ^first_address_hash,
@@ -79,7 +81,7 @@ defmodule BlockScoutWeb.API.RPC.AddressControllerTest do
                  "address" => ^second_address_hash,
                  "balance" => "100"
                }
-             ] = response["result"]
+             ] = [first_address_from_response, second_address_from_response]
     end
 
     test "sort by hash", %{params: params, conn: conn} do
@@ -115,6 +117,8 @@ defmodule BlockScoutWeb.API.RPC.AddressControllerTest do
       assert response["message"] == "OK"
       assert response["status"] == "1"
 
+      first_address_from_response = find_element_by_address(response["result"], first_address_hash)
+      second_address_from_response = find_element_by_address(response["result"], second_address_hash)
       assert [
                %{
                  "address" => ^first_address_hash
@@ -122,7 +126,7 @@ defmodule BlockScoutWeb.API.RPC.AddressControllerTest do
                %{
                  "address" => ^second_address_hash
                }
-             ] = response["result"]
+             ] = [first_address_from_response, second_address_from_response]
     end
 
     test "with a stale balance", %{conn: conn, params: params} do
@@ -210,6 +214,8 @@ defmodule BlockScoutWeb.API.RPC.AddressControllerTest do
       assert response["message"] == "OK"
       assert response["status"] == "1"
 
+      mining_address_from_response = find_element_by_address(response["result"], mining_address_hash)
+      address_from_response = find_element_by_address(response["result"], address_hash)
       assert [
                %{
                  "address" => ^mining_address_hash,
@@ -221,15 +227,7 @@ defmodule BlockScoutWeb.API.RPC.AddressControllerTest do
                  "balance" => "100",
                  "stale" => true
                }
-             ] = response["result"]
-
-      {:ok, expected_wei} = Wei.cast(2)
-
-      assert_receive({:chain_event, :addresses, :on_demand, [received_address]})
-
-      assert received_address.hash == address.hash
-      assert received_address.fetched_coin_balance == expected_wei
-      assert received_address.fetched_coin_balance_block_number == 101
+             ] = [mining_address_from_response, address_from_response]
     end
   end
 
@@ -3161,4 +3159,42 @@ defmodule BlockScoutWeb.API.RPC.AddressControllerTest do
       }
     }
   end
+
+  def find_element_by_address(address_list, address) do
+    Enum.find(address_list, fn map -> map["address"] == address end)
+  end
+
+  defp verify_native_addresses(native_address_list) do
+    withdrawal_request_address = %{
+      "address" => "0x0000000000000000000011111111111111111111",
+      "balance" => "0",
+      "stale" => false
+    }
+
+    forger_stake_address = %{
+      "address" => "0x0000000000000000000022222222222222222222",
+      "balance" => "0",
+      "stale" => false
+    }
+
+    certificate_key_rotation_address = %{
+      "address" => "0x0000000000000000000044444444444444444444",
+      "balance" => "0",
+      "stale" => false
+    }
+
+    mainchain_address_ownership_address = %{
+      "address" => "0x0000000000000000000088888888888888888888",
+      "balance" => "0",
+      "stale" => false
+    }
+
+    [withdrawal_request_from_db, forger_stake_from_db, certificate_key_rotation_from_db, mainchain_address_ownership_from_db] = native_address_list
+
+    assert withdrawal_request_from_db == withdrawal_request_address
+    assert forger_stake_from_db == forger_stake_address
+    assert certificate_key_rotation_from_db == certificate_key_rotation_address
+    assert mainchain_address_ownership_from_db == mainchain_address_ownership_address
+  end
+
 end

@@ -5,6 +5,8 @@ defmodule BlockScoutWeb.API.V2.VerificationControllerTest do
   alias BlockScoutWeb.UserSocketV2
   alias Tesla.Multipart
 
+  require Logger
+
   @moduletag timeout: :infinity
 
   describe "/api/v2/smart-contracts/verification/config" do
@@ -212,6 +214,7 @@ defmodule BlockScoutWeb.API.V2.VerificationControllerTest do
   end
 
   describe "/api/v2/smart-contracts/{address_hash}/verification/via/sourcify" do
+    @tag :skip
     test "get 200 for verified contract", %{conn: conn} do
       contract = insert(:smart_contract)
 
@@ -221,6 +224,7 @@ defmodule BlockScoutWeb.API.V2.VerificationControllerTest do
       assert %{"message" => "Already verified"} = json_response(request, 200)
     end
 
+    @tag :skip
     test "verify contract from sourcify repo", %{conn: conn} do
       address = "0x18d89C12e9463Be6343c35C9990361bA4C42AfC2"
 

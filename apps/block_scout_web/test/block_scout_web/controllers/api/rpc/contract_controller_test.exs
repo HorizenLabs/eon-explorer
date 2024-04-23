@@ -84,7 +84,7 @@ defmodule BlockScoutWeb.API.RPC.ContractControllerTest do
       assert :ok = ExJsonSchema.Validator.validate(listcontracts_schema(), response)
     end
 
-    test "with no contracts", %{conn: conn, params: params} do
+    test "with only precompiled (native) contracts", %{conn: conn, params: params} do
       response =
         conn
         |> get("/api", params)
@@ -92,7 +92,7 @@ defmodule BlockScoutWeb.API.RPC.ContractControllerTest do
 
       assert response["message"] == "OK"
       assert response["status"] == "1"
-      assert response["result"] == []
+      verify_native_contracts(response["result"])
       assert :ok = ExJsonSchema.Validator.validate(listcontracts_schema(), response)
     end
 
@@ -107,7 +107,8 @@ defmodule BlockScoutWeb.API.RPC.ContractControllerTest do
       assert response["message"] == "OK"
       assert response["status"] == "1"
 
-      assert response["result"] == [result(contract)]
+      contract_from_response = find_element_by_address(response["result"], to_string(contract.address_hash))
+      assert contract_from_response == result(contract)
 
       assert :ok = ExJsonSchema.Validator.validate(listcontracts_schema(), response)
     end
@@ -123,7 +124,8 @@ defmodule BlockScoutWeb.API.RPC.ContractControllerTest do
       assert response["message"] == "OK"
       assert response["status"] == "1"
 
-      assert response["result"] == [result_not_verified(address.hash)]
+      contract_from_response = find_element_by_address(response["result"], to_string(address.hash))
+      assert contract_from_response == result_not_verified(address.hash)
 
       assert :ok = ExJsonSchema.Validator.validate(listcontracts_schema(), response)
     end
@@ -140,7 +142,8 @@ defmodule BlockScoutWeb.API.RPC.ContractControllerTest do
       assert response["message"] == "OK"
       assert response["status"] == "1"
 
-      assert response["result"] == [result_not_verified(address.hash)]
+      contract_from_response = find_element_by_address(response["result"], to_string(address.hash))
+      assert contract_from_response == result_not_verified(address.hash)
 
       assert :ok = ExJsonSchema.Validator.validate(listcontracts_schema(), response)
     end
@@ -161,7 +164,8 @@ defmodule BlockScoutWeb.API.RPC.ContractControllerTest do
       assert response["message"] == "OK"
       assert response["status"] == "1"
 
-      assert response["result"] == [result_not_verified(address.hash)]
+      contract_from_response = find_element_by_address(response["result"], to_string(address.hash))
+      assert contract_from_response == result_not_verified(address.hash)
 
       assert :ok = ExJsonSchema.Validator.validate(listcontracts_schema(), response)
     end
@@ -178,7 +182,8 @@ defmodule BlockScoutWeb.API.RPC.ContractControllerTest do
       assert response["message"] == "OK"
       assert response["status"] == "1"
 
-      assert response["result"] == [result(contract)]
+      contract_from_response = find_element_by_address(response["result"], to_string(contract.address_hash))
+      assert contract_from_response == result(contract)
 
       assert :ok = ExJsonSchema.Validator.validate(listcontracts_schema(), response)
     end
@@ -228,7 +233,9 @@ defmodule BlockScoutWeb.API.RPC.ContractControllerTest do
       assert response["message"] == "OK"
       assert response["status"] == "1"
 
-      assert response["result"] == [result(contract_2), result(contract_3)]
+      contract_from_response_2 = find_element_by_address(response["result"], to_string(contract_2.address_hash))
+      contract_from_response_3 = find_element_by_address(response["result"], to_string(contract_3.address_hash))
+      assert [contract_from_response_2, contract_from_response_3] == [result(contract_2), result(contract_3)]
 
       assert :ok = ExJsonSchema.Validator.validate(listcontracts_schema(), response)
     end
@@ -325,7 +332,8 @@ defmodule BlockScoutWeb.API.RPC.ContractControllerTest do
       assert response["message"] == "OK"
       assert response["status"] == "1"
 
-      assert response["result"] == [result_not_verified(contract_address.hash)]
+      contract_from_response = find_element_by_address(response["result"], to_string(contract_address.hash))
+      assert contract_from_response == result_not_verified(contract_address.hash)
 
       assert :ok = ExJsonSchema.Validator.validate(listcontracts_schema(), response)
     end
@@ -347,7 +355,8 @@ defmodule BlockScoutWeb.API.RPC.ContractControllerTest do
       assert response["message"] == "OK"
       assert response["status"] == "1"
 
-      assert response["result"] == [result_not_verified(contract_address.hash)]
+      contract_from_response = find_element_by_address(response["result"], to_string(contract_address.hash))
+      assert contract_from_response == result_not_verified(contract_address.hash)
 
       assert :ok = ExJsonSchema.Validator.validate(listcontracts_schema(), response)
     end
@@ -968,4 +977,51 @@ defmodule BlockScoutWeb.API.RPC.ContractControllerTest do
       {:ok, "0x0000000000000000000000000000000000000000000000000000000000000000"}
     end)
   end
+
+  def find_element_by_address(contract_list, address) do
+    Enum.find(contract_list, fn map -> map["Address"] == address end)
+  end
+
+  defp verify_native_contracts(native_contract_list) do
+
+    withdrawal_request_contract = %{
+      "Address" => "0x0000000000000000000011111111111111111111",
+      "CompilerVersion" => "-",
+      "ContractName" => "Withdrawal Request",
+      "OptimizationUsed" => "0",
+      "ABI" => "[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"bytes20\",\"name\":\"mcDest\",\"type\":\"bytes20\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint32\",\"name\":\"epochNumber\",\"type\":\"uint32\"}],\"name\":\"AddWithdrawalRequest\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"PubKeyHash\",\"name\":\"pubKeyHash\",\"type\":\"bytes20\"}],\"name\":\"backwardTransfer\",\"outputs\":[{\"components\":[{\"internalType\":\"PubKeyHash\",\"name\":\"pubKeyHash\",\"type\":\"bytes20\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"internalType\":\"struct WithdrawalRequests.WithdrawalRequest\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"withdrawalEpoch\",\"type\":\"uint32\"}],\"name\":\"getBackwardTransfers\",\"outputs\":[{\"components\":[{\"internalType\":\"PubKeyHash\",\"name\":\"pubKeyHash\",\"type\":\"bytes20\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"internalType\":\"struct WithdrawalRequests.WithdrawalRequest[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
+    }
+
+    forger_stake_contract = %{
+      "Address" => "0x0000000000000000000022222222222222222222",
+      "CompilerVersion" => "-",
+      "ContractName" => "Forger Stake",
+      "OptimizationUsed" => "0",
+      "ABI" => "[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"stakeId\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"DelegateForgerStake\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint32\",\"name\":\"forgerIndex\",\"type\":\"uint32\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"blockSignProposition\",\"type\":\"bytes32\"}],\"name\":\"OpenForgerList\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint32\",\"name\":\"oldVersion\",\"type\":\"uint32\"},{\"indexed\":false,\"internalType\":\"uint32\",\"name\":\"newVersion\",\"type\":\"uint32\"}],\"name\":\"StakeUpgrade\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"stakeId\",\"type\":\"bytes32\"}],\"name\":\"WithdrawForgerStake\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"publicKey\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"vrf1\",\"type\":\"bytes32\"},{\"internalType\":\"bytes1\",\"name\":\"vrf2\",\"type\":\"bytes1\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"delegate\",\"outputs\":[{\"internalType\":\"StakeID\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getAllForgersStakes\",\"outputs\":[{\"components\":[{\"internalType\":\"StakeID\",\"name\":\"stakeId\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"stakedAmount\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"publicKey\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"vrf1\",\"type\":\"bytes32\"},{\"internalType\":\"bytes1\",\"name\":\"vrf2\",\"type\":\"bytes1\"}],\"internalType\":\"struct ForgerStakes.StakeInfo[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"int32\",\"name\":\"startIndex\",\"type\":\"int32\"},{\"internalType\":\"int32\",\"name\":\"pageSize\",\"type\":\"int32\"}],\"name\":\"getPagedForgersStakes\",\"outputs\":[{\"internalType\":\"int32\",\"name\":\"\",\"type\":\"int32\"},{\"components\":[{\"internalType\":\"StakeID\",\"name\":\"stakeId\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"stakedAmount\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"publicKey\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"vrf1\",\"type\":\"bytes32\"},{\"internalType\":\"bytes1\",\"name\":\"vrf2\",\"type\":\"bytes1\"}],\"internalType\":\"struct ForgerStakes.StakeInfo[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"int32\",\"name\":\"startIndex\",\"type\":\"int32\"},{\"internalType\":\"int32\",\"name\":\"pageSize\",\"type\":\"int32\"}],\"name\":\"getPagedForgersStakesByUser\",\"outputs\":[{\"internalType\":\"int32\",\"name\":\"\",\"type\":\"int32\"},{\"components\":[{\"internalType\":\"StakeID\",\"name\":\"stakeId\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"stakedAmount\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"publicKey\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"vrf1\",\"type\":\"bytes32\"},{\"internalType\":\"bytes1\",\"name\":\"vrf2\",\"type\":\"bytes1\"}],\"internalType\":\"struct ForgerStakes.StakeInfo[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"forgerIndex\",\"type\":\"uint32\"},{\"internalType\":\"bytes32\",\"name\":\"signature1\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"signature2\",\"type\":\"bytes32\"}],\"name\":\"openStakeForgerList\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"stakeOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"upgrade\",\"outputs\":[{\"internalType\":\"uint32\",\"name\":\"\",\"type\":\"uint32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"StakeID\",\"name\":\"stakeId\",\"type\":\"bytes32\"},{\"internalType\":\"bytes1\",\"name\":\"signatureV\",\"type\":\"bytes1\"},{\"internalType\":\"bytes32\",\"name\":\"signatureR\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"signatureS\",\"type\":\"bytes32\"}],\"name\":\"withdraw\",\"outputs\":[{\"internalType\":\"StakeID\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+    }
+
+    certificate_key_rotation_contract = %{
+      "Address" => "0x0000000000000000000044444444444444444444",
+      "CompilerVersion" => "-",
+      "ContractName" => "Certificate Key Rotation",
+      "OptimizationUsed" => "0",
+      "ABI" => "[{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"key_type\",\"type\":\"uint32\"},{\"internalType\":\"uint32\",\"name\":\"index\",\"type\":\"uint32\"},{\"internalType\":\"bytes32\",\"name\":\"newKey_1\",\"type\":\"bytes32\"},{\"internalType\":\"bytes1\",\"name\":\"newKey_2\",\"type\":\"bytes1\"},{\"internalType\":\"bytes32\",\"name\":\"signKeySig_1\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"signKeySig_2\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"masterKeySig_1\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"masterKeySig_2\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"newKeySig_1\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"newKeySig_2\",\"type\":\"bytes32\"}],\"name\":\"submitKeyRotation\",\"outputs\":[{\"internalType\":\"uint32\",\"name\":\"\",\"type\":\"uint32\"},{\"internalType\":\"uint32\",\"name\":\"\",\"type\":\"uint32\"},{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"bytes1\",\"name\":\"\",\"type\":\"bytes1\"},{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+    }
+
+    mainchain_address_ownership_contract = %{
+      "Address" => "0x0000000000000000000088888888888888888888",
+      "CompilerVersion" => "-",
+      "ContractName" => "Mainchain Address Ownership",
+      "OptimizationUsed" => "0",
+      "ABI" => "[{\"inputs\":[],\"name\":\"getAllKeyOwnerships\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"scAddress\",\"type\":\"address\"},{\"internalType\":\"bytes3\",\"name\":\"mcAddrBytes1\",\"type\":\"bytes3\"},{\"internalType\":\"bytes32\",\"name\":\"mcAddrBytes2\",\"type\":\"bytes32\"}],\"internalType\":\"struct McAddrOwnership.McAddrOwnershipData[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getKeyOwnerScAddresses\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"scAddress\",\"type\":\"address\"}],\"name\":\"getKeyOwnerships\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"scAddress\",\"type\":\"address\"},{\"internalType\":\"bytes3\",\"name\":\"mcAddrBytes1\",\"type\":\"bytes3\"},{\"internalType\":\"bytes32\",\"name\":\"mcAddrBytes2\",\"type\":\"bytes32\"}],\"internalType\":\"struct McAddrOwnership.McAddrOwnershipData[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes3\",\"name\":\"mcAddrBytes1\",\"type\":\"bytes3\"},{\"internalType\":\"bytes32\",\"name\":\"mcAddrBytes2\",\"type\":\"bytes32\"}],\"name\":\"removeKeysOwnership\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes3\",\"name\":\"mcAddrBytes1\",\"type\":\"bytes3\"},{\"internalType\":\"bytes32\",\"name\":\"mcAddrBytes2\",\"type\":\"bytes32\"},{\"internalType\":\"bytes24\",\"name\":\"signature1\",\"type\":\"bytes24\"},{\"internalType\":\"bytes32\",\"name\":\"signature2\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"signature3\",\"type\":\"bytes32\"}],\"name\":\"sendKeysOwnership\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"mcMultisigAddress\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"redeemScript\",\"type\":\"string\"},{\"internalType\":\"string[]\",\"name\":\"mcSignatures\",\"type\":\"string[]\"}],\"name\":\"sendMultisigKeysOwnership\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+    }
+
+    [withdrawal_request_from_db, forger_stake_from_db, certificate_key_rotation_from_db, mainchain_address_ownership_from_db] = native_contract_list
+
+    assert withdrawal_request_from_db == withdrawal_request_contract
+    assert forger_stake_from_db == forger_stake_contract
+    assert certificate_key_rotation_from_db == certificate_key_rotation_contract
+    assert mainchain_address_ownership_from_db == mainchain_address_ownership_contract
+  end
+
 end

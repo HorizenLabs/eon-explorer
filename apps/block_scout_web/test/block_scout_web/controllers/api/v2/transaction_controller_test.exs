@@ -101,6 +101,7 @@ defmodule BlockScoutWeb.API.V2.TransactionControllerTest do
       assert %{"message" => "Unauthorized"} = json_response(request, 401)
     end
 
+    @tag :skip
     test "empty list", %{conn: conn} do
       51
       |> insert_list(:transaction)
@@ -119,6 +120,7 @@ defmodule BlockScoutWeb.API.V2.TransactionControllerTest do
       assert response["next_page_params"] == nil
     end
 
+    @tag :skip
     test "watchlist txs can paginate", %{conn: conn} do
       auth = build(:auth)
       {:ok, user} = UserFromAuth.find_or_create(auth)

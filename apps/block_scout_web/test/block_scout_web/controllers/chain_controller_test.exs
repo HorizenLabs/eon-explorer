@@ -3,10 +3,13 @@ defmodule BlockScoutWeb.ChainControllerTest do
     # ETS table is shared in `Explorer.Counters.AddressesCounter`
     async: false
 
+  import Mox
   import BlockScoutWeb.WebRouter.Helpers, only: [chain_path: 2, block_path: 3, transaction_path: 3, address_path: 3]
 
   alias Explorer.Chain.Block
   alias Explorer.Counters.AddressesCounter
+
+  setup :set_mox_global
 
   setup do
     Supervisor.terminate_child(Explorer.Supervisor, Explorer.Chain.Cache.Blocks.child_id())
@@ -21,6 +24,11 @@ defmodule BlockScoutWeb.ChainControllerTest do
 
   describe "GET index/2" do
     test "returns a welcome message", %{conn: conn} do
+      EthereumJSONRPC.Mox
+      |> expect(:json_rpc, fn %{id: _id, method: "eth_gasPrice", params: []}, _options ->
+        {:ok, "0x4a817c800"}
+      end)
+
       conn = get(conn, chain_path(BlockScoutWeb.Endpoint, :show))
 
       assert(html_response(conn, 200) =~ "POA")
