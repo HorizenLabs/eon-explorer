@@ -193,17 +193,6 @@ defmodule BlockScoutWeb.API.RPC.AddressControllerTest do
         {:ok, [%{id: id, jsonrpc: "2.0", result: "0x02"}]}
       end)
 
-      expect(EthereumJSONRPC.Mox, :json_rpc, 1, fn [
-                                                     %{
-                                                       id: 0,
-                                                       method: "eth_getBlockByNumber",
-                                                       params: ["0x65", true]
-                                                     }
-                                                   ],
-                                                   _ ->
-        {:ok, [res]}
-      end)
-
       response =
         conn
         |> get("/api", params)
