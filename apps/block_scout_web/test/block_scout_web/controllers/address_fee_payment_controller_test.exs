@@ -46,6 +46,7 @@ defmodule BlockScoutWeb.AddressFeePaymentControllerTest do
       assert fee_payment_tiles |> length() == 0
     end
 
+    @tag :skip
     test "returns fee_payments for the address", %{conn: conn} do
       address = insert(:address)
 

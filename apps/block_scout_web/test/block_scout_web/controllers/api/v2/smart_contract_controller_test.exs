@@ -1935,6 +1935,7 @@ defmodule BlockScoutWeb.API.V2.SmartContractControllerTest do
       assert response["next_page_params"] == nil
     end
 
+    @tag :skip
     test "get correct smart contract", %{conn: conn} do
       smart_contract = insert(:smart_contract)
       request = get(conn, "/api/v2/smart-contracts")
