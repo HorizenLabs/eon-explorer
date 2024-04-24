@@ -1409,11 +1409,6 @@ defmodule BlockScoutWeb.API.V2.SmartContractControllerTest do
           "method_id" => "c683630d"
         })
 
-      Logger.info("xyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxy")
-      Logger.info(custom_abi["contract_address_hash"])
-      Logger.info(json_response(request, 200))
-      Logger.info("xyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxy")
-
       assert response = json_response(request, 200)
 
       assert %{
