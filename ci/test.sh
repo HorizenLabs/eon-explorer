@@ -12,6 +12,8 @@ NULL_REDIRECT="$( [ "$ENABLE_LOGS" == "false" ] && echo ' &> /dev/null' || echo 
 export CHAIN_ID=77
 export ETHEREUM_JSONRPC_CASE=EthereumJSONRPC.Case.Nethermind.Mox
 export ETHEREUM_JSONRPC_WEB_SOCKET_CASE=EthereumJSONRPC.WebSocket.Case.Mox
+export API_V2_ENABLED=true
+export API_RATE_LIMIT_DISABLED=true
 
 echo "" && echo "=== Compile Elixir code and Audit Elixir dependencies ===" && echo ""
 
