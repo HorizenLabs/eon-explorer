@@ -16,6 +16,7 @@ RUN set -euxo pipefail \
     && apt -y install autoconf build-essential libgmp3-dev libtool ca-certificates curl gnupg unzip wget git postgresql gosu\
     && curl -L -O "https://storage.googleapis.com/chrome-for-testing-public/${CHROMEDRIVER_VERSION}/linux64/chromedriver-linux64.zip" \
     && unzip chromedriver-linux64.zip \
+    && mv chromedriver-linux64 chromedriver
     && chmod +x chromedriver \
     && mv chromedriver /usr/local/bin \
     && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
