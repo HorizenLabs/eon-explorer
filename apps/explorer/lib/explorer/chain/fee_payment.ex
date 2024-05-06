@@ -63,7 +63,7 @@ defmodule Explorer.Chain.FeePayment do
   end
 
   def changeset(%__MODULE__{} = fee_payment, attrs \\ %{}) do
-    attrs_to_cast = @required_attrs
+    attrs_to_cast = @required_attrs ++ [:value_from_fees, :value_from_mainchain]
 
     fee_payment
     |> cast(attrs, attrs_to_cast)
