@@ -19,6 +19,8 @@ defmodule Explorer.Chain.FeePayment do
           to_address: %Ecto.Association.NotLoaded{} | Address.t() | nil,
           to_address_hash: Hash.Address.t() | nil,
           value: Wei.t(),
+          value_from_fees: Wei.t() | nil,
+          value_from_mainchain: Wei.t() | nil,
           index: :integer
         }
 
@@ -38,6 +40,8 @@ defmodule Explorer.Chain.FeePayment do
   schema "fee_payments" do
     field(:block_number, :integer, primary_key: true)
     field(:value, Wei)
+    field(:value_from_fees, Wei)
+    field(:value_from_mainchain, Wei)
     field(:index, :integer, primary_key: true)
     timestamps()
 

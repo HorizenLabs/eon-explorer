@@ -29,6 +29,8 @@ defmodule EthereumJSONRPC.FeePayments do
             to_address_hash: fp["address"],
             block_number: id_to_params[response.id].number,
             value: quantity_to_integer(fp["value"]),
+            value_from_fees: quantity_to_integer(fp["valueFromFees"]),
+            value_from_mainchain: quantity_to_integer(fp["valueFromMainchain"]),
             index: Enum.count(acc)
           }
           | acc
