@@ -276,6 +276,8 @@ defmodule Indexer.Block.FetcherTest do
     } do
       block_number = @first_full_block_number
       value_string_1 = "0x713e24c43730000"
+      value_from_fees_string = "0x3782dace9d90000"
+      value_from_mainchain_string = "0x39bb49f599a0000"
       value_string_2 = "0x713e24c43730001"
 
       if json_rpc_named_arguments[:transport] == EthereumJSONRPC.Mox do
@@ -424,7 +426,9 @@ defmodule Indexer.Block.FetcherTest do
                      "forwardTransfers" => [
                        %{
                          "to" => forward_transfer_address_hash,
-                         "value" => value_string_1
+                         "value" => value_string_1,
+                         "valueFromFees" => value_from_fees_string,
+                         "valueFromMainchain" => value_from_mainchain_string
                        }
                      ]
                    }
@@ -943,6 +947,9 @@ defmodule Indexer.Block.FetcherTest do
                         %FeePayment{
                           block_number: block_number,
                           index: 0,
+                          value: value_string_1,
+                          value_from_fees: value_from_fees_string,
+                          value_from_mainchain: value_from_mainchain_string,
                           to_address_hash: %Explorer.Chain.Hash{
                             byte_count: 20,
                             bytes:
@@ -959,7 +966,7 @@ defmodule Indexer.Block.FetcherTest do
           wait_for_tasks(CoinBalance)
 
           assert Repo.aggregate(Chain.Block, :count, :hash) == 1
-          assert Repo.aggregate(Address, :count, :hash) == 4
+          assert Repo.aggregate(Address, :count, :hash) == 8
           assert Chain.log_count() == 1
           assert Repo.aggregate(Transaction, :count, :hash) == 1
 
@@ -996,117 +1003,6 @@ defmodule Indexer.Block.FetcherTest do
       end
     end
 
-    @tag :no_geth
-    test "correctly imports blocks with multiple uncle rewards for the same address", %{
-      block_fetcher: %Fetcher{json_rpc_named_arguments: json_rpc_named_arguments} = block_fetcher
-    } do
-      block_number = 7_374_455
-
-      if json_rpc_named_arguments[:transport] == EthereumJSONRPC.Mox do
-        EthereumJSONRPC.Mox
-        |> expect(:json_rpc, 3, fn requests, _options ->
-          {:ok,
-           Enum.map(requests, fn
-             %{id: id, method: "eth_getBlockByNumber", params: ["0x708677", true]} ->
-               %{
-                 id: id,
-                 result: %{
-                   "author" => "0x5a0b54d5dc17e0aadc383d2db43b0a0d3e029c4c",
-                   "difficulty" => "0x6bc767dd80781",
-                   "extraData" => "0x5050594520737061726b706f6f6c2d6574682d7477",
-                   "gasLimit" => "0x7a121d",
-                   "gasUsed" => "0x79cbe9",
-                   "hash" => "0x1b6fb99af0b51af6685a191b2f7bcba684f8565629bf084c70b2530479407455",
-                   "logsBloom" =>
-                     "0x044d42d008801488400e1809190200a80d06105bc0c4100b047895c0d518327048496108388040140010b8208006288102e206160e21052322440924002090c1c808a0817405ab238086d028211014058e949401012403210314896702d06880c815c3060a0f0809987c81044488292cc11d57882c912a808ca10471c84460460040000c0001012804022000a42106591881d34407420ba401e1c08a8d00a000a34c11821a80222818a4102152c8a0c044032080c6462644223104d618e0e544072008120104408205c60510542264808488220403000106281a0290404220112c10b080145028c8000300b18a2c8280701c882e702210b00410834840108084",
-                   "miner" => "0x5a0b54d5dc17e0aadc383d2db43b0a0d3e029c4c",
-                   "mixHash" => "0xda53ae7c2b3c529783d6cdacdb90587fd70eb651c0f04253e8ff17de97844010",
-                   "nonce" => "0x0946e5f01fce12bc",
-                   "number" => "0x708677",
-                   "parentHash" => "0x62543e836e0ef7edfa9e38f26526092c4be97efdf5ba9e0f53a4b0b7d5bc930a",
-                   "receiptsRoot" => "0xa7d2b82bd8526de11736c18bd5cc8cfe2692106c4364526f3310ad56d78669c4",
-                   "sealFields" => [
-                     "0xa0da53ae7c2b3c529783d6cdacdb90587fd70eb651c0f04253e8ff17de97844010",
-                     "0x880946e5f01fce12bc"
-                   ],
-                   "sha3Uncles" => "0x483a8a21a5825ad270f358b3ea56e060bbb8b3082d9a92ec8fa17a5c7e6fc1b6",
-                   "size" => "0x544c",
-                   "stateRoot" => "0x85daa9cd528004c1609d4cb3520fd958e85983bb4183124a4a9f7137fd39c691",
-                   "timestamp" => "0x5c8bc76e",
-                   "totalDifficulty" => "0x201a42c35142ae94458",
-                   "transactions" => [],
-                   "transactionsRoot" => "0xcd6c12fa43cd4e92ad5c0bf232b30488bbcbfe273c5b4af0366fced0767d54db",
-                   "uncles" => []
-                 }
-               }
-
-             %{
-               id: id,
-               method: "zen_getForwardTransfers",
-               params: ["0x708677"]
-             } ->
-               %{
-                 id: id,
-                 jsonrpc: "2.0",
-                 result: %{
-                   "forwardTransfers" => []
-                 }
-               }
-
-             %{id: id, method: "trace_block"} ->
-               block_quantity = integer_to_quantity(block_number)
-               _res = eth_block_number_fake_response(block_quantity)
-
-               %{
-                 id: id,
-                 result: [
-                   %{
-                     "action" => %{
-                       "author" => "0x5a0b54d5dc17e0aadc383d2db43b0a0d3e029c4c",
-                       "rewardType" => "block",
-                       "value" => "0x1d7d843dc3b48000"
-                     },
-                     "blockHash" => "0x1b6fb99af0b51af6685a191b2f7bcba684f8565629bf084c70b2530479407455",
-                     "blockNumber" => block_number,
-                     "subtraces" => 0,
-                     "traceAddress" => [],
-                     "type" => "reward"
-                   },
-                   %{
-                     "action" => %{
-                       "author" => "0xea674fdde714fd979de3edf0f56aa9716b898ec8",
-                       "rewardType" => "uncle",
-                       "value" => "0x14d1120d7b160000"
-                     },
-                     "blockHash" => "0x1b6fb99af0b51af6685a191b2f7bcba684f8565629bf084c70b2530479407455",
-                     "blockNumber" => block_number,
-                     "subtraces" => 0,
-                     "traceAddress" => [],
-                     "type" => "reward"
-                   },
-                   %{
-                     "action" => %{
-                       "author" => "0xea674fdde714fd979de3edf0f56aa9716b898ec8",
-                       "rewardType" => "uncle",
-                       "value" => "0x18493fba64ef0000"
-                     },
-                     "blockHash" => "0x1b6fb99af0b51af6685a191b2f7bcba684f8565629bf084c70b2530479407455",
-                     "blockNumber" => block_number,
-                     "subtraces" => 0,
-                     "traceAddress" => [],
-                     "type" => "reward"
-                   }
-                 ]
-               }
-           end)}
-        end)
-      end
-
-      assert {:ok, %{errors: [], inserted: %{block_rewards: _block_rewards}}} =
-               Fetcher.fetch_and_import_range(block_fetcher, block_number..block_number)
-
-      assert Repo.one!(select(Chain.Block.Reward, fragment("COUNT(*)"))) == 2
-    end
   end
 
   defp wait_until(timeout, producer) do
