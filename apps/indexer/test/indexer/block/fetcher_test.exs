@@ -426,9 +426,7 @@ defmodule Indexer.Block.FetcherTest do
                      "forwardTransfers" => [
                        %{
                          "to" => forward_transfer_address_hash,
-                         "value" => value_string_1,
-                         "valueFromFees" => value_from_fees_string,
-                         "valueFromMainchain" => value_from_mainchain_string
+                         "value" => value_string_1
                        }
                      ]
                    }
@@ -453,7 +451,9 @@ defmodule Indexer.Block.FetcherTest do
                      "payments" => [
                        %{
                          "address" => fee_payment_address_hash,
-                         "value" => value_string_1
+                         "value" => value_string_1,
+                         "valueFromFees" => value_from_fees_string,
+                         "valueFromMainchain" => value_from_mainchain_string
                        }
                      ]
                    }
