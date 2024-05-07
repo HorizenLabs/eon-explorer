@@ -438,6 +438,7 @@ defmodule BlockScoutWeb.API.V2.AddressController do
       @fee_payments_necessity_by_association
       |> Keyword.merge(paging_options(params))
       |> Keyword.merge(current_filter(params))
+      options = add_value_from_mainchain(options, params)
 
       results = Chain.get_fee_payments(address_hash, nil, options)
       {fee_payments, next_page} = split_list_by_page(results)
@@ -449,6 +450,14 @@ defmodule BlockScoutWeb.API.V2.AddressController do
       |> put_status(200)
       |> put_view(FeePaymentView)
       |> render(:fee_payments, %{fee_payments: fee_payments, next_page_params: next_page_params})
+    end
+  end
+
+  defp add_value_from_mainchain(options, params) do
+    value_from_mainchain = Enum.find_value(params, fn {key, _} -> key == "value_from_mainchain" end)
+    case value_from_mainchain do
+      nil -> options
+      _ -> Keyword.put_new(options, :value_from_mainchain, true)
     end
   end
 
