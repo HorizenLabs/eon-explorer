@@ -3,6 +3,8 @@ defmodule Indexer.Block.FetcherTest do
   use EthereumJSONRPC.Case, async: false
   use Explorer.DataCase
 
+  require Logger
+
   import Mox
   import EthereumJSONRPC, only: [integer_to_quantity: 1]
 
@@ -454,7 +456,12 @@ defmodule Indexer.Block.FetcherTest do
                          "value" => value_string_1,
                          "valueFromFees" => value_from_fees_string,
                          "valueFromMainchain" => value_from_mainchain_string
-                       }
+                       },
+                       %{
+                        "address" => fee_payment_address_hash,
+                        "value" => value_string_1,
+                        "valueFromFees" => value_string_1
+                      }
                      ]
                    }
                  }
@@ -866,8 +873,7 @@ defmodule Indexer.Block.FetcherTest do
                             %Explorer.Chain.Hash{
                               byte_count: 20,
                               bytes:
-                                <<52, 93, 11, 192, 119, 209, 13, 227, 44, 166, 187, 208, 73, 105, 84, 146, 34, 103, 201,
-                                  19>>
+                                <<52, 93, 11, 192, 119, 209, 13, 227, 44, 166, 187, 208, 73, 105, 84, 146, 34, 103, 201, 19>>
                             } = fee_payment_address_hash
                         },
                         %Address{
@@ -875,8 +881,7 @@ defmodule Indexer.Block.FetcherTest do
                             %Explorer.Chain.Hash{
                               byte_count: 20,
                               bytes:
-                                <<83, 2, 193, 55, 89, 18, 245, 106, 120, 225, 88, 2, 243, 12, 105, 60, 78, 174, 128,
-                                  181>>
+                                <<83, 2, 193, 55, 89, 18, 245, 106, 120, 225, 88, 2, 243, 12, 105, 60, 78, 174, 128, 181>>
                             } = forward_transfer_address_hash
                         },
                         %Address{
@@ -884,8 +889,7 @@ defmodule Indexer.Block.FetcherTest do
                             %Explorer.Chain.Hash{
                               byte_count: 20,
                               bytes:
-                                <<139, 243, 141, 71, 100, 146, 144, 100, 242, 212, 211, 165, 101, 32, 167, 106, 179,
-                                  223, 65, 91>>
+                                <<139, 243, 141, 71, 100, 146, 144, 100, 242, 212, 211, 165, 101, 32, 167, 106, 179, 223, 65, 91>>
                             } = first_address_hash
                         },
                         %Address{
@@ -893,8 +897,7 @@ defmodule Indexer.Block.FetcherTest do
                             %Explorer.Chain.Hash{
                               byte_count: 20,
                               bytes:
-                                <<232, 221, 197, 199, 162, 210, 240, 215, 169, 121, 132, 89, 192, 16, 79, 223, 94, 152,
-                                  122, 202>>
+                                <<232, 221, 197, 199, 162, 210, 240, 215, 169, 121, 132, 89, 192, 16, 79, 223, 94, 152, 122, 202>>
                             } = second_address_hash
                         }
                       ],
@@ -946,6 +949,17 @@ defmodule Indexer.Block.FetcherTest do
                       fee_payments: [
                         %FeePayment{
                           block_number: block_number,
+                          index: 1,
+                          value: value_string_1,
+                          value_from_fees: value_string_1,
+                          to_address_hash: %Explorer.Chain.Hash{
+                            byte_count: 20,
+                            bytes:
+                            <<52, 93, 11, 192, 119, 209, 13, 227, 44, 166, 187, 208, 73, 105, 84, 146, 34, 103, 201, 19>>
+                          }
+                        },
+                        %FeePayment{
+                          block_number: block_number,
                           index: 0,
                           value: value_string_1,
                           value_from_fees: value_from_fees_string,
@@ -953,8 +967,7 @@ defmodule Indexer.Block.FetcherTest do
                           to_address_hash: %Explorer.Chain.Hash{
                             byte_count: 20,
                             bytes:
-                              <<52, 93, 11, 192, 119, 209, 13, 227, 44, 166, 187, 208, 73, 105, 84, 146, 34, 103, 201,
-                                19>>
+                              <<52, 93, 11, 192, 119, 209, 13, 227, 44, 166, 187, 208, 73, 105, 84, 146, 34, 103, 201, 19>>
                           }
                         }
                       ]
@@ -966,7 +979,7 @@ defmodule Indexer.Block.FetcherTest do
           wait_for_tasks(CoinBalance)
 
           assert Repo.aggregate(Chain.Block, :count, :hash) == 1
-          assert Repo.aggregate(Address, :count, :hash) == 8
+          assert Repo.aggregate(Address, :count, :hash) == 8 # 4 test addresses + 4 precompiled native contracts
           assert Chain.log_count() == 1
           assert Repo.aggregate(Transaction, :count, :hash) == 1
 
@@ -987,9 +1000,20 @@ defmodule Indexer.Block.FetcherTest do
           assert fee_payment_address.fetched_coin_balance == %Wei{value: Decimal.new(1)}
           assert fee_payment_address.fetched_coin_balance_block_number == block_number
 
-          fp = Repo.get_by!(FeePayment, to_address_hash: fee_payment_address_hash)
+          fp = Repo.get_by!(FeePayment, to_address_hash: fee_payment_address_hash, index: 0)
           assert fp.to_address_hash == fee_payment_address_hash
           assert fp.block_hash == block_hash
+          assert fp.value == value_string_1
+          assert fp.value_from_fees == value_from_fees_string
+          assert fp.value_from_mainchain == value_from_mainchain_string
+
+          # fee payment with index 1 and no reward from mainchain
+          fp = Repo.get_by!(FeePayment, to_address_hash: fee_payment_address_hash, index: 1)
+          assert fp.to_address_hash == fee_payment_address_hash
+          assert fp.block_hash == block_hash
+          assert fp.value == value_string_1
+          assert fp.value_from_fees == value_string_1
+          assert fp.value_from_mainchain == nil
 
           fp_coin_balance = Repo.get_by!(Address.CoinBalance, address_hash: fee_payment_address_hash)
           assert fp_coin_balance.value == %Wei{value: Decimal.new(1)}
