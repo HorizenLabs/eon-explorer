@@ -3,8 +3,6 @@ defmodule Indexer.Block.FetcherTest do
   use EthereumJSONRPC.Case, async: false
   use Explorer.DataCase
 
-  require Logger
-
   import Mox
   import EthereumJSONRPC, only: [integer_to_quantity: 1]
 
