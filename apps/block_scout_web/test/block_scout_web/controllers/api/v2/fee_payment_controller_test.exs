@@ -4,6 +4,8 @@ defmodule BlockScoutWeb.API.V2.FeePaymentControllerTest do
   alias Explorer.Chain.{Address, Block, FeePayment, Wei}
   alias Explorer.Repo
 
+  require Logger
+
   describe "/fee-payment" do
 
     test "get empty list", %{conn: conn} do
@@ -26,6 +28,29 @@ defmodule BlockScoutWeb.API.V2.FeePaymentControllerTest do
       request = get(conn, "/api/v2/fee-payments")
       assert response_1 = json_response(request, 200)
       assert response_1 == response
+    end
+
+    # in this test 6 fee payments are inserted in the database:
+    # - 3 fee payments with mainchain reward (value_from_mainchain > 0 wei)
+    # - 3 fee payments with no mainchain reward
+    # it check that only the 3 fee payments with mainchain reward are returned if the value_from_mainchain query param is present and set to true
+    test "get fee payments with mainchain reward", %{conn: conn} do
+      fee_payments = insert_list(3, :fee_payment)
+      fee_payments_with_no_mainchain_reward = insert_list(3, :fee_payment_no_mainchain_reward)
+      [fee_payment | _] = Enum.reverse(fee_payments)
+
+      # return all fee payments
+      request = get(conn, "/api/v2/fee-payments")
+      assert response = json_response(request, 200)
+      assert Enum.count(response["items"]) == 6
+      assert response["next_page_params"] == nil
+
+      # return only fee payments with mainchain reward
+      request = get(conn, "/api/v2/fee-payments?value_from_mainchain=true")
+      assert response = json_response(request, 200)
+      assert Enum.count(response["items"]) == 3
+      assert response["next_page_params"] == nil
+      compare_item(fee_payment, Enum.at(response["items"], 0))
     end
 
     test "get fee payments with working next_page_params", %{conn: conn} do
