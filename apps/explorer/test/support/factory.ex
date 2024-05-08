@@ -847,6 +847,19 @@ defmodule Explorer.Factory do
     }
   end
 
+  def fee_payment_same_block_no_mainchain_reward_factory do
+    address = insert(:address)
+
+    %FeePayment{
+      block: build(:block),
+      block_number: build(:block).number,
+      to_address_hash: address.hash,
+      value: Enum.random(1..100_000),
+      value_from_fees: Enum.random(1..100_000),
+      index: fee_payment_index()
+    }
+  end
+
   def fee_payment_same_address_factory do
     block = insert(:block)
 
@@ -857,6 +870,19 @@ defmodule Explorer.Factory do
       value: Enum.random(1..100_000),
       value_from_fees: Enum.random(1..100_000),
       value_from_mainchain: Enum.random(1..100_000),
+      index: fee_payment_index()
+    }
+  end
+
+  def fee_payment_same_address_no_mainchain_reward_factory do
+    block = insert(:block)
+
+    %FeePayment{
+      block_number: block.number,
+      block_hash: block.hash,
+      to_address: build(:address),
+      value: Enum.random(1..100_000),
+      value_from_fees: Enum.random(1..100_000),
       index: fee_payment_index()
     }
   end

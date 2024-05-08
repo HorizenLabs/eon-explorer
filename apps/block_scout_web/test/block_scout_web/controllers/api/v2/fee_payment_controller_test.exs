@@ -4,8 +4,6 @@ defmodule BlockScoutWeb.API.V2.FeePaymentControllerTest do
   alias Explorer.Chain.{Address, Block, FeePayment, Wei}
   alias Explorer.Repo
 
-  require Logger
-
   describe "/fee-payment" do
 
     test "get empty list", %{conn: conn} do

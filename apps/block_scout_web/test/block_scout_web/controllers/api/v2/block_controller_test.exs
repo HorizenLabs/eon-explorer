@@ -505,6 +505,25 @@ defmodule BlockScoutWeb.API.V2.BlockControllerTest do
       assert response_1 == response
     end
 
+    # retrieve only fee payments with mainchain reward using value_from_mainchain query parameter
+    test "get fee payments with mainchain reward", %{conn: conn} do
+      block = insert(:block)
+      fee_payments = insert_list(3, :fee_payment_same_block, block: block)
+      fee_payments_with_no_mainchain_reward = insert_list(3, :fee_payment_same_block_no_mainchain_reward, block: block)
+      [fee_payment | _] = Enum.reverse(fee_payments)
+
+      request = get(conn, "/api/v2/blocks/#{block.number}/fee-payments")
+      assert response = json_response(request, 200)
+      assert Enum.count(response["items"]) == 6
+      assert response["next_page_params"] == nil
+
+      request = get(conn, "/api/v2/blocks/#{block.hash}/fee-payments?value_from_mainchain=true")
+      assert response = json_response(request, 200)
+      assert Enum.count(response["items"]) == 3
+      assert response["next_page_params"] == nil
+      compare_item(fee_payment, Enum.at(response["items"], 0))
+    end
+
     test "get fee payments with working next_page_params", %{conn: conn} do
 
       block = insert(:block)
