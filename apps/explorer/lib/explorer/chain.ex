@@ -3821,10 +3821,12 @@ end
   def get_fee_payments(address_hash \\ nil, block_hash \\ nil, options \\ []) when is_list(options) do
     necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
     paging_options = Keyword.get(options, :paging_options, @default_paging_options)
+    value_from_mainchain = Keyword.get(options, :value_from_mainchain, false)
 
     FeePayment
     |> fee_payments_filter_address_hash(address_hash)
     |> fee_payments_filter_block_hash(block_hash)
+    |> fee_payments_filter_with_value_from_maichain(value_from_mainchain)
     |> order_by([fee_payment], desc: [fee_payment.block_number, fee_payment.index])
     |> handle_fee_payments_paging_options(paging_options)
     |> join_associations(necessity_by_association)
@@ -3840,6 +3842,12 @@ end
   defp fee_payments_filter_block_hash(query, block_hash) do
     query |> where([fp], fp.block_hash == ^block_hash)
   end
+
+  defp fee_payments_filter_with_value_from_maichain(query, true) do
+    zero_wei = %Wei{value: Decimal.new(0)}
+    query |> where([fp], fp.value_from_mainchain > ^zero_wei)
+  end
+  defp fee_payments_filter_with_value_from_maichain(query, _), do: query
 
   def fee_payments_count() do
     FeePayment
