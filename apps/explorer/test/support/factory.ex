@@ -813,6 +813,8 @@ defmodule Explorer.Factory do
       block_hash: block.hash,
       to_address_hash: address.hash,
       value: Enum.random(1..100_000),
+      value_from_fees: Enum.random(1..100_000),
+      value_from_mainchain: Enum.random(1..100_000),
       index: fee_payment_index()
     }
   end
@@ -825,6 +827,8 @@ defmodule Explorer.Factory do
       block_number: build(:block).number,
       to_address_hash: address.hash,
       value: Enum.random(1..100_000),
+      value_from_fees: Enum.random(1..100_000),
+      value_from_mainchain: Enum.random(1..100_000),
       index: fee_payment_index()
     }
   end
@@ -837,6 +841,8 @@ defmodule Explorer.Factory do
       block_hash: block.hash,
       to_address: build(:address),
       value: Enum.random(1..100_000),
+      value_from_fees: Enum.random(1..100_000),
+      value_from_mainchain: Enum.random(1..100_000),
       index: fee_payment_index()
     }
   end
