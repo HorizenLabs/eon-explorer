@@ -1715,6 +1715,8 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
       address = insert(:address)
       fee_payments = insert_list(3, :fee_payment_same_address, to_address: address)
       fee_payments_with_no_mainchain_reward = insert_list(3, :fee_payment_same_address_no_mainchain_reward, to_address: address)
+      address_two = insert(:address) # insert 3 fee payments related to a second address
+      fee_payments_with_no_mainchain_reward_address_two = insert_list(3, :fee_payment_same_address_no_mainchain_reward, to_address: address_two)
       [fee_payment | _] = Enum.reverse(fee_payments)
 
       request = get(conn, "/api/v2/addresses/#{address.hash}/fee-payments")
@@ -1727,6 +1729,16 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
       assert Enum.count(response["items"]) == 3
       assert response["next_page_params"] == nil
       compare_item(fee_payment, Enum.at(response["items"], 0))
+
+      request = get(conn, "/api/v2/addresses/#{address_two.hash}/fee-payments")
+      assert response = json_response(request, 200)
+      assert Enum.count(response["items"]) == 3
+      assert response["next_page_params"] == nil
+
+      request = get(conn, "/api/v2/addresses/#{address_two.hash}/fee-payments?value_from_mainchain=true")
+      assert response = json_response(request, 200)
+      assert Enum.count(response["items"]) == 0
+      assert response["next_page_params"] == nil
     end
 
     test "get fee payments with working next_page_params", %{conn: conn} do
