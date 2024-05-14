@@ -29,12 +29,12 @@ defmodule BlockScoutWeb.API.V2.FeePaymentControllerTest do
     end
 
     # in this test 6 fee payments are inserted in the database:
-    # - 3 fee payments with mainchain reward (value_from_mainchain > 0 wei)
-    # - 3 fee payments with no mainchain reward
+    # - 3 fee payments with current format (value_from_fees and value_from_mainchain fields) and mainchain reward > 0 wei
+    # - 3 fee payments with old format (and so no mainchain reward present)
     # it check that only the 3 fee payments with mainchain reward are returned if the value_from_mainchain query param is present and set to true
     test "get fee payments with mainchain reward", %{conn: conn} do
       fee_payments = insert_list(3, :fee_payment)
-      fee_payments_with_no_mainchain_reward = insert_list(3, :fee_payment_no_mainchain_reward)
+      fee_payments_old_format = insert_list(3, :fee_payment_old_format)
       [fee_payment | _] = Enum.reverse(fee_payments)
 
       # return all fee payments

@@ -1714,9 +1714,9 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
     test "get fee payments with mainchain reward", %{conn: conn} do
       address = insert(:address)
       fee_payments = insert_list(3, :fee_payment_same_address, to_address: address)
-      fee_payments_with_no_mainchain_reward = insert_list(3, :fee_payment_same_address_no_mainchain_reward, to_address: address)
-      address_two = insert(:address) # insert 3 fee payments related to a second address
-      fee_payments_with_no_mainchain_reward_address_two = insert_list(3, :fee_payment_same_address_no_mainchain_reward, to_address: address_two)
+      fee_payments_old_format = insert_list(3, :fee_payment_same_address_no_mainchain_reward, to_address: address)
+      address_two = insert(:address) # insert 3 fee payments with no mainchain reward related to a second address
+      fee_payments_old_format_address_two = insert_list(3, :fee_payment_same_address_no_mainchain_reward, to_address: address_two)
       [fee_payment | _] = Enum.reverse(fee_payments)
 
       request = get(conn, "/api/v2/addresses/#{address.hash}/fee-payments")
