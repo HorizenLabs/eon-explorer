@@ -1710,6 +1710,37 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
       assert response_1 == response
     end
 
+    # retrieve only fee payments with mainchain reward using value_from_mainchain query parameter
+    test "get fee payments with mainchain reward", %{conn: conn} do
+      address = insert(:address)
+      fee_payments = insert_list(3, :fee_payment_same_address, to_address: address)
+      fee_payments_old_format = insert_list(3, :fee_payment_same_address_no_mainchain_reward, to_address: address)
+      address_two = insert(:address) # insert 3 fee payments with no mainchain reward related to a second address
+      fee_payments_old_format_address_two = insert_list(3, :fee_payment_same_address_no_mainchain_reward, to_address: address_two)
+      [fee_payment | _] = Enum.reverse(fee_payments)
+
+      request = get(conn, "/api/v2/addresses/#{address.hash}/fee-payments")
+      assert response = json_response(request, 200)
+      assert Enum.count(response["items"]) == 6
+      assert response["next_page_params"] == nil
+
+      request = get(conn, "/api/v2/addresses/#{address.hash}/fee-payments?value_from_mainchain=true")
+      assert response = json_response(request, 200)
+      assert Enum.count(response["items"]) == 3
+      assert response["next_page_params"] == nil
+      compare_item(fee_payment, Enum.at(response["items"], 0))
+
+      request = get(conn, "/api/v2/addresses/#{address_two.hash}/fee-payments")
+      assert response = json_response(request, 200)
+      assert Enum.count(response["items"]) == 3
+      assert response["next_page_params"] == nil
+
+      request = get(conn, "/api/v2/addresses/#{address_two.hash}/fee-payments?value_from_mainchain=true")
+      assert response = json_response(request, 200)
+      assert Enum.count(response["items"]) == 0
+      assert response["next_page_params"] == nil
+    end
+
     test "get fee payments with working next_page_params", %{conn: conn} do
       address = insert(:address)
       fee_payments = insert_list(51, :fee_payment_same_address, to_address: address)
@@ -1864,6 +1895,8 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
     assert fee_payment.block_number == json["block_number"]
     assert to_string(fee_payment.block_hash) == json["block_hash"]
     assert Wei.cast(json["value"]) == {:ok, fee_payment.value}
+    assert Wei.cast(json["value_from_fees"]) == {:ok, fee_payment.value_from_fees}
+    assert Wei.cast(json["value_from_mainchain"]) == {:ok, fee_payment.value_from_mainchain}
     assert Jason.encode!(Repo.get_by(Block, hash: fee_payment.block_hash).timestamp) =~ String.replace(json["timestamp"], "Z", "")
   end
 

@@ -11,6 +11,8 @@ defmodule BlockScoutWeb.API.V2.FeePaymentView do
     %{
       "to_address" => Address.checksum(fee_payment.to_address_hash),
       "value" => fee_payment.value,
+      "value_from_fees" => fee_payment.value_from_fees,
+      "value_from_mainchain" => fee_payment.value_from_mainchain,
       "block_number" => fee_payment.block_number,
       "block_hash" => fee_payment.block_hash,
       "index" => fee_payment.index,
