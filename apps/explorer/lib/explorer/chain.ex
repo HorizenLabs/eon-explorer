@@ -3826,7 +3826,7 @@ end
     FeePayment
     |> fee_payments_filter_address_hash(address_hash)
     |> fee_payments_filter_block_hash(block_hash)
-    |> fee_payments_filter_with_value_from_maichain(value_from_mainchain)
+    |> fee_payments_filter_with_value_from_mainchain(value_from_mainchain)
     |> order_by([fee_payment], desc: [fee_payment.block_number, fee_payment.index])
     |> handle_fee_payments_paging_options(paging_options)
     |> join_associations(necessity_by_association)
@@ -3843,11 +3843,11 @@ end
     query |> where([fp], fp.block_hash == ^block_hash)
   end
 
-  defp fee_payments_filter_with_value_from_maichain(query, true) do
+  defp fee_payments_filter_with_value_from_mainchain(query, true) do
     zero_wei = %Wei{value: Decimal.new(0)}
     query |> where([fp], fp.value_from_mainchain > ^zero_wei)
   end
-  defp fee_payments_filter_with_value_from_maichain(query, _), do: query
+  defp fee_payments_filter_with_value_from_mainchain(query, _), do: query
 
   def fee_payments_count() do
     FeePayment
