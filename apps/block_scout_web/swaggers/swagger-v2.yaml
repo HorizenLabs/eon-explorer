@@ -936,7 +936,7 @@ paths:
         - $ref: "#/components/parameters/addressHash"
       responses:
         "200":
-          description: pay attention that receiver field is not included to response in this endpoint
+          description: address's forward transfers
           content:
             application/json:
               schema:
@@ -969,7 +969,7 @@ paths:
           description: An optional parameter to filter fee payments with reward from mainchain
       responses:
         "200":
-          description: pay attention that receiver field is not included to response in this endpoint
+          description: address's fee payments
           content:
             application/json:
               schema:
