@@ -3,7 +3,7 @@ defmodule EthereumJsonrpc.MixProject do
 
   def project do
     [
-      version: Mix.Project.config()[:version],
+      version: "3.6.0-RC1",
       aliases: aliases(Mix.env()),
       app: :ethereum_jsonrpc,
       build_path: "../../_build",
