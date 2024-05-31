@@ -80,6 +80,7 @@ defmodule BlockScoutWeb.API.V2.AddressControllerTest do
       assert ^correct_response = json_response(request, 200)
     end
 
+    @tag :account
     test "get watchlist id", %{conn: conn} do
       auth = build(:auth)
       address = insert(:address)

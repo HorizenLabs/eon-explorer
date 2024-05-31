@@ -56,11 +56,13 @@ defmodule BlockScoutWeb.API.V2.MainPageControllerTest do
   end
 
   describe "/main-page/transactions/watchlist" do
+
     test "unauthorized", %{conn: conn} do
       request = get(conn, "/api/v2/main-page/transactions/watchlist")
       assert %{"message" => "Unauthorized"} = json_response(request, 401)
     end
 
+    @tag :account
     test "get last 6 txs", %{conn: conn} do
       insert_list(10, :transaction) |> with_block()
 

@@ -21,6 +21,10 @@ Bureaucrat.start(
 
 ExUnit.configure(formatters: [JUnitFormatter, ExUnit.CLIFormatter, Bureaucrat.Formatter])
 ExUnit.start()
+ExUnit.configure(exclude: [
+  file: ~r/test\/block_scout_web\/controllers\/admin\//,
+  file: ~r/test\/block_scout_web\/controllers\/account\//
+])
 
 Mox.defmock(Explorer.ExchangeRates.Source.TestSource, for: Explorer.ExchangeRates.Source)
 

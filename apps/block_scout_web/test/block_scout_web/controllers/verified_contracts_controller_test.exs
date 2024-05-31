@@ -35,7 +35,8 @@ defmodule BlockScoutWeb.VerifiedContractsControllerTest do
 
       items = Map.get(json_response(conn, 200), "items")
 
-      assert length(items) == 4
+      # the expected length includes also the 4 precompiled (native) contracts, so its value will be 4+4
+      assert length(items) == 8
     end
 
     test "returns next page of results based on last verified contract", %{conn: conn} do
