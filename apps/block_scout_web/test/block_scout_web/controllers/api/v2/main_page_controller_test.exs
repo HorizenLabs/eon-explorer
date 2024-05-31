@@ -62,7 +62,7 @@ defmodule BlockScoutWeb.API.V2.MainPageControllerTest do
       assert %{"message" => "Unauthorized"} = json_response(request, 401)
     end
 
-    @tag :skip
+    @tag :account
     test "get last 6 txs", %{conn: conn} do
       insert_list(10, :transaction) |> with_block()
 

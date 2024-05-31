@@ -1225,7 +1225,7 @@ defmodule BlockScoutWeb.API.V2.SmartContractControllerTest do
       {:ok, conn: Plug.Test.init_test_session(conn, current_user: user)}
     end
 
-    @tag :skip
+    @tag :account
     test "get write method from custom abi", %{conn: conn} do
       abi = [
         %{
@@ -1277,7 +1277,7 @@ defmodule BlockScoutWeb.API.V2.SmartContractControllerTest do
              ] == response
     end
 
-    @tag :skip
+    @tag :account
     test "get read method from custom abi", %{conn: conn} do
       abi = [
         %{
@@ -1345,7 +1345,7 @@ defmodule BlockScoutWeb.API.V2.SmartContractControllerTest do
              } in response
     end
 
-    @tag :skip
+    @tag :account
     test "query read method", %{conn: conn} do
       abi = [
         %{

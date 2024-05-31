@@ -145,7 +145,7 @@ defmodule BlockScoutWeb.Mixfile do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: "test --no-start"
+      test: "test --no-start --exclude account"
     ]
   end
 

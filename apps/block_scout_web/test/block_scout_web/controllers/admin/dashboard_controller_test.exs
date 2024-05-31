@@ -18,7 +18,7 @@ defmodule BlockScoutWeb.Admin.DashboardControllerTest do
       {:ok, conn: conn}
     end
 
-    @tag :skip
+    @tag :account
     test "shows the dashboard page", %{conn: conn} do
       result = get(conn, "/admin" <> AdminRoutes.dashboard_path(conn, :index))
       assert html_response(result, 200) =~ "administrator_dashboard"
