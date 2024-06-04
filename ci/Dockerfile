@@ -8,16 +8,16 @@ SHELL ["/bin/bash", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive \
     TZ=Etc/UTC \
     DISPLAY=:99.0 \
-    CHROMEDRIVER_VERSION='104.0.5112.79' \
+    CHROMEDRIVER_VERSION='123.0.6312.105' \
     NODE_MAJOR=18
 
 RUN set -euxo pipefail \
     && apt update \
     && apt -y install autoconf build-essential libgmp3-dev libtool ca-certificates curl gnupg unzip wget git postgresql gosu\
-    && curl -L -O "http://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" \
-    && unzip chromedriver_linux64.zip \
-    && chmod +x chromedriver \
-    && mv chromedriver /usr/local/bin \
+    && curl -L -O "https://storage.googleapis.com/chrome-for-testing-public/${CHROMEDRIVER_VERSION}/linux64/chromedriver-linux64.zip" \
+    && unzip chromedriver-linux64.zip \
+    && chmod +x chromedriver-linux64/chromedriver \
+    && mv chromedriver-linux64/chromedriver /usr/local/bin \
     && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
     && apt -y install ./google-chrome-stable_current_amd64.deb \
     && apt update \
