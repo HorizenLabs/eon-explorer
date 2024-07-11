@@ -8,6 +8,10 @@ defmodule BlockScoutWeb.API.V2.SearchView do
     %{"items" => Enum.map(search_results, &prepare_search_result/1), "next_page_params" => next_page_params}
   end
 
+  def render("search_results.json", %{search_results: search_results}) do
+    Enum.map(search_results, &prepare_search_result/1)
+  end
+
   def render("search_results.json", %{result: {:ok, result}}) do
     Map.merge(%{"redirect" => true}, redirect_search_results(result))
   end
