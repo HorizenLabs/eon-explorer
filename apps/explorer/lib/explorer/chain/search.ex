@@ -20,13 +20,10 @@ defmodule Explorer.Chain.Search do
 
   alias Explorer.Chain.{
     Address,
-    Beacon.Blob,
     Block,
-    DenormalizationHelper,
     SmartContract,
     Token,
-    Transaction,
-    UserOperation
+    Transaction
   }
 
   @doc """
@@ -95,29 +92,10 @@ defmodule Explorer.Chain.Search do
       valid_full_hash?(string) ->
         tx_query = search_tx_query(string)
 
-        tx_block_query =
+        tx_block_op_query =
           basic_query
           |> union(^tx_query)
           |> union(^block_query)
-
-        tx_block_op_query =
-          if UserOperation.enabled?() do
-            user_operation_query = search_user_operation_query(string)
-
-            tx_block_query
-            |> union(^user_operation_query)
-          else
-            tx_block_query
-          end
-
-        if Application.get_env(:explorer, :chain_type) == :ethereum do
-          blob_query = search_blob_query(string)
-
-          tx_block_op_query
-          |> union(^blob_query)
-        else
-          tx_block_op_query
-        end
 
       block_query ->
         basic_query
@@ -178,24 +156,6 @@ defmodule Explorer.Chain.Search do
             []
           end
 
-        op_result =
-          if valid_full_hash?(search_query) && UserOperation.enabled?() do
-            search_query
-            |> search_user_operation_query()
-            |> select_repo(options).all()
-          else
-            []
-          end
-
-        blob_result =
-          if valid_full_hash?(search_query) && Application.get_env(:explorer, :chain_type) == :ethereum do
-            search_query
-            |> search_blob_query()
-            |> select_repo(options).all()
-          else
-            []
-          end
-
         address_result =
           if query = search_address_query(search_query) do
             query
@@ -219,8 +179,6 @@ defmodule Explorer.Chain.Search do
             contracts_result,
             labels_result,
             tx_result,
-            op_result,
-            blob_result,
             address_result,
             blocks_result,
           ]
@@ -377,22 +335,7 @@ defmodule Explorer.Chain.Search do
   end
 
   defp search_tx_query(term) do
-    if DenormalizationHelper.transactions_denormalization_finished?() do
-      transaction_search_fields =
-        search_fields()
-        |> Map.put(:tx_hash, dynamic([transaction], transaction.hash))
-        |> Map.put(:block_hash, dynamic([transaction], transaction.block_hash))
-        |> Map.put(:type, "transaction")
-        |> Map.put(:block_number, dynamic([transaction], transaction.block_number))
-        |> Map.put(:inserted_at, dynamic([transaction], transaction.inserted_at))
-        |> Map.put(:timestamp, dynamic([transaction], transaction.block_timestamp))
-
-      from(transaction in Transaction,
-        where: transaction.hash == ^term,
-        select: ^transaction_search_fields
-      )
-    else
-      transaction_search_fields =
+    transaction_search_fields =
         search_fields()
         |> Map.put(:tx_hash, dynamic([transaction, _], transaction.hash))
         |> Map.put(:block_hash, dynamic([transaction, _], transaction.block_hash))
@@ -407,38 +350,6 @@ defmodule Explorer.Chain.Search do
         where: transaction.hash == ^term,
         select: ^transaction_search_fields
       )
-    end
-  end
-
-  defp search_user_operation_query(term) do
-    user_operation_search_fields =
-      search_fields()
-      |> Map.put(:user_operation_hash, dynamic([user_operation, _], user_operation.hash))
-      |> Map.put(:block_hash, dynamic([user_operation, _], user_operation.block_hash))
-      |> Map.put(:type, "user_operation")
-      |> Map.put(:inserted_at, dynamic([user_operation, _], user_operation.inserted_at))
-      |> Map.put(:block_number, dynamic([user_operation, _], user_operation.block_number))
-      |> Map.put(:timestamp, dynamic([_, block], block.timestamp))
-
-    from(user_operation in UserOperation,
-      left_join: block in Block,
-      on: user_operation.block_hash == block.hash,
-      where: user_operation.hash == ^term,
-      select: ^user_operation_search_fields
-    )
-  end
-
-  defp search_blob_query(term) do
-    blob_search_fields =
-      search_fields()
-      |> Map.put(:blob_hash, dynamic([blob, _], blob.hash))
-      |> Map.put(:type, "blob")
-      |> Map.put(:inserted_at, dynamic([blob, _], blob.inserted_at))
-
-    from(blob in Blob,
-      where: blob.hash == ^term,
-      select: ^blob_search_fields
-    )
   end
 
   defp search_block_query(term) do
@@ -568,7 +479,6 @@ defmodule Explorer.Chain.Search do
       address_hash: dynamic([_], type(^nil, :binary)),
       tx_hash: dynamic([_], type(^nil, :binary)),
       user_operation_hash: dynamic([_], type(^nil, :binary)),
-      blob_hash: dynamic([_], type(^nil, :binary)),
       block_hash: dynamic([_], type(^nil, :binary)),
       type: nil,
       name: nil,
