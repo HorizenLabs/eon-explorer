@@ -4,8 +4,6 @@ defmodule BlockScoutWeb.API.V2.SearchControllerTest do
   alias Explorer.Chain.{Address, Block}
   alias Explorer.Repo
 
-  import Logger
-
   setup do
     insert(:block)
     insert(:unique_smart_contract)
