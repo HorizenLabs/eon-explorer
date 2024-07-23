@@ -291,6 +291,45 @@ defmodule BlockScoutWeb.API.V2.SearchControllerTest do
   end
 
   describe "/search/quick" do
+
+    test "check address", %{conn: conn} do
+      address = insert(:address)
+      hash = Address.checksum(address.hash)
+      request = get(conn, "/api/v2/search/quick?q=#{hash}")
+      assert response = json_response(request, 200)
+      assert Enum.count(response) == 1
+      item = Enum.at(response, 0)
+      assert item["type"] == "address"
+      assert item["address"] == to_string(address.hash)
+      assert item["is_smart_contract_verified"] == false
+      assert item["url"] =~ to_string(address.hash)
+
+    end
+
+    test "check block", %{conn: conn} do
+      block = insert(:block)
+      hash = Address.checksum(block.hash)
+      request = get(conn, "/api/v2/search/quick?q=#{hash}")
+      assert response = json_response(request, 200)
+      assert Enum.count(response) == 1
+      item = Enum.at(response, 0)
+      assert item["type"] == "block"
+      assert item["block_number"] == block.number
+      assert item["block_hash"] == to_string(block.hash)
+      assert item["url"] =~ to_string(block.hash)
+    end
+
+    test "check transactions", %{conn: conn} do
+      transaction = insert(:transaction)
+      request = get(conn, "/api/v2/search/quick?q=#{transaction.hash}")
+      assert response = json_response(request, 200)
+      assert Enum.count(response) == 1
+      item = Enum.at(response, 0)
+      assert item["type"] == "transaction"
+      assert item["tx_hash"] == to_string(transaction.hash)
+      assert item["url"] =~ to_string(transaction.hash)
+    end
+
     test "check that all categories are in response list", %{conn: conn} do
       name = "156000"
 
