@@ -3,7 +3,7 @@ defmodule BlockScoutWeb.Mixfile do
 
   def project do
     [
-      version: "3.8.0-RC1",
+      version: "3.8.0",
       aliases: aliases(),
       app: :block_scout_web,
       build_path: "../../_build",
