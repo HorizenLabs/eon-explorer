@@ -4,6 +4,10 @@ defmodule BlockScoutWeb.API.V2.SearchController do
   import BlockScoutWeb.Chain, only: [paging_options: 1, next_page_params: 3, split_list_by_page: 1, from_param: 1]
 
   alias Explorer.Chain
+  alias Explorer.Chain.Search
+  alias Explorer.PagingOptions
+
+  @api_true [api?: true]
 
   def search(conn, %{"q" => query} = params) do
     [paging_options: paging_options] = paging_options(params)
@@ -32,4 +36,13 @@ defmodule BlockScoutWeb.API.V2.SearchController do
     |> put_status(200)
     |> render(:search_results, %{result: result})
   end
+
+  def quick_search(conn, %{"q" => query}) do
+    search_results = Search.balanced_unpaginated_search(%PagingOptions{page_size: 50}, query, @api_true)
+
+    conn
+    |> put_status(200)
+    |> render(:search_results, %{search_results: search_results})
+  end
+
 end

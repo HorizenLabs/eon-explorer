@@ -1117,4 +1117,12 @@ defmodule Explorer.Factory do
   end
 
   def random_bool, do: Enum.random([true, false])
+
+  def address_tag_factory do
+    %AddressTag{
+      label: sequence("label"),
+      display_name: sequence("display_name")
+    }
+  end
+
 end
