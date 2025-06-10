@@ -67,7 +67,80 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
 
   @max_error_length 255
 
-  @ignored_hosts ["localhost", "127.0.0.1", "0.0.0.0", "", nil]
+  @default_ignored_hosts_regex [
+    ~r/^(localhost|127\.0\.0\.1|0\.0\.0\.0|)$/
+  ]
+
+  defp ignored_hosts_regex do
+    config(:ignored_hosts_regex) || nil
+  end
+
+  defp load_ignored_hosts do
+    case ignored_hosts_regex() do
+      nil -> @default_ignored_hosts_regex
+      "" -> @default_ignored_hosts_regex
+      pattern ->
+        case parse_regex(pattern) do
+          {:ok, env_regex} -> @default_ignored_hosts_regex ++ [env_regex]
+          :error -> @default_ignored_hosts_regex
+        end
+    end
+  end
+
+  defp parse_regex(pattern) do
+    case Regex.compile(pattern) do
+      {:ok, regex} -> {:ok, regex}
+      {:error, _} ->
+        :error
+    end
+  end
+
+  defp ignored_hosts_regex_lists do
+    load_ignored_hosts()
+  end
+
+  defp is_ignored?(host) when is_nil(host), do: true
+
+  defp is_ignored?(host) do
+    Enum.any?(ignored_hosts_regex_lists(), fn
+      regex when is_binary(regex) -> regex == host
+      regex -> Regex.match?(regex, host)
+    end)
+  end
+
+  defp is_ip?(host) do
+    case :inet.parse_address(to_charlist(host)) do
+      {:ok, _} -> true
+      _ -> false
+    end
+  end
+
+  defp ip_to_string(ip), do: to_string(:inet.ntoa(ip))
+
+  defp resolve_host(host) do
+    ipv4_addresses = case :inet.gethostbyname(to_charlist(host)) do
+      {:ok, {:hostent, _name, _aliases, :inet, _length, ip_list}} ->
+        Enum.map(ip_list, &ip_to_string/1)
+      _ ->
+        []
+    end
+
+    ipv6_addresses = case :inet.gethostbyname(to_charlist(host), :inet6) do
+      {:ok, {:hostent, _name, _aliases, :inet6, _length, ip6_list}} ->
+        Enum.map(ip6_list, &ip_to_string/1)
+      _ ->
+        []
+    end
+
+    resolved_ips = ipv4_addresses ++ ipv6_addresses
+    if resolved_ips != [] do
+      IO.puts("Resolved #{host} to #{Enum.join(resolved_ips, ", ")}")
+      {:ok, resolved_ips}
+    else
+      IO.puts("Failed to resolve #{host}")
+      {:error, "unable to resolve"}
+    end
+  end
 
   def fetch_metadata(unquote(@cryptokitties_address_hash), token_id) do
     %{@token_uri => {:ok, ["https://api.cryptokitties.co/kitties/{id}"]}}
@@ -233,12 +306,33 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
   end
 
   def fetch_metadata_from_uri(uri, hex_token_id \\ nil) do
-    case Mix.env() != :test && URI.parse(uri) do
-      %URI{host: host} when host in @ignored_hosts ->
-        {:error, "ignored host #{host}"}
+    case URI.parse(uri) do
+      %URI{host: host} when is_binary(host) ->
+        host_list = [host]
 
+        resolved_list =
+          if is_ip?(host) do
+            host_list
+          else
+            case resolve_host(host) do
+              {:ok, ips} when is_list(ips) -> host_list ++ ips
+              {:error, _} = error ->
+                IO.puts("Error resolving host #{host}")
+                error
+            end
+          end
+
+        if is_tuple(resolved_list) and elem(resolved_list, 0) == :error do
+          resolved_list
+        else
+          if Enum.any?(resolved_list, &is_ignored?/1) do
+            {:error, "ignored host or IP in #{Enum.join(resolved_list, ", ")}"}
+          else
+            fetch_metadata_from_uri_inner(uri, hex_token_id)
+          end
+        end
       _ ->
-        fetch_metadata_from_uri_inner(uri, hex_token_id)
+        {:error, "invalid URI"}
     end
   end
 
@@ -351,4 +445,10 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
   end
 
   defp truncate_error(error), do: String.slice(error, 0, @max_error_length)
+
+  @spec config(atom()) :: term
+  defp config(key) do
+    Application.get_env(:explorer, __MODULE__, [])[key]
+  end
+
 end
